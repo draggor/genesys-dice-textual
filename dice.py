@@ -22,7 +22,7 @@ symbol_display = {
     Symbol.ADVANTAGE: '⮝',
     Symbol.DESPAIR: '⦻',
     Symbol.FAILURE: '⨯',
-    Symbol.THREAT: '🟕',
+    Symbol.THREAT: '⎊',
     Symbol.BLANK: ' ',
 }
 
