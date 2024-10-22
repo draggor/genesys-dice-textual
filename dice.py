@@ -215,12 +215,11 @@ def roll(dice_str: str) -> List[Face]:
 #pprint(roll('PAADDD%%'))
 
 def table(dice_str):
-    dice = [dice_map[d].faces for d in dice_str]
-    combinations = itertools.product(*dice)
-    combo_list = list(combinations)
-    total = len(combo_list)
+    dice_faces = [dice_map[die_str].faces for die_str in dice_str]
+    product = list(itertools.product(*dice_faces))
+    total = len(product)
     reduced = {}
-    for combo in combo_list:
+    for combo in product:
         r = reduce_results(list(combo))
         r = ' '.join(r)
         if r in reduced:
@@ -234,6 +233,6 @@ def table(dice_str):
     return reduced
 
 
-t = table('PAACC')
+t = table('PAADD')
 pprint(len(t))
 pprint(t)
