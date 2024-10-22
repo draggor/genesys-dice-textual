@@ -18,7 +18,7 @@ class Symbol(StrEnum):
 
 symbol_display = {
     Symbol.TRIUMPH: '❂',
-    Symbol.SUCCESS: '🟎',
+    Symbol.SUCCESS: '✷',
     Symbol.ADVANTAGE: '⮝',
     Symbol.DESPAIR: '⦻',
     Symbol.FAILURE: '⨯',
