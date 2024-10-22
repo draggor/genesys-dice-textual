@@ -19,7 +19,7 @@ class Symbol(StrEnum):
 symbol_display = {
     Symbol.TRIUMPH: '❂',
     Symbol.SUCCESS: '✷',
-    Symbol.ADVANTAGE: '⮝',
+    Symbol.ADVANTAGE: '▲',
     Symbol.DESPAIR: '⦻',
     Symbol.FAILURE: '⨯',
     Symbol.THREAT: '⎊',
@@ -233,6 +233,7 @@ def table(dice_str):
     reduced = {}
     for combo in combo_list:
         r = reduce_results(list(combo))
+        r = ' '.join(r)
         if r in reduced:
             reduced[r] += 1
         else:
