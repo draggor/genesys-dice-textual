@@ -214,17 +214,6 @@ def roll(dice_str: str) -> List[Face]:
 
 #pprint(roll('PAADDD%%'))
 
-def table():
-    rows = set()
-    for f1 in Proficiency.faces:
-        for f2 in Ability.faces:
-            for f3 in Ability.faces:
-                for f4 in Difficulty.faces:
-                    for f5 in Difficulty.faces:
-                        rows.add(reduce_results([f1,f2,f3,f4,f5]))
-
-    return rows
-
 def table(dice_str):
     dice = [dice_map[d].faces for d in dice_str]
     combinations = itertools.product(*dice)
