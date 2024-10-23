@@ -48,6 +48,9 @@ class Die:
     def __init__(self, faces: List[Face]):
         self.faces = faces
 
+    def roll(self) -> Face:
+      return random.choice(self.faces)
+
 
 Boost = Die(
     [
@@ -147,6 +150,35 @@ dice_map = {
 def roll_die(die: Die) -> Face:
     return random.choice(die.faces)
 
+cancel_map = {
+    Symbol.THREAT: Symbol.ADVANTAGE,
+    Symbol.ADVANTAGE: Symbol.THREAT,
+    Symbol.FAILURE: Symbol.SUCCESS,
+    Symbol.SUCCESS: Symbol.FAILURE,
+    Symbol.DESPAIR: Symbol.SUCCESS,
+    Symbol.TRIUMPH: Symbol.FAILURE
+}
+
+def test_cancel(results, result):
+    match: result:
+        case int():
+            results['Percentile'].append(result)
+        case Symbol():
+            opposite = cancel_map[result]
+
+            if result is Symbol.TRIUMPH or result is Symbol.DESPAIR:
+                result_add = cancel_map[opposite]
+                results[result] += 1
+            else:
+                result_add = result
+
+            if results[opposite] == 0:
+                results[result_add] += 1
+            else:
+                results[opposite] -= 1
+
+
+
 
 def add_result(results, result):
     match result:
@@ -231,16 +263,16 @@ def roll(dice_str: str) -> List[Face]:
         die = dice_map[die_str]
         # TODO: roll should be a method on die
         # TODO: need to match result to die type for better display
-        result = roll_die(die)
+        result = die.roll()
         results.append(result)
 
     reduced = reduce_results(results)
     pprint(results)
 
-    return reduced
+    return ' '.join(reduced)
 
 
-# pprint(roll('PAADDD%%'))
+pprint(roll('PAADDD%%'))
 
 
 def table(dice_str):
@@ -262,6 +294,6 @@ def table(dice_str):
     return reduced
 
 
-t = table("PAADD")
-pprint(len(t))
-pprint(t)
+#t = table("PAADD")
+#pprint(len(t))
+#pprint(t)
