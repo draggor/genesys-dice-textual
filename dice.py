@@ -19,11 +19,11 @@ class Symbol(StrEnum):
 
 symbol_display = {
     Symbol.TRIUMPH: "❂",
-    Symbol.SUCCESS: "🟎",
-    Symbol.ADVANTAGE: "⮝",
+    Symbol.SUCCESS: "✷",
+    Symbol.ADVANTAGE: "▲",
     Symbol.DESPAIR: "⦻",
     Symbol.FAILURE: "⨯",
-    Symbol.THREAT: "🟕",
+    Symbol.THREAT: "⎊",
     Symbol.BLANK: " ",
 }
 
@@ -243,26 +243,14 @@ def roll(dice_str: str) -> List[Face]:
 # pprint(roll('PAADDD%%'))
 
 
-def table():
-    rows = set()
-    for f1 in Proficiency.faces:
-        for f2 in Ability.faces:
-            for f3 in Ability.faces:
-                for f4 in Difficulty.faces:
-                    for f5 in Difficulty.faces:
-                        rows.add(reduce_results([f1, f2, f3, f4, f5]))
-
-    return rows
-
-
 def table(dice_str):
-    dice = [dice_map[d].faces for d in dice_str]
-    combinations = itertools.product(*dice)
-    combo_list = list(combinations)
-    total = len(combo_list)
+    dice_faces = [dice_map[die_str].faces for die_str in dice_str]
+    product = list(itertools.product(*dice_faces))
+    total = len(product)
     reduced = {}
-    for combo in combo_list:
+    for combo in product:
         r = reduce_results(list(combo))
+        r = " ".join(r)
         if r in reduced:
             reduced[r] += 1
         else:
@@ -274,6 +262,6 @@ def table(dice_str):
     return reduced
 
 
-t = table("PAACC")
+t = table("PAADD")
 pprint(len(t))
 pprint(t)
