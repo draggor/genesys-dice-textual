@@ -8,34 +8,38 @@ from pprint import pprint
 
 
 class Symbol(StrEnum):
-    TRIUMPH = 'TR'
-    SUCCESS = 'S'
-    ADVANTAGE = 'A'
-    DESPAIR = 'D'
-    FAILURE = 'F'
-    THREAT = 'TH'
-    BLANK = 'B'
+    TRIUMPH = "TR"
+    SUCCESS = "S"
+    ADVANTAGE = "A"
+    DESPAIR = "D"
+    FAILURE = "F"
+    THREAT = "TH"
+    BLANK = "B"
+
 
 symbol_display = {
-    Symbol.TRIUMPH: '❂',
-    Symbol.SUCCESS: '🟎',
-    Symbol.ADVANTAGE: '⮝',
-    Symbol.DESPAIR: '⦻',
-    Symbol.FAILURE: '⨯',
-    Symbol.THREAT: '🟕',
-    Symbol.BLANK: ' ',
+    Symbol.TRIUMPH: "❂",
+    Symbol.SUCCESS: "🟎",
+    Symbol.ADVANTAGE: "⮝",
+    Symbol.DESPAIR: "⦻",
+    Symbol.FAILURE: "⨯",
+    Symbol.THREAT: "🟕",
+    Symbol.BLANK: " ",
 }
 
+
 class Dice(StrEnum):
-    BOOST = 'B'
-    SETBACK = 'S'
-    ABILITY = 'A'
-    DIFFICULTY = 'D'
-    PROFICIENCY = 'P'
-    CHALLENGE = 'C'
-    PERCENTILE = '%'
+    BOOST = "B"
+    SETBACK = "S"
+    ABILITY = "A"
+    DIFFICULTY = "D"
+    PROFICIENCY = "P"
+    CHALLENGE = "C"
+    PERCENTILE = "%"
+
 
 type Face = int | Symbol | list[Symbol]
+
 
 @dataclass
 class Die:
@@ -44,75 +48,88 @@ class Die:
     def __init__(self, faces: List[Face]):
         self.faces = faces
 
-Boost = Die([
-    Symbol.BLANK,
-    Symbol.BLANK,
-    Symbol.SUCCESS,
-    [Symbol.SUCCESS, Symbol.ADVANTAGE],
-    [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
-    Symbol.ADVANTAGE,
-])
 
-Setback = Die([
-    Symbol.BLANK,
-    Symbol.BLANK,
-    Symbol.FAILURE,
-    Symbol.FAILURE,
-    Symbol.THREAT,
-    Symbol.THREAT,
-])
+Boost = Die(
+    [
+        Symbol.BLANK,
+        Symbol.BLANK,
+        Symbol.SUCCESS,
+        [Symbol.SUCCESS, Symbol.ADVANTAGE],
+        [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
+        Symbol.ADVANTAGE,
+    ]
+)
 
-Ability = Die([
-    Symbol.BLANK,
-    Symbol.SUCCESS,
-    Symbol.SUCCESS,
-    [Symbol.SUCCESS, Symbol.SUCCESS],
-    Symbol.ADVANTAGE,
-    Symbol.ADVANTAGE,
-    [Symbol.SUCCESS, Symbol.ADVANTAGE],
-    [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
-])
+Setback = Die(
+    [
+        Symbol.BLANK,
+        Symbol.BLANK,
+        Symbol.FAILURE,
+        Symbol.FAILURE,
+        Symbol.THREAT,
+        Symbol.THREAT,
+    ]
+)
 
-Difficulty = Die([
-    Symbol.BLANK,
-    Symbol.FAILURE,
-    [Symbol.FAILURE, Symbol.FAILURE],
-    Symbol.THREAT,
-    Symbol.THREAT,
-    Symbol.THREAT,
-    [Symbol.THREAT, Symbol.THREAT],
-    [Symbol.FAILURE, Symbol.THREAT],
-])
+Ability = Die(
+    [
+        Symbol.BLANK,
+        Symbol.SUCCESS,
+        Symbol.SUCCESS,
+        [Symbol.SUCCESS, Symbol.SUCCESS],
+        Symbol.ADVANTAGE,
+        Symbol.ADVANTAGE,
+        [Symbol.SUCCESS, Symbol.ADVANTAGE],
+        [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
+    ]
+)
 
-Proficiency = Die([
-    Symbol.BLANK,
-    Symbol.SUCCESS,
-    Symbol.SUCCESS,
-    [Symbol.SUCCESS, Symbol.SUCCESS],
-    [Symbol.SUCCESS, Symbol.SUCCESS],
-    Symbol.ADVANTAGE,
-    [Symbol.SUCCESS, Symbol.ADVANTAGE],
-    [Symbol.SUCCESS, Symbol.ADVANTAGE],
-    [Symbol.SUCCESS, Symbol.ADVANTAGE],
-    [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
-    [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
-    Symbol.TRIUMPH,
-])
+Difficulty = Die(
+    [
+        Symbol.BLANK,
+        Symbol.FAILURE,
+        [Symbol.FAILURE, Symbol.FAILURE],
+        Symbol.THREAT,
+        Symbol.THREAT,
+        Symbol.THREAT,
+        [Symbol.THREAT, Symbol.THREAT],
+        [Symbol.FAILURE, Symbol.THREAT],
+    ]
+)
 
-Challenge = Die([
-    Symbol.BLANK,
-    Symbol.FAILURE,
-    Symbol.FAILURE,
-    [Symbol.FAILURE, Symbol.FAILURE],
-    [Symbol.FAILURE, Symbol.FAILURE],
-    Symbol.THREAT,
-    Symbol.THREAT,
-    [Symbol.FAILURE, Symbol.THREAT],
-    [Symbol.FAILURE, Symbol.THREAT],
-    [Symbol.THREAT, Symbol.THREAT],
-    [Symbol.THREAT, Symbol.THREAT],
-    Symbol.DESPAIR,
-])
+Proficiency = Die(
+    [
+        Symbol.BLANK,
+        Symbol.SUCCESS,
+        Symbol.SUCCESS,
+        [Symbol.SUCCESS, Symbol.SUCCESS],
+        [Symbol.SUCCESS, Symbol.SUCCESS],
+        Symbol.ADVANTAGE,
+        [Symbol.SUCCESS, Symbol.ADVANTAGE],
+        [Symbol.SUCCESS, Symbol.ADVANTAGE],
+        [Symbol.SUCCESS, Symbol.ADVANTAGE],
+        [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
+        [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
+        Symbol.TRIUMPH,
+    ]
+)
+
+Challenge = Die(
+    [
+        Symbol.BLANK,
+        Symbol.FAILURE,
+        Symbol.FAILURE,
+        [Symbol.FAILURE, Symbol.FAILURE],
+        [Symbol.FAILURE, Symbol.FAILURE],
+        Symbol.THREAT,
+        Symbol.THREAT,
+        [Symbol.FAILURE, Symbol.THREAT],
+        [Symbol.FAILURE, Symbol.THREAT],
+        [Symbol.THREAT, Symbol.THREAT],
+        [Symbol.THREAT, Symbol.THREAT],
+        Symbol.DESPAIR,
+    ]
+)
 
 Percentile = Die(list(range(1, 101)))
 
@@ -126,13 +143,15 @@ dice_map = {
     Dice.PERCENTILE: Percentile,
 }
 
+
 def roll_die(die: Die) -> Face:
     return random.choice(die.faces)
+
 
 def add_result(results, result):
     match result:
         case int():
-            results['Percentile'].append(result)
+            results["Percentile"].append(result)
         case Symbol():
             match result:
                 case Symbol.ADVANTAGE:
@@ -170,6 +189,7 @@ def add_result(results, result):
 
     return results
 
+
 def reduce_results(results: List[Face]):
     reduced = {
         Symbol.TRIUMPH: 0,
@@ -178,7 +198,7 @@ def reduce_results(results: List[Face]):
         Symbol.DESPAIR: 0,
         Symbol.FAILURE: 0,
         Symbol.THREAT: 0,
-        'Percentile': [],
+        "Percentile": [],
     }
 
     for result in results:
@@ -188,10 +208,17 @@ def reduce_results(results: List[Face]):
         else:
             add_result(reduced, result)
 
-    #return reduced
-    composed_str = ''
-    for symbol in [Symbol.TRIUMPH, Symbol.SUCCESS, Symbol.ADVANTAGE, Symbol.DESPAIR, Symbol.FAILURE, Symbol.THREAT]:
-        composed_str += reduced[symbol]*symbol_display[symbol]
+    # return reduced
+    composed_str = ""
+    for symbol in [
+        Symbol.TRIUMPH,
+        Symbol.SUCCESS,
+        Symbol.ADVANTAGE,
+        Symbol.DESPAIR,
+        Symbol.FAILURE,
+        Symbol.THREAT,
+    ]:
+        composed_str += reduced[symbol] * symbol_display[symbol]
 
     return composed_str
 
@@ -212,7 +239,9 @@ def roll(dice_str: str) -> List[Face]:
 
     return reduced
 
-#pprint(roll('PAADDD%%'))
+
+# pprint(roll('PAADDD%%'))
+
 
 def table():
     rows = set()
@@ -221,9 +250,10 @@ def table():
             for f3 in Ability.faces:
                 for f4 in Difficulty.faces:
                     for f5 in Difficulty.faces:
-                        rows.add(reduce_results([f1,f2,f3,f4,f5]))
+                        rows.add(reduce_results([f1, f2, f3, f4, f5]))
 
     return rows
+
 
 def table(dice_str):
     dice = [dice_map[d].faces for d in dice_str]
@@ -244,6 +274,6 @@ def table(dice_str):
     return reduced
 
 
-t = table('PAACC')
+t = table("PAACC")
 pprint(len(t))
 pprint(t)
