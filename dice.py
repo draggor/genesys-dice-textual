@@ -147,8 +147,17 @@ dice_map = {
 }
 
 
-def roll_die(die: Die) -> Face:
-    return random.choice(die.faces)
+@dataclass
+class Result:
+    totals = {
+        Symbol.TRIUMPH: 0,
+        Symbol.SUCCESS: 0,
+        Symbol.ADVANTAGE: 0,
+        Symbol.DESPAIR: 0,
+        Symbol.FAILURE: 0,
+        Symbol.THREAT: 0,
+        "Percentile": [],
+    }
 
 cancel_map = {
     Symbol.THREAT: Symbol.ADVANTAGE,
@@ -160,7 +169,7 @@ cancel_map = {
 }
 
 def test_cancel(results, result):
-    match: result:
+    match result:
         case int():
             results['Percentile'].append(result)
         case Symbol():
