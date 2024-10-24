@@ -265,11 +265,11 @@ def main(t, dice):
 
         count = len(result)
         table = Table(title=f"Results for dice {dice} ({count})")
-        table.add_column("Result", justify="right", no_wrap=True)
-        table.add_column("%", justify="right")
+        table.add_column("Result", justify="right", style="cyan", no_wrap=True)
+        table.add_column("%", justify="right", style="magenta")
 
-        for roll, probability in result.items():
-            table.add_row(roll, str(probability))
+        for rolls, probability in result.items():
+            table.add_row(rolls, str(probability))
 
         console = Console()
         console.print(table)
