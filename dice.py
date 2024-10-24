@@ -4,9 +4,10 @@ import itertools
 import random
 from typing import Any, Dict, List
 
-from pprint import pprint
-
 import click
+from rich.console import Console
+from rich.pretty import pprint
+from rich.table import Table
 
 
 class Symbol(StrEnum):
@@ -237,7 +238,7 @@ def roll(dice_str: str) -> str:
     return str_results
 
 
-def table(dice_str: str) -> Dict[Any, Any]:
+def results_table(dice_str: str) -> Dict[Any, Any]:
     dice_faces = [dice_map[die_str].faces for die_str in dice_str]
     product = list(itertools.product(*dice_faces))
     total = len(product)
@@ -260,10 +261,18 @@ def table(dice_str: str) -> Dict[Any, Any]:
 @click.argument("dice")
 def main(t, dice):
     if t:
-        result = table(dice)
+        result = results_table(dice)
 
-        click.echo(len(result))
-        pprint(result)
+        count = len(result)
+        table = Table(title=f"Results for dice {dice} ({count})")
+        table.add_column("Result", justify="right", no_wrap=True)
+        table.add_column("%", justify="right")
+
+        for roll, probability in result.items():
+            table.add_row(roll, str(probability))
+
+        console = Console()
+        console.print(table)
     else:
         result = roll(dice)
 
@@ -272,10 +281,3 @@ def main(t, dice):
 
 if __name__ == "__main__":
     main()
-
-
-# pprint(roll("PAADDD%%"))
-
-# t = table("PAADD")
-# pprint(len(t))
-# pprint(t)
