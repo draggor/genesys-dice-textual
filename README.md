@@ -16,8 +16,13 @@ Usage: dice.py [OPTIONS] DICE
 
   The dice short codes are:
 
-  BOOST = B SETBACK = S ABILITY = A DIFFICULTY = D PROFICIENCY = P CHALLENGE =
-  C PERCENTILE = "%"
+  BOOST = B
+  SETBACK = S
+  ABILITY = A
+  DIFFICULTY = D
+  PROFICIENCY = P
+  CHALLENGE = C
+  PERCENTILE = %
 
   1 Proficiency (yellow) 2 Ability (green) against 2 Difficulty (purple) is:
   PAADD

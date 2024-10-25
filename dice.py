@@ -274,13 +274,14 @@ def main(t, s, dice):
 
     The dice short codes are:
 
+    \b
     BOOST = B
     SETBACK = S
     ABILITY = A
     DIFFICULTY = D
     PROFICIENCY = P
     CHALLENGE = C
-    PERCENTILE = "%"
+    PERCENTILE = %
 
     1 Proficiency (yellow) 2 Ability (green) against 2 Difficulty (purple) is: PAADD
     """
