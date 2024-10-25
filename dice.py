@@ -239,7 +239,8 @@ def roll(dice_str: str) -> str:
 
 
 def results_table(dice_str: str) -> Dict[Any, Any]:
-    dice_faces = [dice_map[die_str].faces for die_str in dice_str]
+    stripped_dice_str = dice_str.strip('%')
+    dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
     product = list(itertools.product(*dice_faces))
     total = len(product)
     reduced = {}
@@ -268,6 +269,22 @@ def results_table(dice_str: str) -> Dict[Any, Any]:
 @click.option("-s", is_flag=True, help="Print the success rate of a roll")
 @click.argument("dice")
 def main(t, s, dice):
+    """
+    A dice roller and probablity calculator for the Genesys RPG system
+
+    The dice short codes are:
+
+    BOOST = B
+    SETBACK = S
+    ABILITY = A
+    DIFFICULTY = D
+    PROFICIENCY = P
+    CHALLENGE = C
+    PERCENTILE = "%"
+
+    1 Proficiency (yellow) 2 Ability (green) against 2 Difficulty (purple) is: PAADD
+    """
+
     if s:
         result, success_rate = results_table(dice)
         pprint(f"Success rate for {dice} is {success_rate}%")
