@@ -243,8 +243,13 @@ def results_table(dice_str: str) -> Dict[Any, Any]:
     product = list(itertools.product(*dice_faces))
     total = len(product)
     reduced = {}
+    success_count = 0
     for combo in product:
         r = str(Result(list(combo)))
+
+        if symbol_display[Symbol.SUCCESS] in r:
+            success_count += 1
+
         if r in reduced:
             reduced[r] += 1
         else:
@@ -253,23 +258,31 @@ def results_table(dice_str: str) -> Dict[Any, Any]:
     for item in reduced:
         reduced[item] = round(reduced[item] / total * 100, 2)
 
-    return reduced
+    success_rate = round(success_count / total * 100, 2)
+
+    return reduced, success_rate
 
 
 @click.command()
 @click.option("-t", is_flag=True, help="Print all rolls with probabilities")
+@click.option("-s", is_flag=True, help="Print the success rate of a roll")
 @click.argument("dice")
-def main(t, dice):
-    if t:
-        result = results_table(dice)
+def main(t, s, dice):
+    if s:
+        result, success_rate = results_table(dice)
+        pprint(f"Success rate for {dice} is {success_rate}%")
+    elif t:
+        result, success_rate = results_table(dice)
 
         count = len(result)
-        table = Table(title=f"Results for dice {dice} ({count})")
-        table.add_column("Result", justify="right", style="cyan", no_wrap=True)
+        table = Table(title=f"Results for dice {dice} ({count})", show_footer=True)
+        table.add_column("Result", justify="right", style="cyan", no_wrap=True, footer='Success Rate')
         table.add_column("%", justify="right", style="magenta")
 
         for rolls, probability in result.items():
             table.add_row(rolls, str(probability))
+
+        table.columns[1].footer = str(success_rate) + "%"
 
         console = Console()
         console.print(table)
