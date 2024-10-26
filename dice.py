@@ -1,3 +1,4 @@
+from collections import Counter
 from dataclasses import dataclass, field
 from enum import StrEnum
 import itertools
@@ -238,6 +239,34 @@ def roll(dice_str: str) -> str:
     return str_results
 
 
+def count_symbols(roll_result) -> Dict[Any, Any]:
+    flat = []
+    for face in roll_result:
+        if type(face) is list:
+            flat.extend(face)
+        else:
+            flat.append(face)
+    return Counter(flat)
+
+
+def is_success(roll_result) -> bool:
+    counts = count_symbols(roll_result)
+    return (counts[Symbol.SUCCESS] + counts[Symbol.TRIUMPH]) > (counts[Symbol.FAILURE] + counts[Symbol.DESPAIR])
+
+
+def success_probability(dice_str: str) -> float:
+    stripped_dice_str = dice_str.strip('%')
+    dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
+    product = list(itertools.product(*dice_faces))
+    total = len(product)
+    success_count = 0
+
+    for result in product:
+        if is_success(result):
+            success_count += 1
+
+    return round(success_count / total * 100, 2)
+
 def results_table(dice_str: str) -> Dict[Any, Any]:
     stripped_dice_str = dice_str.strip('%')
     dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
@@ -287,7 +316,7 @@ def main(t, s, dice):
     """
 
     if s:
-        result, success_rate = results_table(dice)
+        success_rate = success_probability(dice)
         pprint(f"Success rate for {dice} is {success_rate}%")
     elif t:
         result, success_rate = results_table(dice)
