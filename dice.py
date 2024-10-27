@@ -251,11 +251,13 @@ def count_symbols(roll_result) -> Dict[Any, Any]:
 
 def is_success(roll_result) -> bool:
     counts = count_symbols(roll_result)
-    return (counts[Symbol.SUCCESS] + counts[Symbol.TRIUMPH]) > (counts[Symbol.FAILURE] + counts[Symbol.DESPAIR])
+    return (counts[Symbol.SUCCESS] + counts[Symbol.TRIUMPH]) > (
+        counts[Symbol.FAILURE] + counts[Symbol.DESPAIR]
+    )
 
 
 def success_probability(dice_str: str) -> float:
-    stripped_dice_str = dice_str.strip('%')
+    stripped_dice_str = dice_str.strip("%")
     dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
     product = list(itertools.product(*dice_faces))
     total = len(product)
@@ -267,8 +269,9 @@ def success_probability(dice_str: str) -> float:
 
     return round(success_count / total * 100, 2)
 
+
 def results_table(dice_str: str) -> Dict[Any, Any]:
-    stripped_dice_str = dice_str.strip('%')
+    stripped_dice_str = dice_str.strip("%")
     dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
     product = list(itertools.product(*dice_faces))
     total = len(product)
@@ -323,7 +326,9 @@ def main(t, s, dice):
 
         count = len(result)
         table = Table(title=f"Results for dice {dice} ({count})", show_footer=True)
-        table.add_column("Result", justify="right", style="cyan", no_wrap=True, footer='Success Rate')
+        table.add_column(
+            "Result", justify="right", style="cyan", no_wrap=True, footer="Success Rate"
+        )
         table.add_column("%", justify="right", style="magenta")
 
         for rolls, probability in result.items():
