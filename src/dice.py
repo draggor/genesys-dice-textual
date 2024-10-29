@@ -253,7 +253,7 @@ def roll(dice_str: str) -> str:
     results = []
 
     for die_str in dice_str:
-        die = dice_map[dice_short_codes[die_str]]
+        die = dice_map[dice_short_codes[die_str.upper()]]
         result = die.roll()
         results.append(result)
 
