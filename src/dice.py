@@ -47,6 +47,10 @@ dice_display = {
     Dice.PERCENTILE: "T",
 }
 
+dice_short_codes = {}
+for die, code in dice_display.items():
+    dice_short_codes[code] = die
+
 type Face = int | Symbol | list[Symbol]
 
 
@@ -241,7 +245,7 @@ def roll(dice_str: str) -> str:
     results = []
 
     for die_str in dice_str:
-        die = dice_map[die_str]
+        die = dice_map[dice_short_codes[die_str]]
         # TODO: need to match result to die type for better display
         result = die.roll()
         results.append(result)
@@ -269,8 +273,10 @@ def is_success(roll_result) -> bool:
 
 
 def success_probability(dice_str: str) -> float:
-    stripped_dice_str = dice_str.strip("%")
-    dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
+    stripped_dice_str = dice_str.strip("T").upper()
+    dice_faces = [
+        dice_map[dice_short_codes[die_str]].faces for die_str in stripped_dice_str
+    ]
     product = list(itertools.product(*dice_faces))
     total = len(product)
     success_count = 0
@@ -283,8 +289,10 @@ def success_probability(dice_str: str) -> float:
 
 
 def results_table(dice_str: str) -> Dict[Any, Any]:
-    stripped_dice_str = dice_str.strip("%")
-    dice_faces = [dice_map[die_str].faces for die_str in stripped_dice_str]
+    stripped_dice_str = dice_str.strip("T").upper()
+    dice_faces = [
+        dice_map[dice_short_codes[die_str]].faces for die_str in stripped_dice_str
+    ]
     product = list(itertools.product(*dice_faces))
     total = len(product)
     reduced = {}

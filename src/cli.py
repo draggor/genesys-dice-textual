@@ -31,7 +31,7 @@ def main(t, s, f, dice):
     DIFFICULTY = D
     PROFICIENCY = P
     CHALLENGE = C
-    PERCENTILE = %
+    PERCENTILE = T
 
     1 Proficiency (yellow) 2 Ability (green) against 2 Difficulty (purple) is: PAADD
     """
