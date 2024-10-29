@@ -44,14 +44,16 @@ type Face = int | Symbol | list[Symbol]
 class Die:
     faces: List[Face] = field(default_factory=list)
 
-    def __init__(self, faces: List[Face]):
+    def __init__(self, die_type: Dice, faces: List[Face]):
         self.faces = faces
+        self.die_type = die_type
 
     def roll(self) -> Face:
         return random.choice(self.faces)
 
 
 Boost = Die(
+    Dice.BOOST,
     [
         Symbol.BLANK,
         Symbol.BLANK,
@@ -59,10 +61,11 @@ Boost = Die(
         [Symbol.SUCCESS, Symbol.ADVANTAGE],
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
         Symbol.ADVANTAGE,
-    ]
+    ],
 )
 
 Setback = Die(
+    Dice.SETBACK,
     [
         Symbol.BLANK,
         Symbol.BLANK,
@@ -70,10 +73,11 @@ Setback = Die(
         Symbol.FAILURE,
         Symbol.THREAT,
         Symbol.THREAT,
-    ]
+    ],
 )
 
 Ability = Die(
+    Dice.ABILITY,
     [
         Symbol.BLANK,
         Symbol.SUCCESS,
@@ -83,10 +87,11 @@ Ability = Die(
         Symbol.ADVANTAGE,
         [Symbol.SUCCESS, Symbol.ADVANTAGE],
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
-    ]
+    ],
 )
 
 Difficulty = Die(
+    Dice.DIFFICULTY,
     [
         Symbol.BLANK,
         Symbol.FAILURE,
@@ -96,10 +101,11 @@ Difficulty = Die(
         Symbol.THREAT,
         [Symbol.THREAT, Symbol.THREAT],
         [Symbol.FAILURE, Symbol.THREAT],
-    ]
+    ],
 )
 
 Proficiency = Die(
+    Dice.PROFICIENCY,
     [
         Symbol.BLANK,
         Symbol.SUCCESS,
@@ -113,10 +119,11 @@ Proficiency = Die(
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
         Symbol.TRIUMPH,
-    ]
+    ],
 )
 
 Challenge = Die(
+    Dice.CHALLENGE,
     [
         Symbol.BLANK,
         Symbol.FAILURE,
@@ -130,10 +137,10 @@ Challenge = Die(
         [Symbol.THREAT, Symbol.THREAT],
         [Symbol.THREAT, Symbol.THREAT],
         Symbol.DESPAIR,
-    ]
+    ],
 )
 
-Percentile = Die(list(range(1, 101)))
+Percentile = Die(Dice.PERCENTILE, list(range(1, 101)))
 
 dice_map = {
     Dice.BOOST: Boost,
