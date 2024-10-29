@@ -5,6 +5,8 @@ import itertools
 import random
 from typing import Any, Dict, List
 
+from rich.pretty import pprint
+
 
 class Symbol(StrEnum):
     TRIUMPH = "TR"
@@ -269,7 +271,7 @@ def roll(dice: List[Dice]) -> str:
     return str_results
 
 
-def count_symbols(roll_result) -> Dict[Any, Any]:
+def count_symbols(roll_result: List[Face]) -> Dict[Symbol, int]:
     flat = []
     for face in roll_result:
         if type(face) is list:
@@ -279,7 +281,7 @@ def count_symbols(roll_result) -> Dict[Any, Any]:
     return Counter(flat)
 
 
-def is_success(roll_result) -> bool:
+def is_success(roll_result: List[Face]) -> bool:
     counts = count_symbols(roll_result)
     return (counts[Symbol.SUCCESS] + counts[Symbol.TRIUMPH]) > (
         counts[Symbol.FAILURE] + counts[Symbol.DESPAIR]
