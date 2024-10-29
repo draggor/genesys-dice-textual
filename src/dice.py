@@ -241,19 +241,26 @@ class Result:
         return composed_str
 
 
-def get_dice_faces(dice_str: str) -> List[Face]:
-    stripped_dice_str = dice_str.strip(dice_display[Dice.PERCENTILE]).upper()
-    dice_faces = [
-        dice_map[dice_short_codes[die_str]].faces for die_str in stripped_dice_str
-    ]
+def get_dice_from_str(dice_str: str) -> List[Dice]:
+    dice = []
+    for die in dice_str.strip().upper():
+        if die in dice_short_codes:
+            dice.append(dice_map[dice_short_codes[die]])
+        else:
+            raise Exception(f"{die} is not a valid short code")
+
+    return dice
+
+
+def get_dice_faces(dice: List[Dice]) -> List[Face]:
+    dice_faces = [die.faces for die in dice if die is not Dice.PERCENTILE]
     return dice_faces
 
 
-def roll(dice_str: str) -> str:
+def roll(dice: List[Dice]) -> str:
     results = []
 
-    for die_str in dice_str:
-        die = dice_map[dice_short_codes[die_str.upper()]]
+    for die in dice:
         result = die.roll()
         results.append(result)
 
@@ -279,8 +286,8 @@ def is_success(roll_result) -> bool:
     )
 
 
-def success_probability(dice_str: str) -> float:
-    dice_faces = get_dice_faces(dice_str)
+def success_probability(dice: List[Dice]) -> float:
+    dice_faces = get_dice_faces(dice)
     product = list(itertools.product(*dice_faces))
     total = len(product)
     success_count = 0
@@ -292,8 +299,8 @@ def success_probability(dice_str: str) -> float:
     return round(success_count / total * 100, 2)
 
 
-def results_table(dice_str: str) -> Dict[Any, Any]:
-    dice_faces = get_dice_faces(dice_str)
+def results_table(dice: List[Dice]) -> Dict[Any, Any]:
+    dice_faces = get_dice_faces(dice)
     product = list(itertools.product(*dice_faces))
     total = len(product)
     reduced = {}

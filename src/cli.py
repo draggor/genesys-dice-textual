@@ -10,6 +10,7 @@ from dice import (
     dice_map,
     Dice,
     symbol_display,
+    get_dice_from_str,
 )
 
 
@@ -37,10 +38,12 @@ def main(t, s, f, dice):
     """
 
     if s:
-        success_rate = success_probability(dice)
+        dice_list = get_dice_from_str(dice)
+        success_rate = success_probability(dice_list)
         pprint(f"Success rate for {dice} is {success_rate}%")
     elif t:
-        result, success_rate = results_table(dice)
+        dice_list = get_dice_from_str(dice)
+        result, success_rate = results_table(dice_list)
 
         count = len(result)
         table = Table(title=f"Results for dice {dice} ({count})", show_footer=True)
@@ -81,7 +84,8 @@ def main(t, s, f, dice):
         if dice is None:
             click.echo(click.get_current_context().get_help())
         else:
-            result = roll(dice)
+            dice_list = get_dice_from_str(dice)
+            result = roll(dice_list)
 
             click.echo(result)
 
