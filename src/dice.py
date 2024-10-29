@@ -28,14 +28,24 @@ symbol_display = {
 
 
 class Dice(StrEnum):
-    BOOST = "B"
-    SETBACK = "S"
-    ABILITY = "A"
-    DIFFICULTY = "D"
-    PROFICIENCY = "P"
-    CHALLENGE = "C"
-    PERCENTILE = "%"
+    BOOST = "boost"
+    SETBACK = "setback"
+    ABILITY = "ability"
+    DIFFICULTY = "difficulty"
+    PROFICIENCY = "proficiency"
+    CHALLENGE = "challenge"
+    PERCENTILE = "percentile"
 
+
+dice_display = {
+    Dice.BOOST: "B",
+    Dice.SETBACK: "S",
+    Dice.ABILITY: "A",
+    Dice.DIFFICULTY: "D",
+    Dice.PROFICIENCY: "P",
+    Dice.CHALLENGE: "C",
+    Dice.PERCENTILE: "T",
+}
 
 type Face = int | Symbol | list[Symbol]
 

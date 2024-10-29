@@ -10,27 +10,11 @@ from dice import (
     dice_map,
     Dice,
     Die,
+    dice_display,
     symbol_display,
 )
 
-
-color_map = {
-    Dice.BOOST: "cyan",
-    Dice.SETBACK: "black",
-    Dice.ABILITY: "ansi_green",
-    Dice.DIFFICULTY: "darkorchid",
-    Dice.PROFICIENCY: "gold",
-    Dice.CHALLENGE: "darkred",
-    Dice.PERCENTILE: "lightslategrey",
-}
-
-
-class Die(Button):
-    def __init__(self, die: Die, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.die = die
-        self.label = die.die_type
-        self.styles.background = color_map[die.die_type]
+from die_button import DieButton
 
 
 class DiceMenu(Container):
@@ -45,7 +29,7 @@ class DiceMenu(Container):
 
     def compose(self) -> ComposeResult:
         for die_type, die in dice_map.items():
-            yield Die(die, id=die_type.name)
+            yield DieButton(die, id=die_type.name)
 
 
 class Pending(Placeholder):
