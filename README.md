@@ -8,7 +8,7 @@ Otherwise, just clone the repo and follow the usages below.
 
 # CLI (non TUI) Usage
 ```
-$ uv run dice.py --help
+$ uv run src/cli.py --help
 
 Usage: dice.py [OPTIONS] DICE
 
