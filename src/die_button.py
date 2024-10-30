@@ -256,7 +256,7 @@ class DieButton(Button):
     """The variant name for the button."""
 
     def __init__(self, die: Die, *args, **kwargs):
-        super().__init__(variant=die.die_type, *args, **kwargs)
+        super().__init__(variant=die.die_type, *args, **kwargs)  # type: ignore
         self.die = die
         self.label = dice_display[die.die_type]
         # self.variant = die.die_type

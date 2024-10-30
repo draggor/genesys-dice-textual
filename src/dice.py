@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 import itertools
 import random
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from rich.pretty import pprint
 
@@ -243,7 +243,7 @@ class Result:
         return composed_str
 
 
-def get_dice_from_str(dice_str: str) -> List[Dice]:
+def get_dice_from_str(dice_str: str) -> List[Die]:
     dice = []
     for die in dice_str.strip().upper():
         if die in dice_short_codes:
@@ -254,12 +254,12 @@ def get_dice_from_str(dice_str: str) -> List[Dice]:
     return dice
 
 
-def get_dice_faces(dice: List[Dice]) -> List[Face]:
+def get_dice_faces(dice: List[Die]) -> List[List[Face]]:
     dice_faces = [die.faces for die in dice if die is not Dice.PERCENTILE]
     return dice_faces
 
 
-def roll(dice: List[Dice]) -> str:
+def roll(dice: List[Die]) -> str:
     results = []
 
     for die in dice:
@@ -272,12 +272,14 @@ def roll(dice: List[Dice]) -> str:
 
 
 def count_symbols(roll_result: List[Face]) -> Dict[Symbol, int]:
-    flat = []
+    flat: List[Symbol] = []
     for face in roll_result:
         if type(face) is list:
             flat.extend(face)
-        else:
+        elif type(face) is Symbol:
             flat.append(face)
+        else:
+            raise Exception(f"{face} is a buggy face?")
     return Counter(flat)
 
 
@@ -288,24 +290,24 @@ def is_success(roll_result: List[Face]) -> bool:
     )
 
 
-def success_probability(dice: List[Dice]) -> float:
+def success_probability(dice: List[Die]) -> float:
     dice_faces = get_dice_faces(dice)
     product = list(itertools.product(*dice_faces))
     total = len(product)
     success_count = 0
 
     for result in product:
-        if is_success(result):
+        if is_success(list(result)):
             success_count += 1
 
     return round(success_count / total * 100, 2)
 
 
-def results_table(dice: List[Dice]) -> Dict[Any, Any]:
+def results_table(dice: List[Die]) -> Tuple[Dict[str, float], float]:
     dice_faces = get_dice_faces(dice)
     product = list(itertools.product(*dice_faces))
     total = len(product)
-    reduced = {}
+    reduced: Dict[str, float] = {}
     success_count = 0
     for combo in product:
         r = str(Result(list(combo)))

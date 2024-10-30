@@ -13,5 +13,12 @@ dependencies = [
 [tool.uv]
 dev-dependencies = [
     "black>=24.10.0",
+    "mypy>=1.13.0",
     "pytest>=8.3.3",
 ]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+warn_return_any = true
+warn_unused_configs = true
