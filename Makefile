@@ -14,5 +14,8 @@ build:
 dice:
 	uv run src/cli.py
 
-.PHONY: clean build dice
+mypy:
+	uv run mypy
+
+.PHONY: clean build dice mypy
 
