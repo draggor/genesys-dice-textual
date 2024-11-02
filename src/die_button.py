@@ -89,9 +89,10 @@ class DieButton(Button):
     $percentile-lighten-3: $percentile;
 
     DieButton {
-        width: auto;
-        min-width: 16;
-        height: auto;
+        width: 5;
+        max-width: 5;
+        height: 3;
+        max-height: 3;
         background: $panel;
         color: $text;
         border: none;
