@@ -1,5 +1,11 @@
+from dataclasses import field
+from typing import Any, Dict, List, Tuple
+
+from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal
+from textual.message import Message
+from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import Button, Header, Footer, Placeholder
 
@@ -29,10 +35,10 @@ class DiceMenu(Container):
 
     def compose(self) -> ComposeResult:
         for die_type, die in dice_map.items():
-            yield DieButton(die, id=die_type.name)
+            yield DieButton(die, id=die_type.name, classes="tray")
 
 
-class Pending(Placeholder):
+class Pending(Horizontal):
     DEFAULT_CSS = """
     Pending {
         height: 1fr;
@@ -40,11 +46,26 @@ class Pending(Placeholder):
     }
     """
 
+    dice: List[Dice] = reactive(list, recompose=True)
+
+    def compose(self) -> ComposeResult:
+        for die_type in self.dice:
+            die = dice_map[die_type]
+            yield DieButton(die, id=die_type.name, classes="pending")
+
+    def modify_dice(self, die: Die) -> None:
+        self.dice.append(die.die_type)
+        self.mutate_reactive(Pending.dice)
+
 
 class Tray(Horizontal):
     def compose(self) -> ComposeResult:
         yield Pending(id="Pending")
         yield DiceMenu(id="DiceMenu")
+
+    @on(Button.Pressed, ".tray")
+    def modify_pending_dice(self, message: DieButton.Pressed) -> None:
+        self.query_one(Pending).modify_dice(message.control.die)
 
 
 class TrayScreen(Screen):
