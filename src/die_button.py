@@ -1,5 +1,6 @@
 from textual.app import ComposeResult
 from textual.css._error_tools import friendly_list
+from textual.message import Message
 from textual.widgets import Button
 
 from typing_extensions import Literal, Self
@@ -260,8 +261,6 @@ class DieButton(Button):
         super().__init__(variant=die.die_type, *args, **kwargs)  # type: ignore
         self.die = die
         self.label = dice_display[die.die_type]
-        # self.variant = die.die_type
-        # self.styles.background = color_map[die.die_type]
 
     def validate_variant(self, variant: str) -> str:
         if variant not in _VALID_DIE_VARIANTS:

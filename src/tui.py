@@ -18,6 +18,7 @@ from dice import (
     Die,
     dice_display,
     symbol_display,
+    Modifier,
 )
 
 from die_button import DieButton
@@ -34,7 +35,8 @@ class DiceMenu(Container):
     """
 
     def compose(self) -> ComposeResult:
-        for die_type, die in dice_map.items():
+        for die_type in dice_display.keys():
+            die = dice_map[die_type]
             yield DieButton(die, id=die_type.name, classes="tray")
 
 
@@ -46,27 +48,33 @@ class Pending(Container):
     }
     """
 
-    order: List[Dice] = [
-        Dice.PROFICIENCY,
-        Dice.ABILITY,
-        Dice.BOOST,
-        Dice.CHALLENGE,
-        Dice.DIFFICULTY,
-        Dice.SETBACK,
-    ]
+    @staticmethod
+    def default_dice() -> Dict[Dice, int]:
+        d = {}
 
-    dice: List[Dice] = reactive(list, recompose=True)
+        for die_type in dice_display.keys():
+            d[die_type] = 0
 
-    # TODO: Print the pending dice in self.order, maybe change self.dice
-    #       to be a map that has counts?  Maybe have each die type be a row?
-    #       Stretch: have both row version and single line priority version
+        return d
+
+    dice: reactive[Dict[Dice, int]] = reactive(default_dice, recompose=True)
+
     def compose(self) -> ComposeResult:
-        for idx, die_type in enumerate(self.dice):
+        css_id: int = 0
+
+        for die_type, count in self.dice.items():
             die = dice_map[die_type]
-            yield DieButton(die, id=f"{die_type.name}{idx}", classes="pending")
+            row = []
+            for _ in range(1, count + 1):
+                css_id += 1
+                row.append(
+                    DieButton(die, id=f"{die_type.name}{css_id}", classes="pending")
+                )
+
+            yield Horizontal(*row)
 
     def modify_dice(self, die: Die) -> None:
-        self.dice.append(die.die_type)
+        self.dice[die.die_type] += 1
         self.mutate_reactive(Pending.dice)
 
 

@@ -9,13 +9,13 @@ from rich.pretty import pprint
 
 
 class Symbol(StrEnum):
-    TRIUMPH = "TR"
-    SUCCESS = "S"
-    ADVANTAGE = "A"
-    DESPAIR = "D"
-    FAILURE = "F"
-    THREAT = "TH"
-    BLANK = "B"
+    TRIUMPH = "triumph"
+    SUCCESS = "success"
+    ADVANTAGE = "advantage"
+    DESPAIR = "despair"
+    FAILURE = "failure"
+    THREAT = "threat"
+    BLANK = "blank"
 
 
 symbol_display = {
@@ -29,6 +29,13 @@ symbol_display = {
 }
 
 
+class Modifier(StrEnum):
+    ADD = "add"
+    UPGRADE = "upgrade"
+    REMOVE = "remove"
+    DOWNGRADE = "downgrade"
+
+
 class Dice(StrEnum):
     BOOST = "boost"
     SETBACK = "setback"
@@ -40,12 +47,12 @@ class Dice(StrEnum):
 
 
 dice_display = {
-    Dice.BOOST: "B",
-    Dice.SETBACK: "S",
-    Dice.ABILITY: "A",
-    Dice.DIFFICULTY: "D",
     Dice.PROFICIENCY: "P",
+    Dice.ABILITY: "A",
+    Dice.BOOST: "B",
     Dice.CHALLENGE: "C",
+    Dice.DIFFICULTY: "D",
+    Dice.SETBACK: "S",
     Dice.PERCENTILE: "T",
 }
 
