@@ -7,14 +7,14 @@ from textual.containers import Container, Horizontal, HorizontalGroup, VerticalG
 from textual.message import Message
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import Button, Header, Footer, Placeholder
+from textual.widgets import Button, Header, Footer, Label, Placeholder, Static
 
 from dice import (
-    roll,
     results_table,
     success_probability,
     dice_map,
     Dice,
+    DicePool,
     Die,
     dice_display,
     symbol_display,
@@ -59,60 +59,43 @@ class DiceMenu(Container):
 class Pending(Container):
     DEFAULT_CSS = """
     Pending {
-        height: 28;
+        height: 100%;
         width: 50%;
+
+        Container {
+            height: 28;
+        }
+
+        #dice_string {
+            dock: bottom;
+            height: 1;
+            content-align: center middle;
+        }
     }
     """
 
-    @staticmethod
-    def default_dice() -> Dict[Dice, int]:
-        d = {}
-
-        for die_type in dice_display.keys():
-            d[die_type] = 0
-
-        return d
-
-    dice: reactive[Dict[Dice, int]] = reactive(default_dice, recompose=True)
+    dice_pool: reactive[DicePool] = reactive(DicePool, recompose=True)
 
     def compose(self) -> ComposeResult:
+        yield Static(str(self.dice_pool), id="dice_string")
+
         css_id: int = 0
 
-        for die_type, count in self.dice.items():
-            die = dice_map[die_type]
-            row = []
-            for _ in range(1, count + 1):
-                css_id += 1
-                row.append(
-                    DieButton(die, id=f"{die_type.name}{css_id}", classes="pending")
-                )
+        with Container():
+            for die_type, count in self.dice_pool.dice.items():
+                die = dice_map[die_type]
+                row = []
+                for _ in range(1, count + 1):
+                    css_id += 1
+                    row.append(
+                        DieButton(die, id=f"{die_type.name}{css_id}", classes="pending")
+                    )
 
-            yield Horizontal(*row)
+                yield Horizontal(*row)
 
     def modify_dice(self, die: Die, modifier: Optional[Modifier] = None) -> None:
-        match modifier:
-            case Modifier.ADD:
-                self.dice[die.die_type] += 1
-            case Modifier.UPGRADE:
-                if die.upgrade and self.dice[die.die_type] > 0:
-                    self.dice[die.die_type] -= 1
-                    self.dice[die.upgrade] += 1
-                else:
-                    self.dice[die.die_type] += 1
-            case Modifier.REMOVE:
-                if self.dice[die.die_type] > 0:
-                    self.dice[die.die_type] -= 1
-            case Modifier.DOWNGRADE:
-                if self.dice[die.die_type] > 0:
-                    if die.downgrade:
-                        self.dice[die.die_type] -= 1
-                        self.dice[die.downgrade] += 1
-                    else:
-                        self.dice[die.die_type] -= 1
-            case _:
-                self.dice[die.die_type] += 1
-
-        self.mutate_reactive(Pending.dice)
+        self.dice_pool.modify(die, modifier)
+        self.mutate_reactive(Pending.dice_pool)
 
 
 class Tray(Horizontal):

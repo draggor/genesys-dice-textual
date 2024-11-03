@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 import itertools
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Self, cast
 
 from rich.pretty import pprint
 
@@ -71,6 +71,7 @@ for die, code in dice_display.items():
     dice_short_codes[code] = die
 
 type Face = int | Symbol | list[Symbol]
+type DieResult = tuple[Dice, Face]
 
 
 @dataclass
@@ -91,8 +92,8 @@ class Die:
         self.upgrade = upgrade
         self.downgrade = downgrade
 
-    def roll(self) -> Face:
-        return random.choice(self.faces)
+    def roll(self) -> DieResult:
+        return self.die_type, random.choice(self.faces)
 
 
 Boost = Die(
@@ -203,6 +204,7 @@ dice_map = {
     Dice.PERCENTILE: Percentile,
 }
 
+
 cancel_map = {
     Symbol.THREAT: Symbol.ADVANTAGE,
     Symbol.ADVANTAGE: Symbol.THREAT,
@@ -218,8 +220,9 @@ class Result:
     totals: Dict[Any, Any]
 
     results: List[Face] = field(default_factory=list)
+    details: Dict[Dice, List[Face]] = field(default_factory=dict)
 
-    def __init__(self, results: List[Face]) -> None:
+    def __init__(self, results: Optional[List[Face]] = None) -> None:
         self.totals = {
             Symbol.TRIUMPH: 0,
             Symbol.SUCCESS: 0,
@@ -229,18 +232,25 @@ class Result:
             Symbol.THREAT: 0,
             "Percentile": [],
         }
-        self.results = results
-        self.reduce(results)
+        if results is not None:
+            self.results = results
+            self.reduce()
+        else:
+            self.results = []
 
-    def reduce(self, results: List[Face]) -> None:
-        for result in results:
-            if type(result) is list:
-                for item in result:
-                    self.add(item)
+        self.details = {}
+
+    def reduce(self) -> Self:
+        for face in self.results:
+            if type(face) is list:
+                for symbol in face:
+                    self.add_symbol(symbol)
             else:
-                self.add(result)
+                self.add_symbol(face)
 
-    def add(self, result: Face) -> None:
+        return self
+
+    def add_symbol(self, result: Face) -> None:
         match result:
             case int():
                 self.totals["Percentile"].append(result)
@@ -260,6 +270,16 @@ class Result:
                 else:
                     self.totals[opposite] -= 1
 
+    def add(self, result: DieResult) -> None:
+        die_type, face = result
+
+        if die_type in self.details:
+            self.details[die_type].append(face)
+        else:
+            self.details[die_type] = [face]
+
+        self.results.append(face)
+
     def __str__(self) -> str:
         composed_str = ""
         for symbol in [
@@ -274,6 +294,117 @@ class Result:
 
         composed_str = " ".join(composed_str)
         composed_str += " " + " ".join(map(str, self.totals["Percentile"]))
+
+        return composed_str
+
+
+@dataclass
+class DicePool:
+    @staticmethod
+    def default_dice() -> Dict[Dice, int]:
+        d = {}
+
+        for die_type in dice_display.keys():
+            d[die_type] = 0
+
+        return d
+
+    dice: Dict[Dice, int] = field(default_factory=default_dice)
+    result: Optional[Result] = None
+
+    def __init__(self, dice_str: Optional[str] = None) -> None:
+        if dice_str is not None:
+            self.dice = self.default_dice()
+            for die in get_dice_from_str(dice_str):
+                self.dice[die.die_type] += 1
+
+    def modify(self, die: Die, modifier: Optional[Modifier] = None) -> Self:
+        match modifier:
+            case Modifier.ADD:
+                self.dice[die.die_type] += 1
+            case Modifier.UPGRADE:
+                if die.upgrade and self.dice[die.die_type] > 0:
+                    self.dice[die.die_type] -= 1
+                    self.dice[die.upgrade] += 1
+                else:
+                    self.dice[die.die_type] += 1
+            case Modifier.REMOVE:
+                if self.dice[die.die_type] > 0:
+                    self.dice[die.die_type] -= 1
+            case Modifier.DOWNGRADE:
+                if self.dice[die.die_type] > 0:
+                    if die.downgrade:
+                        self.dice[die.die_type] -= 1
+                        self.dice[die.downgrade] += 1
+                    else:
+                        self.dice[die.die_type] -= 1
+            case _:
+                pass
+
+        return self
+
+    def roll(self) -> Result:
+        roll_result = Result()
+
+        for die_type, count in self.dice.items():
+            for _ in range(1, count + 1):
+                die = dice_map[die_type]
+                die_result: DieResult = die.roll()
+                roll_result.add(die_result)
+
+        return roll_result.reduce()
+
+    def get_dice_faces(self) -> List[List[Face]]:
+        faces = []
+
+        for die_type, count in self.dice.items():
+            for _ in range(1, count + 1):
+                die = dice_map[die_type]
+                faces.append(die.faces)
+
+        return faces
+
+    def success_probability(self) -> float:
+        dice_faces = self.get_dice_faces()
+        product = list(itertools.product(*dice_faces))
+        total = len(product)
+        success_count = 0
+
+        for result in product:
+            if is_success(list(result)):
+                success_count += 1
+
+        return round(success_count / total * 100, 2)
+
+    def results_table(self) -> Tuple[Dict[str, float], float]:
+        dice_faces = self.get_dice_faces()
+        product = list(itertools.product(*dice_faces))
+        total = len(product)
+        reduced: Dict[str, float] = {}
+        success_count = 0
+        for combo in product:
+            r = str(Result(list(combo)).reduce())
+
+            if symbol_display[Symbol.SUCCESS] in r:
+                success_count += 1
+
+            if r in reduced:
+                reduced[r] += 1
+            else:
+                reduced[r] = 1
+
+        for item in reduced:
+            reduced[item] = round(reduced[item] / total * 100, 2)
+
+        success_rate = round(success_count / total * 100, 2)
+
+        return reduced, success_rate
+
+    def __str__(self) -> str:
+        composed_str = ""
+
+        for die_type, count in self.dice.items():
+            composed_str += dice_display[die_type] * count
 
         return composed_str
 
@@ -294,16 +425,16 @@ def get_dice_faces(dice: List[Die]) -> List[List[Face]]:
     return dice_faces
 
 
-def roll(dice: List[Die]) -> str:
-    results = []
-
-    for die in dice:
-        result = die.roll()
-        results.append(result)
-
-    reduced = Result(results)
-    str_results = str(reduced)
-    return str_results
+# def roll(dice: List[Die]) -> str:
+#    results = []
+#
+#    for die in dice:
+#        result = die.roll()
+#        results.append(result)
+#
+#    reduced = Result(results)
+#    str_results = str(reduced)
+#    return str_results
 
 
 def count_symbols(roll_result: List[Face]) -> Dict[Symbol, int]:
@@ -361,3 +492,25 @@ def results_table(dice: List[Die]) -> Tuple[Dict[str, float], float]:
     success_rate = round(success_count / total * 100, 2)
 
     return reduced, success_rate
+
+
+def dice_faces() -> List[List[str]]:
+    table = [["Die"]]
+
+    for i in range(1, 13):
+        table[0].append(str(i))
+
+    for die_type, die in dice_map.items():
+        if die_type is Dice.PERCENTILE:
+            pass
+        else:
+            row = [die_type.name]
+            for face in die.faces:
+                if type(face) is list:
+                    row.append(" ".join([symbol_display[f] for f in face]))
+                else:
+                    symbol = cast(Symbol, face)
+                    row.append(symbol_display[symbol])
+            table.append(row)
+
+    return table
