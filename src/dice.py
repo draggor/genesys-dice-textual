@@ -36,6 +36,14 @@ class Modifier(StrEnum):
     DOWNGRADE = "downgrade"
 
 
+modifier_display = {
+    Modifier.ADD: "+",
+    Modifier.UPGRADE: "↑",
+    Modifier.REMOVE: "-",
+    Modifier.DOWNGRADE: "↓",
+}
+
+
 class Dice(StrEnum):
     BOOST = "boost"
     SETBACK = "setback"
@@ -53,7 +61,7 @@ dice_display = {
     Dice.CHALLENGE: "C",
     Dice.DIFFICULTY: "D",
     Dice.SETBACK: "S",
-    Dice.PERCENTILE: "T",
+    Dice.PERCENTILE: "%",
 }
 
 dice_short_codes = {}

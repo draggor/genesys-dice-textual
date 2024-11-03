@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 
 from textual import on
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal
+from textual.containers import Container, Horizontal, HorizontalGroup, VerticalGroup
 from textual.message import Message
 from textual.reactive import reactive
 from textual.screen import Screen
@@ -19,6 +19,7 @@ from dice import (
     dice_display,
     symbol_display,
     Modifier,
+    modifier_display,
 )
 
 from die_button import DieButton
@@ -27,24 +28,36 @@ from die_button import DieButton
 class DiceMenu(Container):
     DEFAULT_CSS = """
     DiceMenu {
-        height: 1fr;
-        width: 1fr;
-        layout: grid;
-        grid-size: 7;
+        height: 28;
+        width: 50%;
     }
     """
 
     def compose(self) -> ComposeResult:
         for die_type in dice_display.keys():
+            row = []
             die = dice_map[die_type]
-            yield DieButton(die, id=die_type.name, classes="tray")
+
+            if die_type is Dice.PERCENTILE:
+                row.append(DieButton(die, id=die_type.name, classes="tray"))
+            else:
+                for mod in modifier_display.keys():
+                    row.append(
+                        DieButton(
+                            die,
+                            modifier=mod,
+                            id=f"{die_type.name}-{mod.name}",
+                            classes="tray modifier",
+                        )
+                    )
+            yield Horizontal(*row)
 
 
 class Pending(Container):
     DEFAULT_CSS = """
     Pending {
-        height: 1fr;
-        width: 1fr;
+        height: 28;
+        width: 50%;
     }
     """
 

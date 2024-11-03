@@ -3,9 +3,9 @@ from textual.css._error_tools import friendly_list
 from textual.message import Message
 from textual.widgets import Button
 
-from typing_extensions import Literal, Self
+from typing_extensions import Literal, Optional, Self
 
-from dice import Die, Dice, dice_display
+from dice import Die, Dice, dice_display, Modifier, modifier_display
 
 
 # Currently not used, but here's a reference
@@ -92,8 +92,10 @@ class DieButton(Button):
     DieButton {
         width: 5;
         max-width: 5;
+        min-width: 5;
         height: 3;
         max-height: 3;
+        min-height: 3;
         background: $panel;
         color: $text;
         border: none;
@@ -102,7 +104,13 @@ class DieButton(Button):
         text-align: center;
         content-align: center middle;
         text-style: bold;
+        margin: 1;
 
+        &.modifier {
+            min-width: 6;
+            max-width: 6;
+            width: 6;
+        }
 
         &:focus {
             text-style: bold reverse;
@@ -257,10 +265,13 @@ class DieButton(Button):
     # variant = reactive(Dice.ABILITY, init=False)
     """The variant name for the button."""
 
-    def __init__(self, die: Die, *args, **kwargs):
+    def __init__(self, die: Die, modifier: Optional[Modifier] = None, *args, **kwargs):
         super().__init__(variant=die.die_type, *args, **kwargs)  # type: ignore
         self.die = die
+        self.modifier = modifier
         self.label = dice_display[die.die_type]
+        if modifier is not None:
+            self.label += modifier_display[modifier]
 
     def validate_variant(self, variant: str) -> str:
         if variant not in _VALID_DIE_VARIANTS:
