@@ -3,9 +3,11 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 import itertools
 import random
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from rich.pretty import pprint
+
+# TODO: Formatting for foundry, see https://github.com/StarWarsFoundryVTT/StarWarsFFG/wiki/FAQ#how-do-i-manually-roll-dice
 
 
 class Symbol(StrEnum):
@@ -74,10 +76,20 @@ type Face = int | Symbol | list[Symbol]
 @dataclass
 class Die:
     faces: List[Face] = field(default_factory=list)
+    upgrade: Optional[Dice] = None
+    downgrade: Optional[Dice] = None
 
-    def __init__(self, die_type: Dice, faces: List[Face]):
+    def __init__(
+        self,
+        die_type: Dice,
+        faces: List[Face],
+        upgrade: Optional[Dice] = None,
+        downgrade: Optional[Dice] = None,
+    ):
         self.faces = faces
         self.die_type = die_type
+        self.upgrade = upgrade
+        self.downgrade = downgrade
 
     def roll(self) -> Face:
         return random.choice(self.faces)
@@ -93,6 +105,7 @@ Boost = Die(
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
         Symbol.ADVANTAGE,
     ],
+    upgrade=Dice.ABILITY,
 )
 
 Setback = Die(
@@ -105,6 +118,7 @@ Setback = Die(
         Symbol.THREAT,
         Symbol.THREAT,
     ],
+    upgrade=Dice.DIFFICULTY,
 )
 
 Ability = Die(
@@ -119,6 +133,8 @@ Ability = Die(
         [Symbol.SUCCESS, Symbol.ADVANTAGE],
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
     ],
+    downgrade=Dice.BOOST,
+    upgrade=Dice.PROFICIENCY,
 )
 
 Difficulty = Die(
@@ -133,6 +149,8 @@ Difficulty = Die(
         [Symbol.THREAT, Symbol.THREAT],
         [Symbol.FAILURE, Symbol.THREAT],
     ],
+    downgrade=Dice.SETBACK,
+    upgrade=Dice.CHALLENGE,
 )
 
 Proficiency = Die(
@@ -151,6 +169,7 @@ Proficiency = Die(
         [Symbol.ADVANTAGE, Symbol.ADVANTAGE],
         Symbol.TRIUMPH,
     ],
+    downgrade=Dice.ABILITY,
 )
 
 Challenge = Die(
@@ -169,6 +188,7 @@ Challenge = Die(
         [Symbol.THREAT, Symbol.THREAT],
         Symbol.DESPAIR,
     ],
+    downgrade=Dice.DIFFICULTY,
 )
 
 Percentile = Die(Dice.PERCENTILE, list(range(1, 101)))
