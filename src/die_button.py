@@ -150,7 +150,7 @@ class DieButton(Button):
 
         &.-ability{
             background: $ability;
-            color: $text;
+            color: $background;
 
             &:hover {
                 background: $ability-darken-2;
