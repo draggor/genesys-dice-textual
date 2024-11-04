@@ -38,18 +38,6 @@ wheels = [
 ]
 
 [[package]]
-name = "clipman"
-version = "3.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "dbus-next" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/0a/ad/d01a0d2be741e64eb51a73724a6768ed14c93a4ca1dca493529e6194a06f/clipman-3.3.1.tar.gz", hash = "sha256:cb2ad1a7ec5795b805ae521952ed733b35a499a33d512236a439a64fd58add50", size = 18913 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/1c/e808b9c37e75f0462001787db20d75a0d268b884904fb3c0b9252b3ecc8f/clipman-3.3.1-py3-none-any.whl", hash = "sha256:1f33ce83f6da162c068016db03e6230800f58b83cf3362fa1220fe55736b0a1f", size = 18693 },
-]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -59,21 +47,12 @@ wheels = [
 ]
 
 [[package]]
-name = "dbus-next"
-version = "0.2.3"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ce/45/6a40fbe886d60a8c26f480e7d12535502b5ba123814b3b9a0b002ebca198/dbus_next-0.2.3.tar.gz", hash = "sha256:f4eae26909332ada528c0a3549dda8d4f088f9b365153952a408e28023a626a5", size = 71112 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/fc/c0a3f4c4eaa5a22fbef91713474666e13d0ea2a69c84532579490a9f2cc8/dbus_next-0.2.3-py3-none-any.whl", hash = "sha256:58948f9aff9db08316734c0be2a120f6dc502124d9642f55e90ac82ffb16a18b", size = 57885 },
-]
-
-[[package]]
 name = "genesys-dice-tui"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "click" },
-    { name = "clipman" },
+    { name = "pyperclip" },
     { name = "rich" },
     { name = "textual" },
 ]
@@ -88,7 +67,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.1.7" },
-    { name = "clipman", specifier = ">=3.3.1" },
+    { name = "pyperclip", specifier = ">=1.9.0" },
     { name = "rich", specifier = ">=13.9.3" },
     { name = "textual", specifier = ">=0.84.0" },
 ]
@@ -238,6 +217,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/8e/62/8336eff65bcbc8e4c
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f7/3f/01c8b82017c199075f8f788d0d906b9ffbbc5a47dc9918a945e13d5a2bda/pygments-2.18.0-py3-none-any.whl", hash = "sha256:b8e6aca0523f3ab76fee51799c488e38782ac06eafcf95e7ba832985c8e7b13a", size = 1205513 },
 ]
+
+[[package]]
+name = "pyperclip"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/30/23/2f0a3efc4d6a32f3b63cdff36cd398d9701d26cda58e3ab97ac79fb5e60d/pyperclip-1.9.0.tar.gz", hash = "sha256:b7de0142ddc81bfc5c7507eea19da920b92252b548b96186caf94a5e2527d310", size = 20961 }
 
 [[package]]
 name = "pytest"
