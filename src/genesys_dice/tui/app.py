@@ -11,7 +11,7 @@ from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import Button, Header, Footer, Label, Placeholder, Static
 
-from dice import (
+from genesys_dice.dice import (
     Dice,
     DicePool,
     dice_display,
@@ -20,8 +20,13 @@ from dice import (
     Result,
 )
 
-from die_button import DieButton
-from title_widgets import TitleButton, TitleContainer, TitleHorizontal, TitleLabel
+from genesys_dice.tui.widgets import (
+    DieButton,
+    TitleButton,
+    TitleContainer,
+    TitleHorizontal,
+    TitleLabel,
+)
 
 
 class DiceMenu(TitleContainer):
@@ -141,7 +146,7 @@ class Tray(Vertical):
 
 
 class TrayScreen(Screen):
-    CSS_PATH = "tray_screen.tcss"
+    CSS_PATH = "css/tray_screen.tcss"
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
