@@ -1,8 +1,6 @@
 from typing import Optional, cast
 
-import clipman
-
-clipman.init()
+import pyperclip
 
 from rich.text import Text
 
@@ -107,15 +105,13 @@ class Tray(Vertical):
                 yield Button("Clear!", id="Clear", variant="error")
 
     def watch_roll_result(self, roll_result: Result) -> None:
-        # self.query_one("#RollResult", Label).update(str(roll_result))
-        # self.query_one("#RollDetails", Label).update(roll_result.details_str())
         self.query_one("#RollResult", TitleButton).label = str(roll_result)
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
-        clipman.copy(message.control.label)
+        pyperclip.copy(message.control.label)
 
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
@@ -123,7 +119,6 @@ class Tray(Vertical):
         pending = self.query_one(Pending)
         pending.modify_dice(die_button.die_type, die_button.modifier)
         dice_roll_str = pending.dice_pool.roll_str()
-        # self.query_one("#RollString", Label).update(dice_roll_str)
         self.query_one("#RollString", TitleButton).label = dice_roll_str
 
     @on(Button.Pressed, ".pending")
@@ -132,7 +127,6 @@ class Tray(Vertical):
         pending = self.query_one(Pending)
         pending.modify_dice(die_button.die_type, Modifier.REMOVE)
         dice_roll_str = pending.dice_pool.roll_str()
-        # self.query_one("#RollString", Label).update(dice_roll_str)
         self.query_one("#RollString", TitleButton).label = dice_roll_str
 
     @on(Button.Pressed, "#Roll")
@@ -143,7 +137,6 @@ class Tray(Vertical):
     def clear_dice(self, message: Button.Pressed) -> None:
         self.roll_result = Result()
         self.query_one(Pending).clear_dice()
-        # self.query_one("#RollString", Label).update("")
         self.query_one("#RollString", TitleButton).label = ""
 
 

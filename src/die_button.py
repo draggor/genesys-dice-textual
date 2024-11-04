@@ -220,9 +220,6 @@ class DieButton(Button):
     }
     """
 
-    # variant = reactive(Dice.ABILITY, init=False)
-    """The variant name for the button."""
-
     def __init__(
         self, die_type: Dice, modifier: Optional[Modifier] = None, *args, **kwargs
     ):
