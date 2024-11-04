@@ -5,15 +5,15 @@ from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import Button, Header, Footer, Placeholder
+from textual.widgets import Button, Header, Footer, Label, Placeholder, Static
 
 from dice import (
     Dice,
     DicePool,
     dice_display,
-
     Modifier,
     modifier_display,
+    Result,
 )
 
 from die_button import DieButton
@@ -65,27 +65,56 @@ class Pending(Container):
         self.dice_pool.modify(die_type, modifier)
         self.mutate_reactive(Pending.dice_pool)
 
+    def clear_dice(self) -> None:
+        self.dice_pool = DicePool()
+
 
 class Tray(Horizontal):
+
+    roll_result: Result = reactive(Result)
+
     def compose(self) -> ComposeResult:
         with Vertical():
             yield Pending(id="Pending")
             with Horizontal(id="RollButtons"):
-                yield Placeholder(id="RollString")
-                yield Placeholder(id="RollResult")
+                yield Label(id="RollString")
+                yield Label(id="RollDetails")
+                yield Label(id="RollResult")
         with Vertical():
             yield DiceMenu(id="DiceMenu")
-            yield Placeholder(id="RollButtons")
+            with Container(id="RollButtons"):
+                yield Button("Roll!", id="Roll", variant="success")
+                yield Button("Clear!", id="Clear", variant="error")
+
+    def watch_roll_result(self, roll_result: Result) -> None:
+        self.query_one("#RollResult").update(str(roll_result))
+        self.query_one("#RollDetails").update(roll_result.details_str())
 
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
         die_button = cast(DieButton, message.control)
-        self.query_one(Pending).modify_dice(die_button.die_type, die_button.modifier)
+        pending = self.query_one(Pending)
+        pending.modify_dice(die_button.die_type, die_button.modifier)
+        dice_roll_str = pending.dice_pool.roll_str()
+        self.query_one("#RollString").update(dice_roll_str)
 
     @on(Button.Pressed, ".pending")
     def remove_pending_dice(self, message: DieButton.Pressed) -> None:
         die_button = cast(DieButton, message.control)
-        self.query_one(Pending).modify_dice(die_button.die_type, Modifier.REMOVE)
+        pending = self.query_one(Pending)
+        pending.modify_dice(die_button.die_type, Modifier.REMOVE)
+        dice_roll_str = pending.dice_pool.roll_str()
+        self.query_one("#RollString").update(dice_roll_str)
+
+    @on(Button.Pressed, "#Roll")
+    def roll_dice(self, message: Button.Pressed) -> None:
+        self.roll_result = self.query_one(Pending).dice_pool.roll()
+
+    @on(Button.Pressed, "#Clear")
+    def clear_dice(self, message: Button.Pressed) -> None:
+        self.roll_result = Result()
+        self.query_one(Pending).clear_dice()
+        self.query_one("#RollString").update("")
 
 
 class TrayScreen(Screen):

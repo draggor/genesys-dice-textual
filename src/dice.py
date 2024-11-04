@@ -280,6 +280,25 @@ class Result:
 
         self.results.append(face)
 
+    def details_str(self) -> str:
+        lines = []
+
+        for die_type, faces in self.details.items():
+            composed_str = f"{dice_display[die_type]}: "
+            str_faces = []
+            for face in faces:
+                if type(face) is list:
+                    str_faces.append(" ".join([symbol_display[s] for s in face]))
+                elif type(face) is int:
+                    str_faces.append(str(face))
+                else:
+                    symbol_key = cast(Symbol, face)
+                    str_faces.append(symbol_display[symbol_key])
+            composed_str += " | ".join(str_faces)
+            lines.append(composed_str)
+
+        return "\n".join(lines)
+
     def __str__(self) -> str:
         composed_str = ""
         for symbol in [
@@ -402,6 +421,14 @@ class DicePool:
         success_rate = round(success_count / total * 100, 2)
 
         return reduced, success_rate
+
+    def roll_str(self) -> str:
+        composed_str = ""
+
+        for die_type, count in self.dice.items():
+            composed_str += dice_display[die_type] * count
+
+        return composed_str
 
     def __str__(self) -> str:
         composed_str = ""

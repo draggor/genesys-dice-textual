@@ -13,14 +13,23 @@ DiceMenu {
 #RollButtons {
     height: 1fr;
     width: 1fr;
+    align: center middle;
 }
 
 #RollString {
     height: 1fr;
     width: 1fr;
+    content-align: center middle;
+}
+
+#RollDetails {
+    height: 1fr;
+    width: 1fr;
+    content-align: center middle;
 }
 
 #RollResult {
     height: 1fr;
     width: 1fr;
+    content-align: center middle;
 }
