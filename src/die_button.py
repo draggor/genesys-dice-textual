@@ -1,11 +1,9 @@
-from textual.app import ComposeResult
 from textual.css._error_tools import friendly_list
-from textual.message import Message
 from textual.widgets import Button
 
-from typing_extensions import Literal, Optional, Self
+from typing_extensions import Literal, Optional
 
-from dice import Die, Dice, dice_display, Modifier, modifier_display
+from dice import Dice, dice_display, Modifier, modifier_display
 
 
 # Currently not used, but here's a reference
@@ -265,11 +263,13 @@ class DieButton(Button):
     # variant = reactive(Dice.ABILITY, init=False)
     """The variant name for the button."""
 
-    def __init__(self, die: Die, modifier: Optional[Modifier] = None, *args, **kwargs):
-        super().__init__(variant=die.die_type, *args, **kwargs)  # type: ignore
-        self.die = die
+    def __init__(
+        self, die_type: Dice, modifier: Optional[Modifier] = None, *args, **kwargs
+    ):
+        super().__init__(variant=die_type, *args, **kwargs)  # type: ignore
+        self.die_type = die_type
         self.modifier = modifier
-        self.label = dice_display[die.die_type]
+        self.label = dice_display[die_type]
         if modifier is not None:
             self.label += modifier_display[modifier]
 

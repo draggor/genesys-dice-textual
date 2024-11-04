@@ -67,8 +67,8 @@ dice_display = {
 }
 
 dice_short_codes = {}
-for die, code in dice_display.items():
-    dice_short_codes[code] = die
+for die_type, code in dice_display.items():
+    dice_short_codes[code] = die_type
 
 type Face = int | Symbol | list[Symbol]
 type DieResult = tuple[Dice, Face]
@@ -313,31 +313,34 @@ class DicePool:
     result: Optional[Result] = None
 
     def __init__(self, dice_str: Optional[str] = None) -> None:
+        self.dice = self.default_dice()
+
         if dice_str is not None:
-            self.dice = self.default_dice()
             for die in get_dice_from_str(dice_str):
                 self.dice[die.die_type] += 1
 
-    def modify(self, die: Die, modifier: Optional[Modifier] = None) -> Self:
+    def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:
+        die = dice_map[die_type]
+
         match modifier:
             case Modifier.ADD:
-                self.dice[die.die_type] += 1
+                self.dice[die_type] += 1
             case Modifier.UPGRADE:
-                if die.upgrade and self.dice[die.die_type] > 0:
-                    self.dice[die.die_type] -= 1
+                if die.upgrade and self.dice[die_type] > 0:
+                    self.dice[die_type] -= 1
                     self.dice[die.upgrade] += 1
                 else:
-                    self.dice[die.die_type] += 1
+                    self.dice[die_type] += 1
             case Modifier.REMOVE:
-                if self.dice[die.die_type] > 0:
-                    self.dice[die.die_type] -= 1
+                if self.dice[die_type] > 0:
+                    self.dice[die_type] -= 1
             case Modifier.DOWNGRADE:
-                if self.dice[die.die_type] > 0:
+                if self.dice[die_type] > 0:
                     if die.downgrade:
-                        self.dice[die.die_type] -= 1
+                        self.dice[die_type] -= 1
                         self.dice[die.downgrade] += 1
                     else:
-                        self.dice[die.die_type] -= 1
+                        self.dice[die_type] -= 1
             case _:
                 pass
 
