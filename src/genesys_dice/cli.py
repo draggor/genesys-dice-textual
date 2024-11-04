@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.pretty import pprint
 from rich.table import Table
 
-from dice import (
+from genesys_dice.dice import (
     dice_display,
     dice_faces,
     DicePool,
@@ -13,7 +13,7 @@ from dice import (
     Symbol,
 )
 
-from tui import DiceApp
+from genesys_dice.tui.app import DiceApp
 
 
 def command_success(dice: str) -> None:

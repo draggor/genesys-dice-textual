@@ -3,7 +3,7 @@ from textual.widgets import Button
 
 from typing_extensions import Literal, Optional
 
-from dice import Dice, dice_display, Modifier, modifier_display
+from genesys_dice.dice import Dice, dice_display, Modifier, modifier_display
 
 
 # Currently not used, but here's a reference
