@@ -9,7 +9,7 @@ clean:
 	rm -rf ./build ./dist
 
 build:
-	uvx pyinstaller -p ./.venv/lib/python3.12/site-packages/ --onefile -n genesys-dice src/cli.py
+	uvx pyinstaller -p ./.venv/lib/python3.12/site-packages/ --onefile --add-data src/tray_screen.tcss:. -n genesys-dice src/tui.py
 
 dice:
 	uv run src/cli.py
