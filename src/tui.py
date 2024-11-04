@@ -17,9 +17,11 @@ from dice import (
 )
 
 from die_button import DieButton
+from title_widgets import TitleContainer, TitleHorizontal, TitleLabel
 
 
-class DiceMenu(Container):
+class DiceMenu(TitleContainer):
+
     def compose(self) -> ComposeResult:
         for die_type in dice_display.keys():
             row = []
@@ -42,7 +44,7 @@ class DiceMenu(Container):
             yield Horizontal(*row)
 
 
-class Pending(Container):
+class Pending(TitleContainer):
 
     dice_pool: reactive[DicePool] = reactive(DicePool, recompose=True)
 
@@ -69,19 +71,19 @@ class Pending(Container):
         self.dice_pool = DicePool()
 
 
-class Tray(Horizontal):
+class Tray(Vertical):
 
     roll_result: reactive[Result] = reactive(Result)
 
     def compose(self) -> ComposeResult:
-        with Vertical():
-            yield Pending(id="Pending")
-            with Horizontal(id="RollButtons"):
-                yield Label(id="RollString")
-                yield Label(id="RollDetails")
-                yield Label(id="RollResult")
-        with Vertical():
-            yield DiceMenu(id="DiceMenu")
+        with Horizontal(id="TrayUpper"):
+            yield Pending(id="Pending", border_title="Pending Dice")
+            yield DiceMenu(id="DiceMenu", border_title="Dice Menu")
+        with Horizontal(id="TrayLower"):
+            with Horizontal():
+                yield TitleLabel(id="RollString", border_title="Short Code")
+                yield TitleLabel(id="RollDetails", border_title="Details")
+                yield TitleLabel(id="RollResult", border_title="Result")
             with Container(id="RollButtons"):
                 yield Button("Roll!", id="Roll", variant="success")
                 yield Button("Clear!", id="Clear", variant="error")

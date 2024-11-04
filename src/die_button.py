@@ -89,172 +89,132 @@ class DieButton(Button):
 
     DieButton {
         width: 5;
+        min-width: 2;
         max-width: 5;
-        min-width: 5;
         height: 3;
+        min-height: 1;
         max-height: 3;
-        min-height: 3;
         background: $panel;
         color: $text;
         border: none;
-        border-top: tall $panel-lighten-2;
-        border-bottom: tall $panel-darken-3;
         text-align: center;
         content-align: center middle;
         text-style: bold;
         margin: 1;
 
         &.modifier {
-            min-width: 6;
-            max-width: 6;
             width: 6;
+            min-width: 2;
+            max-width: 6;
         }
 
         &:focus {
             text-style: bold reverse;
         }
         &:hover {
-            border-top: tall $panel;
             background: $panel-darken-2;
             color: $text;
         }
         &.-active {
             background: $panel;
-            border-bottom: tall $panel-lighten-2;
-            border-top: tall $panel-darken-2;
             tint: $background 30%;
         }
 
         &.-boost {
             background: $boost;
             color: $text;
-            border-top: tall $boost-lighten-3;
-            border-bottom: tall $boost-darken-3;
 
             &:hover {
                 background: $boost-darken-2;
                 color: $text;
-                border-top: tall $boost;
             }
 
             &.-active {
                 background: $boost;
-                border-bottom: tall $boost-lighten-3;
-                border-top: tall $boost-darken-3;
             }
         }
 
         &.-setback {
             background: $setback;
             color: $text;
-            border-top: tall $setback-lighten-2;
-            border-bottom: tall $setback-darken-3;
 
             &:hover {
                 background: $setback-darken-2;
                 color: $text;
-                border-top: tall $setback;
             }
 
             &.-active {
                 background: $setback;
-                border-bottom: tall $setback-lighten-2;
-                border-top: tall $setback-darken-2;
             }
         }
 
         &.-ability{
             background: $ability;
             color: $text;
-            border-top: tall $ability-lighten-2;
-            border-bottom: tall $ability-darken-3;
 
             &:hover {
                 background: $ability-darken-2;
                 color: $text;
-                border-top: tall $ability;
             }
 
             &.-active {
                 background: $ability;
-                border-bottom: tall $ability-lighten-2;
-                border-top: tall $ability-darken-2;
             }
         }
 
         &.-difficulty {
             background: $difficulty;
             color: $text;
-            border-top: tall $difficulty-lighten-2;
-            border-bottom: tall $difficulty-darken-3;
 
             &:hover {
                 background: $difficulty-darken-1;
                 color: $text;
-                border-top: tall $difficulty;
             }
 
             &.-active {
                 background: $difficulty;
-                border-bottom: tall $difficulty-lighten-2;
-                border-top: tall $difficulty-darken-2;
             }
         }
 
         &.-proficiency {
             background: $proficiency;
             color: $text;
-            border-top: tall $proficiency-lighten-2;
-            border-bottom: tall $proficiency-darken-3;
 
             &:hover {
                 background: $proficiency-darken-1;
                 color: $text;
-                border-top: tall $proficiency;
             }
 
             &.-active {
                 background: $proficiency;
-                border-bottom: tall $proficiency-lighten-2;
-                border-top: tall $proficiency-darken-2;
             }
         }
 
         &.-challenge {
             background: $challenge;
             color: $text;
-            border-top: tall $challenge-lighten-2;
-            border-bottom: tall $challenge-darken-3;
 
             &:hover {
                 background: $challenge-darken-1;
                 color: $text;
-                border-top: tall $challenge;
             }
 
             &.-active {
                 background: $challenge;
-                border-bottom: tall $challenge-lighten-2;
-                border-top: tall $challenge-darken-2;
             }
         }
 
         &.-percentile {
             background: $percentile;
             color: $text;
-            border-top: tall $percentile-lighten-2;
-            border-bottom: tall $percentile-darken-3;
 
             &:hover {
                 background: $percentile-darken-1;
                 color: $text;
-                border-top: tall $percentile;
             }
 
             &.-active {
                 background: $percentile;
-                border-bottom: tall $percentile-lighten-2;
-                border-top: tall $percentile-darken-2;
             }
         }
     }
