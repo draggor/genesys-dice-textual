@@ -6,13 +6,14 @@ This project uses [uv](https://docs.astral.sh/uv/) as its package manager and ru
 
 Otherwise, just clone the repo and follow the usages below.
 
-# CLI (non TUI) Usage
+# Usage
 ```
 $ uv run src/cli.py --help
 
-Usage: dice.py [OPTIONS] DICE
+Usage: dice.py [OPTIONS] [DICE]
 
-  A dice roller and probablity calculator for the Genesys RPG system
+  A dice roller and probablity calculator for the Genesys RPG system.
+  If run without any arguments, it loads the interactive TUI.
 
   The dice short codes are:
 
@@ -28,7 +29,9 @@ Usage: dice.py [OPTIONS] DICE
   PAADD
 
 Options:
+  -d      Print the details of the roll
   -t      Print all rolls with probabilities
   -s      Print the success rate of a roll
+  -f      Print the faces of the dice
   --help  Show this message and exit.
 ```

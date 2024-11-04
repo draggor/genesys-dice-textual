@@ -13,6 +13,8 @@ from dice import (
     Symbol,
 )
 
+from tui import DiceApp
+
 
 def command_success(dice: str) -> None:
     success_rate = DicePool(dice).success_probability()
@@ -79,7 +81,9 @@ def command_roll(dice: str, details: bool):
 @click.argument("dice", required=False)
 def main(d, t, s, f, dice):
     """
-    A dice roller and probablity calculator for the Genesys RPG system
+    \b
+    A dice roller and probablity calculator for the Genesys RPG system.
+    If run without any arguments, it loads the interactive TUI.
 
     The dice short codes are:
 
@@ -103,7 +107,9 @@ def main(d, t, s, f, dice):
         command_faces()
     else:
         if dice is None:
-            click.echo(click.get_current_context().get_help())
+            # click.echo(click.get_current_context().get_help())
+            app = DiceApp()
+            app.run()
         else:
             command_roll(dice, d)
 
