@@ -146,7 +146,7 @@ class Tray(Vertical):
 
 
 class TrayScreen(Screen):
-    CSS_PATH = "tray_screen.tcss"
+    CSS_PATH = "app.tcss"
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
