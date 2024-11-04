@@ -1,5 +1,11 @@
 from typing import Optional, cast
 
+import clipman
+
+clipman.init()
+
+from rich.text import Text
+
 from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal, Vertical
@@ -17,7 +23,7 @@ from dice import (
 )
 
 from die_button import DieButton
-from title_widgets import TitleContainer, TitleHorizontal, TitleLabel
+from title_widgets import TitleButton, TitleContainer, TitleHorizontal, TitleLabel
 
 
 class DiceMenu(TitleContainer):
@@ -81,16 +87,35 @@ class Tray(Vertical):
             yield DiceMenu(id="DiceMenu", border_title="Dice Menu")
         with Horizontal(id="TrayLower"):
             with Horizontal():
-                yield TitleLabel(id="RollString", border_title="Short Code")
-                yield TitleLabel(id="RollDetails", border_title="Details")
-                yield TitleLabel(id="RollResult", border_title="Result")
+                # yield TitleLabel(id="RollString", border_title="Short Code")
+                # yield TitleLabel(id="RollDetails", border_title="Details")
+                # yield TitleLael(id="RollResult", border_title="Result")
+                yield TitleButton(
+                    label="",
+                    id="RollString",
+                    classes="copy",
+                    border_title="Short Code",
+                )
+                yield TitleButton(
+                    id="RollDetails", classes="copy", border_title="Details"
+                )
+                yield TitleButton(
+                    id="RollResult", classes="copy", border_title="Result"
+                )
             with Container(id="RollButtons"):
                 yield Button("Roll!", id="Roll", variant="success")
                 yield Button("Clear!", id="Clear", variant="error")
 
     def watch_roll_result(self, roll_result: Result) -> None:
-        self.query_one("#RollResult", Label).update(str(roll_result))
-        self.query_one("#RollDetails", Label).update(roll_result.details_str())
+        # self.query_one("#RollResult", Label).update(str(roll_result))
+        # self.query_one("#RollDetails", Label).update(roll_result.details_str())
+        self.query_one("#RollResult", TitleButton).label = str(roll_result)
+        formatted_details = Text(roll_result.details_str(), justify="left")
+        self.query_one("#RollDetails", TitleButton).label = formatted_details
+
+    @on(Button.Pressed, ".copy")
+    def copy_roll_str(self, message: TitleButton.Pressed) -> None:
+        clipman.copy(message.control.label)
 
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
@@ -98,7 +123,8 @@ class Tray(Vertical):
         pending = self.query_one(Pending)
         pending.modify_dice(die_button.die_type, die_button.modifier)
         dice_roll_str = pending.dice_pool.roll_str()
-        self.query_one("#RollString", Label).update(dice_roll_str)
+        # self.query_one("#RollString", Label).update(dice_roll_str)
+        self.query_one("#RollString", TitleButton).label = dice_roll_str
 
     @on(Button.Pressed, ".pending")
     def remove_pending_dice(self, message: DieButton.Pressed) -> None:
@@ -106,7 +132,8 @@ class Tray(Vertical):
         pending = self.query_one(Pending)
         pending.modify_dice(die_button.die_type, Modifier.REMOVE)
         dice_roll_str = pending.dice_pool.roll_str()
-        self.query_one("#RollString", Label).update(dice_roll_str)
+        # self.query_one("#RollString", Label).update(dice_roll_str)
+        self.query_one("#RollString", TitleButton).label = dice_roll_str
 
     @on(Button.Pressed, "#Roll")
     def roll_dice(self, message: Button.Pressed) -> None:
@@ -116,7 +143,8 @@ class Tray(Vertical):
     def clear_dice(self, message: Button.Pressed) -> None:
         self.roll_result = Result()
         self.query_one(Pending).clear_dice()
-        self.query_one("#RollString", Label).update("")
+        # self.query_one("#RollString", Label).update("")
+        self.query_one("#RollString", TitleButton).label = ""
 
 
 class TrayScreen(Screen):
