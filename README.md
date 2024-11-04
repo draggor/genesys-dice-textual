@@ -35,3 +35,9 @@ Options:
   -f      Print the faces of the dice
   --help  Show this message and exit.
 ```
+
+# TUI
+When run without arguments, you get the textual TUI interface.  Click on the buttons in the Dice Tray to add dice to the pending roll.  Click roll when ready.  `Short Code`, `Details`, and `Result` are all buttons: click them and it will copy the text into your copy buffer.
+
+## WSL
+For me, I had to manually add `/mnt/c/Windows/System32` to my `$PATH` in order to get access to `clip.exe`.
