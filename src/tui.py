@@ -71,7 +71,7 @@ class Pending(Container):
 
 class Tray(Horizontal):
 
-    roll_result: Result = reactive(Result)
+    roll_result: reactive[Result] = reactive(Result)
 
     def compose(self) -> ComposeResult:
         with Vertical():
@@ -87,8 +87,8 @@ class Tray(Horizontal):
                 yield Button("Clear!", id="Clear", variant="error")
 
     def watch_roll_result(self, roll_result: Result) -> None:
-        self.query_one("#RollResult").update(str(roll_result))
-        self.query_one("#RollDetails").update(roll_result.details_str())
+        self.query_one("#RollResult", Label).update(str(roll_result))
+        self.query_one("#RollDetails", Label).update(roll_result.details_str())
 
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
@@ -96,7 +96,7 @@ class Tray(Horizontal):
         pending = self.query_one(Pending)
         pending.modify_dice(die_button.die_type, die_button.modifier)
         dice_roll_str = pending.dice_pool.roll_str()
-        self.query_one("#RollString").update(dice_roll_str)
+        self.query_one("#RollString", Label).update(dice_roll_str)
 
     @on(Button.Pressed, ".pending")
     def remove_pending_dice(self, message: DieButton.Pressed) -> None:
@@ -104,7 +104,7 @@ class Tray(Horizontal):
         pending = self.query_one(Pending)
         pending.modify_dice(die_button.die_type, Modifier.REMOVE)
         dice_roll_str = pending.dice_pool.roll_str()
-        self.query_one("#RollString").update(dice_roll_str)
+        self.query_one("#RollString", Label).update(dice_roll_str)
 
     @on(Button.Pressed, "#Roll")
     def roll_dice(self, message: Button.Pressed) -> None:
@@ -114,7 +114,7 @@ class Tray(Horizontal):
     def clear_dice(self, message: Button.Pressed) -> None:
         self.roll_result = Result()
         self.query_one(Pending).clear_dice()
-        self.query_one("#RollString").update("")
+        self.query_one("#RollString", Label).update("")
 
 
 class TrayScreen(Screen):
