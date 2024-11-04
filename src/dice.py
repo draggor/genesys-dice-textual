@@ -450,23 +450,6 @@ def get_dice_from_str(dice_str: str) -> List[Die]:
     return dice
 
 
-def get_dice_faces(dice: List[Die]) -> List[List[Face]]:
-    dice_faces = [die.faces for die in dice if die is not Dice.PERCENTILE]
-    return dice_faces
-
-
-# def roll(dice: List[Die]) -> str:
-#    results = []
-#
-#    for die in dice:
-#        result = die.roll()
-#        results.append(result)
-#
-#    reduced = Result(results)
-#    str_results = str(reduced)
-#    return str_results
-
-
 def count_symbols(roll_result: List[Face]) -> Dict[Symbol, int]:
     flat: List[Symbol] = []
     for face in roll_result:
@@ -484,44 +467,6 @@ def is_success(roll_result: List[Face]) -> bool:
     return (counts[Symbol.SUCCESS] + counts[Symbol.TRIUMPH]) > (
         counts[Symbol.FAILURE] + counts[Symbol.DESPAIR]
     )
-
-
-def success_probability(dice: List[Die]) -> float:
-    dice_faces = get_dice_faces(dice)
-    product = list(itertools.product(*dice_faces))
-    total = len(product)
-    success_count = 0
-
-    for result in product:
-        if is_success(list(result)):
-            success_count += 1
-
-    return round(success_count / total * 100, 2)
-
-
-def results_table(dice: List[Die]) -> Tuple[Dict[str, float], float]:
-    dice_faces = get_dice_faces(dice)
-    product = list(itertools.product(*dice_faces))
-    total = len(product)
-    reduced: Dict[str, float] = {}
-    success_count = 0
-    for combo in product:
-        r = str(Result(list(combo)))
-
-        if symbol_display[Symbol.SUCCESS] in r:
-            success_count += 1
-
-        if r in reduced:
-            reduced[r] += 1
-        else:
-            reduced[r] = 1
-
-    for item in reduced:
-        reduced[item] = round(reduced[item] / total * 100, 2)
-
-    success_rate = round(success_count / total * 100, 2)
-
-    return reduced, success_rate
 
 
 def dice_faces() -> List[List[str]]:
