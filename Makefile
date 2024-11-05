@@ -11,11 +11,14 @@ clean:
 build:
 	uvx pyinstaller -p ./.venv/lib/python3.12/site-packages/ --onefile --add-data src/genesys_dice/tui/app.tcss:genesys_dice/tui -n genesys-dice src/genesys_dice/cli.py
 
+build-win:
+	uvx pyinstaller -p ./.venv/lib/site-packages/ --onefile --add-data ./src/genesys_dice/tui/app.tcss:genesys_dice/tui -n genesys-dice ./src/genesys_dice/cli.py
+
 tui:
 	uv run src/genesys_dice/cli.py
 
 mypy:
 	uv run mypy
 
-.PHONY: clean build mypy tui
+.PHONY: clean build build-win mypy tui
 
