@@ -8,9 +8,9 @@ Otherwise, just clone the repo and follow the usages below.
 
 # Usage
 ```
-$ uv run src/cli.py --help
+$ uv run genesys-dice --help
 
-Usage: dice.py [OPTIONS] [DICE]
+Usage: genesys-dice [OPTIONS] [DICE]
 
   A dice roller and probablity calculator for the Genesys RPG system.
   If run without any arguments, it loads the interactive TUI.
