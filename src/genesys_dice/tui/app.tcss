@@ -31,6 +31,11 @@ DiceMenu {
     max-width: 31;
     border: solid white;
     align: center middle;
+    layout: grid;
+    grid-size: 2 2;
+    grid-rows: 1fr;
+    grid-columns: 1fr;
+    grid-gutter: 1;
 }
 
 #RollString {
