@@ -193,7 +193,7 @@ class DieButton(Button):
 
             &:hover {
                 background: $difficulty-darken-1;
-                color: $text;
+                color: $hover-dark;
                 border-top: tall $difficulty;
             }
 
@@ -231,7 +231,7 @@ class DieButton(Button):
 
             &:hover {
                 background: $challenge-darken-1;
-                color: $text;
+                color: $hover-dark;
                 border-top: tall $challenge;
             }
 
