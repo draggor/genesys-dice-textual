@@ -1,6 +1,6 @@
 from typing import Optional, cast
 
-import pyperclip
+import pyperclip  # type: ignore
 
 from rich.text import Text
 
