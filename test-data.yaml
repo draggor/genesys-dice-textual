@@ -1,0 +1,13 @@
+- name: A Test Roll
+  dice: PPADD
+  description: |
+    This is a 2 rank proficiency, 2 difficulty roll
+
+    Not much else to it
+
+- name: Another Roll
+  dice: AAD
+  description: |
+    This is an unskilled roll
+
+    The related ability is 2, and it's easy difficulty

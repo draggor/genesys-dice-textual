@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "click>=8.1.7",
+    "platformdirs>=4.3.6",
     "pyperclip>=1.9.0",
+    "pyyaml>=6.0.2",
     "rich>=13.9.3",
     "textual>=0.84.0",
 ]
@@ -24,6 +26,7 @@ dev-dependencies = [
     "mypy>=1.13.0",
     "pdoc3>=0.11.1",
     "pytest>=8.3.3",
+    "types-pyyaml>=6.0.12.20240917",
 ]
 
 [tool.mypy]
