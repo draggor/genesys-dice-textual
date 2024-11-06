@@ -17,7 +17,7 @@ def load_from_file(path: Optional[str] = None):
     if path is not None:
         data_file_path = path
     else:
-        data_file_path = os.path.join(PLATFORM_DIRS.user_data_dir, path)
+        data_file_path = os.path.join(PLATFORM_DIRS.user_data_dir, DATA_FILE_NAME)
 
     with open(data_file_path, "r") as file:
         data = yaml.safe_load(file)
