@@ -339,18 +339,12 @@ class DicePool:
 
         return d
 
-    # This is set in __post_init__, but here as a reminder
-    # dice_counts: Dict[Dice, int] = field(default_factory=default_dice)
-
-    dice: Optional[str] = ""
+    dice_counts: Dict[Dice, int] = field(default_factory=default_dice, init=False)
+    dice: str = ""
 
     def __post_init__(self) -> None:
-        if self.dice is None:
-            self.dice = ""
-        self.dice_counts = DicePool.default_dice()
-
-        for die in get_dice_from_str(self.dice):
-            self.dice_counts[die.die_type] += 1
+        for die_type in get_dice_from_str(self.dice):
+            self.dice_counts[die_type] += 1
 
     def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:
         die = dice_map[die_type]
@@ -384,11 +378,10 @@ class DicePool:
     def roll(self) -> Result:
         roll_result = Result()
 
-        for die_type, count in self.dice_counts.items():
-            for _ in range(1, count + 1):
-                die = dice_map[die_type]
-                die_result: DieResult = die.roll()
-                roll_result.add(die_result)
+        for die_type in self.get_dice():
+            die = dice_map[die_type]
+            die_result: DieResult = die.roll()
+            roll_result.add(die_result)
 
         return roll_result.reduce()
 
@@ -404,10 +397,9 @@ class DicePool:
     def get_dice_faces(self) -> List[List[Face]]:
         faces = []
 
-        for die_type, count in self.dice_counts.items():
-            for _ in range(1, count + 1):
-                die = dice_map[die_type]
-                faces.append(die.faces)
+        for die_type in self.get_dice():
+            die = dice_map[die_type]
+            faces.append(die.faces)
 
         return faces
 
@@ -465,13 +457,13 @@ class DicePool:
             return self.dice
 
 
-def get_dice_from_str(dice_str: str) -> List[Die]:
+def get_dice_from_str(dice_str: str) -> List[Dice]:
     dice = []
-    for die in dice_str.strip().upper():
-        if die in dice_short_codes:
-            dice.append(dice_map[dice_short_codes[die]])
+    for die_str in dice_str.strip().upper():
+        if die_str in dice_short_codes:
+            dice.append(dice_short_codes[die_str])
         else:
-            raise Exception(f"{die} is not a valid short code")
+            raise Exception(f"{die_str} is not a valid short code")
 
     return dice
 

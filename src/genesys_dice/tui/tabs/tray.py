@@ -132,14 +132,14 @@ class Tray(Vertical):
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
 
-    def set_dice(self, dice_str: Optional[str] = None) -> None:
+    def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
         text = message.control.label
         if text is not None and len(text) > 0:
-            pyperclip.copy(message.control.label)
+            pyperclip.copy(text)
 
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
