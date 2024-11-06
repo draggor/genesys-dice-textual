@@ -33,6 +33,7 @@ Options:
   -t      Print all rolls with probabilities
   -s      Print the success rate of a roll
   -f      Print the faces of the dice
+  -u      Run the TUI with initial dice
   --help  Show this message and exit.
 ```
 
