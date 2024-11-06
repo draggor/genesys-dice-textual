@@ -114,7 +114,11 @@ class Tray(Vertical):
         self.query_one("#RollString", TitleButton).label = dice_roll_str
 
     def watch_roll_result(self, roll_result: Result) -> None:
-        self.query_one("#RollResult", TitleButton).label = str(roll_result)
+        roll_result_button = self.query_one("#RollResult", TitleButton)
+        roll_result_button.label = str(roll_result)
+        roll_result_button.variant = "success" if roll_result.success else "error"
+        self.notify(roll_result.success)
+
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
 

@@ -221,6 +221,7 @@ class Result:
 
     results: List[Face] = field(default_factory=list)
     details: Dict[Dice, List[Face]] = field(default_factory=dict)
+    _success: bool = False
 
     def __init__(self, results: Optional[List[Face]] = None) -> None:
         self.totals = {
@@ -240,6 +241,10 @@ class Result:
 
         self.details = {}
 
+    @property
+    def success(self) -> bool:
+        return self._success
+
     def reduce(self) -> Self:
         for face in self.results:
             if type(face) is list:
@@ -247,6 +252,8 @@ class Result:
                     self.add_symbol(symbol)
             else:
                 self.add_symbol(face)
+
+        self._success = self.totals[Symbol.SUCCESS] > 0
 
         return self
 
