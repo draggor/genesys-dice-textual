@@ -218,10 +218,10 @@ class Result:
             "Percentile": [],
         }
 
-    totals: Dict[Any, Any] = field(default_factory=default_totals)
     results: List[Face] = field(default_factory=list)
-    details: Dict[Dice, List[Face]] = field(default_factory=dict)
 
+    details: Dict[Dice, List[Face]] = field(default_factory=dict, init=False)
+    totals: Dict[Any, Any] = field(default_factory=default_totals, init=False)
     _success: Optional[bool] = field(default=None, init=False)
 
     def __post_init__(self) -> None:
@@ -410,7 +410,7 @@ class DicePool:
         reduced: Dict[str, float] = {}
         success_count = 0
         for combo in product:
-            r = str(Result(results=list(combo)).reduce())
+            r = str(Result(list(combo)).reduce())
 
             if symbol_display[Symbol.SUCCESS] in r:
                 success_count += 1
@@ -439,10 +439,7 @@ class DicePool:
         return sum(self.dice_counts.values()) == 0
 
     def __str__(self) -> str:
-        if self.dice is None:
-            return ""
-        else:
-            return self.dice
+        return self.dice
 
 
 def get_dice_from_str(dice_str: str) -> List[Dice]:
