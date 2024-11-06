@@ -18,7 +18,7 @@ docs:
 	uv run pdoc --html -o site genesys_dice
 
 docs-serve:
-	uv run python -m http.server -d html/genesys_dice
+	uv run python -m http.server -d site/genesys_dice
 
 tui:
 	uv run src/genesys_dice/cli.py
