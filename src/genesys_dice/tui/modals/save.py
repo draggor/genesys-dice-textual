@@ -54,7 +54,7 @@ class SaveModal(ModalScreen):
 
             #-save-dice-grid {
                 layout: grid;
-                grid-size: 9;
+                grid-size: 8;
                 grid-gutter: 0;
                 grid-rows: 5;
                 grid-columns: 7;
