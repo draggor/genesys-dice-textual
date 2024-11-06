@@ -78,21 +78,17 @@ class Pending(TitleContainer):
 
             yield Horizontal(*row)
 
-    def modify_dice(self, die_type: Dice, modifier: Optional[Modifier] = None) -> None:
-        self.dice_pool.modify(die_type, modifier)
-        self.mutate_reactive(Pending.dice_pool)
-
-    def set_dice(self, dice_str: Optional[str] = None) -> None:
-        self.dice_pool = DicePool(dice_str)
-
 
 class Tray(Vertical):
 
+    dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
     roll_result: reactive[Result] = reactive(Result)
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="TrayUpper"):
-            yield Pending(id="Pending", border_title="Pending Dice")
+            yield Pending(id="Pending", border_title="Pending Dice").data_bind(
+                Tray.dice_pool
+            )
             yield DiceMenu(id="DiceMenu", border_title="Dice Menu")
         with Horizontal(id="TrayLower"):
             with Horizontal():
@@ -103,22 +99,19 @@ class Tray(Vertical):
                     border_title="Short Code",
                 )
                 yield TitleButton(
-                    id="RollDetails", classes="copy", border_title="Details"
+                    label="", id="RollDetails", classes="copy", border_title="Details"
                 )
                 yield TitleButton(
-                    id="RollResult", classes="copy", border_title="Result"
+                    label="", id="RollResult", classes="copy", border_title="Result"
                 )
             with Container(id="RollButtons"):
                 yield Button("Roll!", id="Roll", variant="success")
                 yield Button("Clear!", id="Clear", variant="error")
                 yield Button("Save!", id="Save", variant="primary")
 
-    def on_mount(self) -> None:
-        def update_roll_str(dice_pool) -> None:
-            dice_roll_str = dice_pool.roll_str()
-            self.query_one("#RollString", TitleButton).label = dice_roll_str
-
-        self.watch(self.query_one(Pending), "dice_pool", update_roll_str)
+    def watch_dice_pool(self) -> None:
+        dice_roll_str = self.dice_pool.roll_str()
+        self.query_one("#RollString", TitleButton).label = dice_roll_str
 
     def watch_roll_result(self, roll_result: Result) -> None:
         self.query_one("#RollResult", TitleButton).label = str(roll_result)
@@ -126,7 +119,7 @@ class Tray(Vertical):
         self.query_one("#RollDetails", TitleButton).label = formatted_details
 
     def set_dice(self, dice_str: Optional[str] = None) -> None:
-        self.query_one(Pending).set_dice(dice_str)
+        self.dice_pool = DicePool(dice_str)
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
@@ -137,25 +130,26 @@ class Tray(Vertical):
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
         die_button = cast(DieButton, message.control)
-        self.query_one(Pending).modify_dice(die_button.die_type, die_button.modifier)
+        self.dice_pool.modify(die_button.die_type, die_button.modifier)
+        self.mutate_reactive(Tray.dice_pool)
 
     @on(Button.Pressed, ".pending")
     def remove_pending_dice(self, message: DieButton.Pressed) -> None:
         die_button = cast(DieButton, message.control)
-        self.query_one(Pending).modify_dice(die_button.die_type, Modifier.REMOVE)
+        self.dice_pool.modify(die_button.die_type, Modifier.REMOVE)
+        self.mutate_reactive(Tray.dice_pool)
 
     @on(Button.Pressed, "#Roll")
     def roll_dice(self, message: Button.Pressed) -> None:
-        self.roll_result = self.query_one(Pending).dice_pool.roll()
+        self.roll_result = self.dice_pool.roll()
 
     @on(Button.Pressed, "#Clear")
     def clear_dice(self, message: Button.Pressed) -> None:
         self.roll_result = Result()
-        self.query_one(Pending).set_dice()
+        self.dice_pool = DicePool()
 
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
-        dice_pool = self.query_one(Pending).dice_pool
-        if not dice_pool.is_empty():
+        if not self.dice_pool.is_empty():
             callback = switch_tab("template-tab", self.app)
-            self.app.push_screen(SaveModal(dice_pool), callback)
+            self.app.push_screen(SaveModal().data_bind(Tray.dice_pool), callback)

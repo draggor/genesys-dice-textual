@@ -66,10 +66,6 @@ class SaveModal(ModalScreen):
 
     dice_pool: reactive[DicePool] = reactive(DicePool, recompose=True)
 
-    def __init__(self, dice_pool: DicePool, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.dice_pool = dice_pool
-
     def compose(self) -> ComposeResult:
         with Vertical(id="-save-container"):
             yield Label("Save Dialog", id="-save-title")

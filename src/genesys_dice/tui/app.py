@@ -49,7 +49,7 @@ class DiceApp(App):
         await self.push_screen(AppScreen())
         if self.starting_dice is not None:
             self.query_one(Tray).set_dice(self.starting_dice)
-            self.query_one("#Save", Button).press()
+            # self.query_one("#Save", Button).press()
 
 
 if __name__ == "__main__":
