@@ -3,7 +3,7 @@ from textual.app import ComposeResult
 from textual.containers import Grid, Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label, TabbedContent
+from textual.widgets import Button, Input, Label
 
 from genesys_dice.data import SavedRoll
 from genesys_dice.dice import DicePool

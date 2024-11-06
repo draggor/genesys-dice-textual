@@ -5,7 +5,6 @@ from textual.containers import Container
 from textual.widgets import Placeholder
 
 
-from genesys_dice.data import SavedRoll
 
 
 class Templates(Container):

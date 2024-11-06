@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Optional
 
 from textual.app import App
 from textual.widgets import TabbedContent

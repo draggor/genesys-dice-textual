@@ -7,7 +7,6 @@ from rich.table import Table
 
 from genesys_dice.dice import (
     dice_display,
-    dice_faces,
     DicePool,
     symbol_display,
     Symbol,

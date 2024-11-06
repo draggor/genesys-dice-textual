@@ -1,5 +1,4 @@
-from collections.abc import Callable
-from typing import Optional, cast
+from typing import cast
 
 import pyperclip  # type: ignore
 
@@ -11,10 +10,6 @@ from textual.containers import Container, Horizontal, Vertical
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
-    Header,
-    Footer,
-    Label,
-    TabbedContent,
 )
 
 from genesys_dice.dice import (
@@ -34,8 +29,6 @@ from genesys_dice.tui.widgets import (
     DieButton,
     TitleButton,
     TitleContainer,
-    TitleHorizontal,
-    TitleLabel,
 )
 
 

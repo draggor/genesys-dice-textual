@@ -1,24 +1,16 @@
 from typing import Iterable, Optional
 
-import pyperclip  # type: ignore
 
-from rich.text import Text
 
-from textual import on
 from textual.app import App, ComposeResult, SystemCommand
-from textual.containers import Container, Horizontal, Vertical
-from textual.message import Message
 from textual.screen import Screen
 from textual.widgets import (
-    Button,
     Header,
     Footer,
-    Placeholder,
     TabbedContent,
     TabPane,
 )
 
-from genesys_dice.tui.messages import ModalMessage
 from genesys_dice.tui.modals import DiceFacesModal
 from genesys_dice.tui.tabs import Tray, Templates
 

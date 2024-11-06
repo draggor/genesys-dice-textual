@@ -2,10 +2,9 @@ from typing import Optional
 
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Grid, Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.events import Click, Key
-from textual.widgets import Button, Input, Label, TabbedContent, Static
+from textual.widgets import Static
 
 from genesys_dice.tui.rich import get_faces_table
 

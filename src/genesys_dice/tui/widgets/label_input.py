@@ -1,6 +1,6 @@
 from textual.app import ComposeResult
 from textual.containers import Vertical
-from textual.widgets import Button, Input, Label, TabbedContent
+from textual.widgets import Input, Label
 
 
 class LabelInput(Vertical):

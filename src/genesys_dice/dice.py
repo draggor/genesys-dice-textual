@@ -1,5 +1,5 @@
 from collections import Counter
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 from enum import StrEnum
 import itertools
 import random
