@@ -382,6 +382,15 @@ class DicePool:
 
         return roll_result.reduce()
 
+    def get_dice(self) -> List[Dice]:
+        dice = []
+
+        for die_type, count in self.dice.items():
+            for _ in range(1, count + 1):
+                dice.append(die_type)
+
+        return dice
+
     def get_dice_faces(self) -> List[List[Face]]:
         faces = []
 

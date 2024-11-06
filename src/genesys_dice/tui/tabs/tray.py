@@ -4,7 +4,7 @@ import pyperclip  # type: ignore
 
 from rich.text import Text
 
-from textual import on, work
+from textual import on
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
 from textual.reactive import reactive

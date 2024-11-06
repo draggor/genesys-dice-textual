@@ -1,11 +1,12 @@
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Grid
+from textual.containers import Grid, Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import ModalScreen
-from textual.widgets import Button, Label, TabbedContent
+from textual.widgets import Button, Input, Label, TabbedContent
 
 from genesys_dice.dice import DicePool
+from genesys_dice.tui.widgets import DieButton, LabelInput
 
 
 class SaveModal(ModalScreen):
@@ -14,18 +15,50 @@ class SaveModal(ModalScreen):
     SaveModal {
         align: center middle;
 
-        #save-dialog {
-            grid-size: 2;
-            grid-gutter: 1 2;
-            grid-rows: 1fr 3;
+        #-save-container {
             padding: 0 1;
             width: 60;
-            height: 11;
+            height: auto;
             border: thick $background 80%;
             background: $surface;
 
-            Button {
+            #-save-footer {
+                dock: bottom;
                 width: 100%;
+                height: 3;
+
+                Button {
+                    width: 1fr;
+                    height: 3;
+                    margin: 0 1;
+                }
+            }
+
+            #-save-title {
+                dock: top;
+                height: 3;
+                width: 1fr;
+                background: $primary-background;
+                content-align: center middle;
+            }
+
+            LabelInput {
+                width: 100%;
+                margin: 1 0;
+                height: auto;
+            }
+
+            .info {
+                margin: 0 1;
+            }
+
+            #-save-dice-grid {
+                layout: grid;
+                grid-size: 9;
+                grid-gutter: 0;
+                grid-rows: 5;
+                grid-columns: 7;
+                height: auto;
             }
         }
     }
@@ -38,18 +71,47 @@ class SaveModal(ModalScreen):
         self.dice_pool = dice_pool
 
     def compose(self) -> ComposeResult:
-        yield Grid(
-            Label("Save these dice:"),
-            Label(self.dice_pool.roll_str()),
-            Button("Save", variant="primary", id="save"),
-            Button("Cancel", variant="error", id="cancel"),
-            id="save-dialog",
-        )
+        dice = [
+            DieButton(die_type, disabled=True, classes="-save-die")
+            for die_type in self.dice_pool.get_dice()
+        ]
 
-    @on(Button.Pressed, "#save")
+        # yield Grid(
+        #    Label("Save Dialog", id="-save-title", classes="two"),
+        #    # Label("Name of the roll:", classes="info two"),
+        #    # Input(placeholder="Name of the roll", classes="info two"),
+        #    LabelInput(
+        #        label_args=["Name of the roll"],
+        #        label_kwargs={"classes": "inner"},
+        #        input_kwargs={"placeholder": "Name of the roll", "classes": "inner"},
+        #    ),
+        #    Label("Save these dice:", classes="info right"),
+        #    # Label(self.dice_pool.roll_str(), classes="info left"),
+        #    Button("Save", variant="primary", id="-save-button"),
+        #    Button("Cancel", variant="error", id="-cancel-button"),
+        #    id="-save-dialog",
+        # )
+
+        with Vertical(id="-save-container"):
+            yield Label("Save Dialog", id="-save-title")
+            yield LabelInput(
+                label_args=["Name of the roll"],
+                label_kwargs={"classes": "inner"},
+                input_kwargs={"placeholder": "Name of the roll", "classes": "inner"},
+            )
+            yield Label("Save these dice:", classes="info right")
+            yield Grid(
+                *dice,
+                id="-save-dice-grid",
+            )
+            with Horizontal(id="-save-footer"):
+                yield Button("Save", variant="primary", id="-save-button")
+                yield Button("Cancel", variant="error", id="-cancel-button")
+
+    @on(Button.Pressed, "#-save-button")
     def save_modal(self, message: Button.Pressed) -> None:
         self.dismiss("bees")
 
-    @on(Button.Pressed, "#cancel")
+    @on(Button.Pressed, "#-cancel-button")
     def cancel_modal(self) -> None:
         self.dismiss()
