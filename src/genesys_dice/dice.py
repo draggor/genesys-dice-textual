@@ -1,11 +1,10 @@
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from enum import StrEnum
 import itertools
 import random
 from typing import Any, Dict, List, Optional, Tuple, Self, cast
 
-from rich.pretty import pprint
 
 # TODO: Formatting for foundry, see https://github.com/StarWarsFoundryVTT/StarWarsFFG/wiki/FAQ#how-do-i-manually-roll-dice
 
@@ -329,7 +328,7 @@ class Result:
         return composed_str
 
 
-@dataclass
+@dataclass()
 class DicePool:
     @staticmethod
     def default_dice() -> Dict[Dice, int]:
@@ -340,53 +339,52 @@ class DicePool:
 
         return d
 
-    dice: Dict[Dice, int] = field(default_factory=default_dice)
-    total_dice: int = 0
-    result: Optional[Result] = None
+    # This is set in __post_init__, but here as a reminder
+    # dice_counts: Dict[Dice, int] = field(default_factory=default_dice)
 
-    def __init__(self, dice_str: Optional[str] = None) -> None:
-        self.dice = self.default_dice()
+    dice: Optional[str] = ""
 
-        if dice_str is not None:
-            for die in get_dice_from_str(dice_str):
-                self.dice[die.die_type] += 1
-                self.total_dice += 1
+    def __post_init__(self) -> None:
+        if self.dice is None:
+            self.dice = ""
+        self.dice_counts = DicePool.default_dice()
+
+        for die in get_dice_from_str(self.dice):
+            self.dice_counts[die.die_type] += 1
 
     def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:
         die = dice_map[die_type]
 
         match modifier:
             case Modifier.ADD:
-                self.dice[die_type] += 1
-                self.total_dice += 1
+                self.dice_counts[die_type] += 1
             case Modifier.UPGRADE:
-                if die.upgrade and self.dice[die_type] > 0:
-                    self.dice[die_type] -= 1
-                    self.dice[die.upgrade] += 1
+                if die.upgrade and self.dice_counts[die_type] > 0:
+                    self.dice_counts[die_type] -= 1
+                    self.dice_counts[die.upgrade] += 1
                 else:
-                    self.dice[die_type] += 1
-                    self.total_dice += 1
+                    self.dice_counts[die_type] += 1
             case Modifier.REMOVE:
-                if self.dice[die_type] > 0:
-                    self.dice[die_type] -= 1
-                    self.total_dice -= 1
+                if self.dice_counts[die_type] > 0:
+                    self.dice_counts[die_type] -= 1
             case Modifier.DOWNGRADE:
-                if self.dice[die_type] > 0:
+                if self.dice_counts[die_type] > 0:
                     if die.downgrade:
-                        self.dice[die_type] -= 1
-                        self.dice[die.downgrade] += 1
+                        self.dice_counts[die_type] -= 1
+                        self.dice_counts[die.downgrade] += 1
                     else:
-                        self.dice[die_type] -= 1
-                        self.total_dice -= 1
+                        self.dice_counts[die_type] -= 1
             case _:
                 pass
+
+        self.dice = self.roll_str()
 
         return self
 
     def roll(self) -> Result:
         roll_result = Result()
 
-        for die_type, count in self.dice.items():
+        for die_type, count in self.dice_counts.items():
             for _ in range(1, count + 1):
                 die = dice_map[die_type]
                 die_result: DieResult = die.roll()
@@ -397,7 +395,7 @@ class DicePool:
     def get_dice(self) -> List[Dice]:
         dice = []
 
-        for die_type, count in self.dice.items():
+        for die_type, count in self.dice_counts.items():
             for _ in range(1, count + 1):
                 dice.append(die_type)
 
@@ -406,7 +404,7 @@ class DicePool:
     def get_dice_faces(self) -> List[List[Face]]:
         faces = []
 
-        for die_type, count in self.dice.items():
+        for die_type, count in self.dice_counts.items():
             for _ in range(1, count + 1):
                 die = dice_map[die_type]
                 faces.append(die.faces)
@@ -452,21 +450,19 @@ class DicePool:
     def roll_str(self) -> str:
         composed_str = ""
 
-        for die_type, count in self.dice.items():
+        for die_type, count in self.dice_counts.items():
             composed_str += dice_display[die_type] * count
 
         return composed_str
 
     def is_empty(self) -> bool:
-        return self.total_dice == 0
+        return sum(self.dice_counts.values()) == 0
 
     def __str__(self) -> str:
-        composed_str = ""
-
-        for die_type, count in self.dice.items():
-            composed_str += dice_display[die_type] * count
-
-        return composed_str
+        if self.dice is None:
+            return ""
+        else:
+            return self.dice
 
 
 def get_dice_from_str(dice_str: str) -> List[Die]:

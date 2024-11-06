@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import Optional, cast
 
 import pyperclip  # type: ignore
@@ -16,6 +17,7 @@ from textual.widgets import (
     TabbedContent,
 )
 
+from genesys_dice.data import SavedRoll
 from genesys_dice.dice import (
     Dice,
     DicePool,
@@ -25,7 +27,7 @@ from genesys_dice.dice import (
     Result,
 )
 from genesys_dice.tui.modals import SaveModal
-from genesys_dice.tui.modals.callbacks import switch_tab
+from genesys_dice.tui.modals.callbacks import switch_tab, switch_tab_saved_roll
 from genesys_dice.tui.widgets import (
     DieButton,
     TitleButton,
@@ -66,7 +68,7 @@ class Pending(TitleContainer):
     def compose(self) -> ComposeResult:
         css_id: int = 0
 
-        for die_type, count in self.dice_pool.dice.items():
+        for die_type, count in self.dice_pool.dice_counts.items():
             row = []
             for _ in range(1, count + 1):
                 css_id += 1
@@ -163,5 +165,5 @@ class Tray(Vertical):
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
         if not self.dice_pool.is_empty():
-            callback = switch_tab("template-tab", self.app)
+            callback = switch_tab_saved_roll("template-tab", self.app)
             self.app.push_screen(SaveModal().data_bind(Tray.dice_pool), callback)
