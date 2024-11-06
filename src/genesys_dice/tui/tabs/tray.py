@@ -116,8 +116,16 @@ class Tray(Vertical):
     def watch_roll_result(self, roll_result: Result) -> None:
         roll_result_button = self.query_one("#RollResult", TitleButton)
         roll_result_button.label = str(roll_result)
-        roll_result_button.variant = "success" if roll_result.success else "error"
-        self.notify(roll_result.success)
+
+        if roll_result.success is None:
+            roll_result_button.variant = "default"
+            roll_result_button.border_subtitle = ""
+        elif roll_result.success:
+            roll_result_button.variant = "success"
+            roll_result_button.border_subtitle = "Success"
+        elif not roll_result.success:
+            roll_result_button.variant = "error"
+            roll_result_button.border_subtitle = "Failure"
 
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details

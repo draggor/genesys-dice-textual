@@ -221,7 +221,7 @@ class Result:
 
     results: List[Face] = field(default_factory=list)
     details: Dict[Dice, List[Face]] = field(default_factory=dict)
-    _success: bool = False
+    _success: Optional[bool] = None
 
     def __init__(self, results: Optional[List[Face]] = None) -> None:
         self.totals = {
@@ -242,7 +242,7 @@ class Result:
         self.details = {}
 
     @property
-    def success(self) -> bool:
+    def success(self) -> Optional[bool]:
         return self._success
 
     def reduce(self) -> Self:
@@ -253,7 +253,12 @@ class Result:
             else:
                 self.add_symbol(face)
 
-        self._success = self.totals[Symbol.SUCCESS] > 0
+        if self.totals[Symbol.SUCCESS] > 0:
+            self._success = True
+        elif self.totals[Symbol.FAILURE] > 0:
+            self._success = False
+        else:
+            self._success = None
 
         return self
 
