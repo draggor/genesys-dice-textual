@@ -27,7 +27,7 @@ symbol_display = {
     Symbol.DESPAIR: "⦻",
     Symbol.FAILURE: "⨯",
     Symbol.THREAT: "⎊",
-    Symbol.BLANK: " ",
+    Symbol.BLANK: "□",
 }
 
 

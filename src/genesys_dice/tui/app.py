@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Iterable, Optional
 
 import pyperclip  # type: ignore
 
 from rich.text import Text
 
 from textual import on
-from textual.app import App, ComposeResult
+from textual.app import App, ComposeResult, SystemCommand
 from textual.containers import Container, Horizontal, Vertical
 from textual.message import Message
 from textual.screen import Screen
@@ -19,6 +19,7 @@ from textual.widgets import (
 )
 
 from genesys_dice.tui.messages import ModalMessage
+from genesys_dice.tui.modals import DiceFacesModal
 from genesys_dice.tui.tabs import Tray, Templates
 
 
@@ -38,6 +39,9 @@ class AppScreen(Screen):
 
 
 class DiceApp(App):
+    BINDINGS = [
+        ("f", "show_dice_faces_modal()", "Show Dice Faces"),
+    ]
 
     starting_dice: Optional[str] = None
 
@@ -50,6 +54,17 @@ class DiceApp(App):
         if self.starting_dice is not None:
             self.query_one(Tray).set_dice(self.starting_dice)
             # self.query_one("#Save", Button).press()
+
+    def action_show_dice_faces_modal(self) -> None:
+        self.push_screen(DiceFacesModal())
+
+    def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
+        yield from super().get_system_commands(screen)
+        yield SystemCommand(
+            "Show Dice Faces",
+            "Pop up a modal window with the dice faces table.",
+            self.action_show_dice_faces_modal,
+        )
 
 
 if __name__ == "__main__":

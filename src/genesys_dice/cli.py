@@ -13,6 +13,7 @@ from genesys_dice.dice import (
     Symbol,
 )
 
+from genesys_dice.tui.rich import get_faces_table
 from genesys_dice.tui.app import DiceApp
 
 
@@ -41,17 +42,7 @@ def command_table(dice: str) -> None:
 
 
 def command_faces() -> None:
-    data = dice_faces()
-
-    table = Table(title="Dice Faces")
-    table.add_column(data[0][0], justify="right", style="cyan")
-
-    for i in range(1, 13):
-        table.add_column(data[0][i], justify="center", style="magenta")
-
-    for row in data[1:]:
-        table.add_row(*row)
-
+    table = get_faces_table()
     console = Console()
     console.print(table)
 
