@@ -96,9 +96,6 @@ class Tray(Vertical):
             yield DiceMenu(id="DiceMenu", border_title="Dice Menu")
         with Horizontal(id="TrayLower"):
             with Horizontal():
-                # yield TitleLabel(id="RollString", border_title="Short Code")
-                # yield TitleLabel(id="RollDetails", border_title="Details")
-                # yield TitleLael(id="RollResult", border_title="Result")
                 yield TitleButton(
                     label="",
                     id="RollString",
@@ -123,7 +120,9 @@ class Tray(Vertical):
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
-        pyperclip.copy(message.control.label)
+        text = message.control.label
+        if text is not None and len(text) > 0:
+            pyperclip.copy(message.control.label)
 
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
@@ -154,5 +153,6 @@ class Tray(Vertical):
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
         dice_pool = self.query_one(Pending).dice_pool
-        callback = switch_tab("template-tab", self.app)
-        self.app.push_screen(SaveModal(dice_pool), callback)
+        if not dice_pool.is_empty():
+            callback = switch_tab("template-tab", self.app)
+            self.app.push_screen(SaveModal(dice_pool), callback)

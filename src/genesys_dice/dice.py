@@ -329,6 +329,7 @@ class DicePool:
         return d
 
     dice: Dict[Dice, int] = field(default_factory=default_dice)
+    total_dice: int = 0
     result: Optional[Result] = None
 
     def __init__(self, dice_str: Optional[str] = None) -> None:
@@ -344,15 +345,18 @@ class DicePool:
         match modifier:
             case Modifier.ADD:
                 self.dice[die_type] += 1
+                self.total_dice += 1
             case Modifier.UPGRADE:
                 if die.upgrade and self.dice[die_type] > 0:
                     self.dice[die_type] -= 1
                     self.dice[die.upgrade] += 1
                 else:
                     self.dice[die_type] += 1
+                    self.total_dice += 1
             case Modifier.REMOVE:
                 if self.dice[die_type] > 0:
                     self.dice[die_type] -= 1
+                    self.total_dice -= 1
             case Modifier.DOWNGRADE:
                 if self.dice[die_type] > 0:
                     if die.downgrade:
@@ -360,6 +364,7 @@ class DicePool:
                         self.dice[die.downgrade] += 1
                     else:
                         self.dice[die_type] -= 1
+                        self.total_dice -= 1
             case _:
                 pass
 
@@ -429,6 +434,9 @@ class DicePool:
             composed_str += dice_display[die_type] * count
 
         return composed_str
+
+    def is_empty(self) -> bool:
+        return self.total_dice == 0
 
     def __str__(self) -> str:
         composed_str = ""
