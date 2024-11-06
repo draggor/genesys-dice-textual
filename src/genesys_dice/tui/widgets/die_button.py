@@ -154,9 +154,9 @@ class DieButton(Button):
             border-bottom: tall $setback-lighten-2;
 
             &:hover {
-                background: $setback-lighten-1;
+                background: $setback-lighten-2;
                 color: $text;
-                border-top: tall $setback;
+                border-top: tall $setback-lighten-3;
             }
 
             &.-active {
@@ -212,7 +212,7 @@ class DieButton(Button):
 
             &:hover {
                 background: $proficiency-darken-2;
-                color: $text;
+                color: $hover-light;
                 border-top: tall $proficiency-darken-1;
             }
 
