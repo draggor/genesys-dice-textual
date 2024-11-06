@@ -75,21 +75,10 @@ type DieResult = tuple[Dice, Face]
 
 @dataclass
 class Die:
+    die_type: Dice
     faces: List[Face] = field(default_factory=list)
     upgrade: Optional[Dice] = None
     downgrade: Optional[Dice] = None
-
-    def __init__(
-        self,
-        die_type: Dice,
-        faces: List[Face],
-        upgrade: Optional[Dice] = None,
-        downgrade: Optional[Dice] = None,
-    ):
-        self.faces = faces
-        self.die_type = die_type
-        self.upgrade = upgrade
-        self.downgrade = downgrade
 
     def roll(self) -> DieResult:
         return self.die_type, random.choice(self.faces)
@@ -216,14 +205,10 @@ cancel_map = {
 
 @dataclass
 class Result:
-    totals: Dict[Any, Any]
 
-    results: List[Face] = field(default_factory=list)
-    details: Dict[Dice, List[Face]] = field(default_factory=dict)
-    _success: Optional[bool] = None
-
-    def __init__(self, results: Optional[List[Face]] = None) -> None:
-        self.totals = {
+    @staticmethod
+    def default_totals() -> Dict[Any, Any]:
+        return {
             Symbol.TRIUMPH: 0,
             Symbol.SUCCESS: 0,
             Symbol.ADVANTAGE: 0,
@@ -232,13 +217,16 @@ class Result:
             Symbol.THREAT: 0,
             "Percentile": [],
         }
-        if results is not None:
-            self.results = results
-            self.reduce()
-        else:
-            self.results = []
 
-        self.details = {}
+    totals: Dict[Any, Any] = field(default_factory=default_totals)
+    results: List[Face] = field(default_factory=list)
+    details: Dict[Dice, List[Face]] = field(default_factory=dict)
+
+    _success: Optional[bool] = field(default=None, init=False)
+
+    def __post_init__(self) -> None:
+        if len(self.results) > 0:
+            self.reduce()
 
     @property
     def success(self) -> Optional[bool]:
@@ -422,7 +410,7 @@ class DicePool:
         reduced: Dict[str, float] = {}
         success_count = 0
         for combo in product:
-            r = str(Result(list(combo)).reduce())
+            r = str(Result(results=list(combo)).reduce())
 
             if symbol_display[Symbol.SUCCESS] in r:
                 success_count += 1
