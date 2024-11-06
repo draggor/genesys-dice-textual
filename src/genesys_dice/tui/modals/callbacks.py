@@ -21,6 +21,9 @@ def switch_tab[T](tab_str: str, app: App) -> Callable[[T], None]:
     return inner
 
 
+type SavedRollFn = Callable[[Optional[SavedRoll]], None]
+
+
 def switch_tab_saved_roll(
     tab_str: str, app: App
 ) -> Callable[[Optional[SavedRoll]], None]:

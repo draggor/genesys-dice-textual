@@ -17,7 +17,6 @@ from textual.widgets import (
     TabbedContent,
 )
 
-from genesys_dice.data import SavedRoll
 from genesys_dice.dice import (
     Dice,
     DicePool,
@@ -27,7 +26,10 @@ from genesys_dice.dice import (
     Result,
 )
 from genesys_dice.tui.modals import SaveModal
-from genesys_dice.tui.modals.callbacks import switch_tab, switch_tab_saved_roll
+from genesys_dice.tui.modals.callbacks import (
+    switch_tab,
+    SavedRollFn,
+)
 from genesys_dice.tui.widgets import (
     DieButton,
     TitleButton,
@@ -165,5 +167,5 @@ class Tray(Vertical):
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
         if not self.dice_pool.is_empty():
-            callback = switch_tab_saved_roll("template-tab", self.app)
+            callback: SavedRollFn = switch_tab("template-tab", self.app)
             self.app.push_screen(SaveModal().data_bind(Tray.dice_pool), callback)
