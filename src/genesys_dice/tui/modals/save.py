@@ -71,39 +71,21 @@ class SaveModal(ModalScreen):
         self.dice_pool = dice_pool
 
     def compose(self) -> ComposeResult:
-        dice = [
-            DieButton(die_type, disabled=True, classes="-save-die")
-            for die_type in self.dice_pool.get_dice()
-        ]
-
-        # yield Grid(
-        #    Label("Save Dialog", id="-save-title", classes="two"),
-        #    # Label("Name of the roll:", classes="info two"),
-        #    # Input(placeholder="Name of the roll", classes="info two"),
-        #    LabelInput(
-        #        label_args=["Name of the roll"],
-        #        label_kwargs={"classes": "inner"},
-        #        input_kwargs={"placeholder": "Name of the roll", "classes": "inner"},
-        #    ),
-        #    Label("Save these dice:", classes="info right"),
-        #    # Label(self.dice_pool.roll_str(), classes="info left"),
-        #    Button("Save", variant="primary", id="-save-button"),
-        #    Button("Cancel", variant="error", id="-cancel-button"),
-        #    id="-save-dialog",
-        # )
-
         with Vertical(id="-save-container"):
             yield Label("Save Dialog", id="-save-title")
+
             yield LabelInput(
                 label_args=["Name of the roll"],
                 label_kwargs={"classes": "inner"},
                 input_kwargs={"placeholder": "Name of the roll", "classes": "inner"},
             )
-            yield Label("Save these dice:", classes="info right")
-            yield Grid(
-                *dice,
-                id="-save-dice-grid",
-            )
+
+            yield Label("Save these dice:", classes="info")
+
+            with Grid(id="-save-dice-grid"):
+                for die_type in self.dice_pool.get_dice():
+                    yield DieButton(die_type, disabled=True)
+
             with Horizontal(id="-save-footer"):
                 yield Button("Save", variant="primary", id="-save-button")
                 yield Button("Cancel", variant="error", id="-cancel-button")
