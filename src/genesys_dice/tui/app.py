@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pyperclip  # type: ignore
 
 from rich.text import Text
@@ -8,6 +10,7 @@ from textual.containers import Container, Horizontal, Vertical
 from textual.message import Message
 from textual.screen import Screen
 from textual.widgets import (
+    Button,
     Header,
     Footer,
     Placeholder,
@@ -35,12 +38,18 @@ class AppScreen(Screen):
 
 
 class DiceApp(App):
-    def on_mount(self) -> None:
-        self.push_screen(AppScreen())
 
-    # def action_change_tab(self, tab_id: str) -> None:
-    #    self.notify("action")
-    #    self.query_one(TabbedContent).active = tab_id
+    starting_dice: Optional[str] = None
+
+    def __init__(self, dice_str: Optional[str] = None, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.starting_dice = dice_str
+
+    async def on_mount(self) -> None:
+        await self.push_screen(AppScreen())
+        if self.starting_dice is not None:
+            self.query_one(Tray).set_dice(self.starting_dice)
+            self.query_one("#Save", Button).press()
 
 
 if __name__ == "__main__":

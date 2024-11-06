@@ -78,8 +78,9 @@ def command_roll(dice: str, details: bool):
 @click.option("-t", is_flag=True, help="Print all rolls with probabilities")
 @click.option("-s", is_flag=True, help="Print the success rate of a roll")
 @click.option("-f", is_flag=True, help="Print the faces of the dice")
+@click.option("-u", is_flag=True, help="Run the TUI with initial dice")
 @click.argument("dice", required=False)
-def main(d, t, s, f, dice):
+def main(d, t, s, f, u, dice):
     """
     \b
     A dice roller and probablity calculator for the Genesys RPG system.
@@ -107,8 +108,10 @@ def main(d, t, s, f, dice):
         command_faces()
     else:
         if dice is None:
-            # click.echo(click.get_current_context().get_help())
             app = DiceApp()
+            app.run()
+        elif u:
+            app = DiceApp(dice)
             app.run()
         else:
             command_roll(dice, d)

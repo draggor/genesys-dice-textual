@@ -338,6 +338,7 @@ class DicePool:
         if dice_str is not None:
             for die in get_dice_from_str(dice_str):
                 self.dice[die.die_type] += 1
+                self.total_dice += 1
 
     def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:
         die = dice_map[die_type]

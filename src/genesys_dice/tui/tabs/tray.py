@@ -82,8 +82,8 @@ class Pending(TitleContainer):
         self.dice_pool.modify(die_type, modifier)
         self.mutate_reactive(Pending.dice_pool)
 
-    def clear_dice(self) -> None:
-        self.dice_pool = DicePool()
+    def set_dice(self, dice_str: Optional[str] = None) -> None:
+        self.dice_pool = DicePool(dice_str)
 
 
 class Tray(Vertical):
@@ -113,10 +113,20 @@ class Tray(Vertical):
                 yield Button("Clear!", id="Clear", variant="error")
                 yield Button("Save!", id="Save", variant="primary")
 
+    def on_mount(self) -> None:
+        def update_roll_str(dice_pool) -> None:
+            dice_roll_str = dice_pool.roll_str()
+            self.query_one("#RollString", TitleButton).label = dice_roll_str
+
+        self.watch(self.query_one(Pending), "dice_pool", update_roll_str)
+
     def watch_roll_result(self, roll_result: Result) -> None:
         self.query_one("#RollResult", TitleButton).label = str(roll_result)
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
+
+    def set_dice(self, dice_str: Optional[str] = None) -> None:
+        self.query_one(Pending).set_dice(dice_str)
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
@@ -127,18 +137,12 @@ class Tray(Vertical):
     @on(Button.Pressed, ".tray")
     def modify_pending_dice(self, message: DieButton.Pressed) -> None:
         die_button = cast(DieButton, message.control)
-        pending = self.query_one(Pending)
-        pending.modify_dice(die_button.die_type, die_button.modifier)
-        dice_roll_str = pending.dice_pool.roll_str()
-        self.query_one("#RollString", TitleButton).label = dice_roll_str
+        self.query_one(Pending).modify_dice(die_button.die_type, die_button.modifier)
 
     @on(Button.Pressed, ".pending")
     def remove_pending_dice(self, message: DieButton.Pressed) -> None:
         die_button = cast(DieButton, message.control)
-        pending = self.query_one(Pending)
-        pending.modify_dice(die_button.die_type, Modifier.REMOVE)
-        dice_roll_str = pending.dice_pool.roll_str()
-        self.query_one("#RollString", TitleButton).label = dice_roll_str
+        self.query_one(Pending).modify_dice(die_button.die_type, Modifier.REMOVE)
 
     @on(Button.Pressed, "#Roll")
     def roll_dice(self, message: Button.Pressed) -> None:
@@ -147,8 +151,7 @@ class Tray(Vertical):
     @on(Button.Pressed, "#Clear")
     def clear_dice(self, message: Button.Pressed) -> None:
         self.roll_result = Result()
-        self.query_one(Pending).clear_dice()
-        self.query_one("#RollString", TitleButton).label = ""
+        self.query_one(Pending).set_dice()
 
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
