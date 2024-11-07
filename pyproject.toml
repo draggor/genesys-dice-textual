@@ -17,10 +17,9 @@ dependencies = [
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Intended Audience :: Gamers",
-    "Environment :: Console :: Textual",
+    "Intended Audience :: End Users/Desktop",
+    "Environment :: Console",
     "License :: OSI Approved :: GNU Affero General Public License v3",
-    "Framework :: Textual",
     "Operating System :: Microsoft :: Windows :: Windows 10",
     "Operating System :: Microsoft :: Windows :: Windows 11",
     "Operating System :: MacOS",
