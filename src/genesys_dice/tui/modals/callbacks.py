@@ -20,14 +20,7 @@ def switch_tab[T](tab_str: str, app: App, tab_class=None) -> Callable[[T], None]
                 )
 
             if tab.active_pane:
-                children = tab.active_pane.query_children()
-                child_count = len(children)
-                if child_count != 1:
-                    raise Exception(
-                        f"When using switch_tab, tab pane {tab_str} can only have 1 child, got {child_count}"
-                    )
-
-                destination_tab = children.first(tab_class)
+                destination_tab = tab.active_pane.query_one(tab_class)
                 destination_tab.set_data(modal_return)
 
     return inner
