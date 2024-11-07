@@ -7,20 +7,28 @@ from textual.widgets import TabbedContent
 from genesys_dice.data import SavedRoll
 
 
-def switch_tab[T, V](tab_str: str, app: App, tab_class) -> Callable[[T], None]:
+def switch_tab[T](tab_str: str, app: App, tab_class=None) -> Callable[[T], None]:
     def inner[U](modal_return: Optional[U] = None) -> None:
+        app.set_focus(None)
+        tab = app.query_one(TabbedContent)
+        tab.active = tab_str
+
         if modal_return is not None:
-            app.set_focus(None)
-            tab = app.query_one(TabbedContent)
-            tab.active = tab_str
-            # TODO: this is fucky and there technically can be Nones
-            #       and making mypy happy on top of that is ???
-            #       Probably a code smell anyway.
+            if tab_class is None:
+                raise Exception(
+                    "tab_class parameter required if accepting data from modal"
+                )
+
             if tab.active_pane:
                 children = tab.active_pane.query_children()
-                if len(children) > 0:
-                    destination_tab = children.first(tab_class)
-                    destination_tab.set_data(modal_return)
+                child_count = len(children)
+                if child_count != 1:
+                    raise Exception(
+                        f"When using switch_tab, tab pane {tab_str} can only have 1 child, got {child_count}"
+                    )
+
+                destination_tab = children.first(tab_class)
+                destination_tab.set_data(modal_return)
 
     return inner
 
