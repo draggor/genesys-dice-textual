@@ -1,7 +1,10 @@
 [project]
 name = "genesys-dice"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.0.3-alpha"
+authors = [
+    { name="Draggor", email="draggor@gmail.com" },
+]
+description = "A die roller for the Genesys table top role playing game system and its special dice."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -12,9 +15,27 @@ dependencies = [
     "rich>=13.9.3",
     "textual>=0.84.0",
 ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Gamers",
+    "Environment :: Console :: Textual",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Framework :: Textual",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment :: Role-Playing",
+    "Typing :: Typed",
+]
 
 [project.scripts]
 genesys-dice = 'genesys_dice:main'
+
+[project.urls]
+Homepage = "https://github.com/draggor/genesys-dice-textual"
+Issues = "https://github.com/draggor/genesys-dice-textual/issues"
 
 [build-system]
 requires = ["hatchling"]
