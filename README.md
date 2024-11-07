@@ -1,3 +1,5 @@
+![genesys-dice](docs/screenshots/genesys-dice-example-roll.svg)
+
 # Genesys Dice
 A python utility for rolling the Genesys role playing game system dice.
 
@@ -42,3 +44,6 @@ When run without arguments, you get the textual TUI interface.  Click on the but
 
 ## WSL
 For me, I had to manually add `/mnt/c/Windows/System32` to my `$PATH` in order to get access to `clip.exe`.
+
+# More Screenshots
+![genesys-dice-face-table](docs/screenshots/genesys-dice-face-table.png)
