@@ -4,6 +4,7 @@ from typing import Iterable, Optional
 from textual.app import App, ComposeResult, SystemCommand
 from textual.screen import Screen
 from textual.widgets import (
+    Button,
     Header,
     Footer,
     TabbedContent,
@@ -11,7 +12,7 @@ from textual.widgets import (
 )
 
 from genesys_dice.tui.modals import DiceFacesModal
-from genesys_dice.tui.tabs import Tray, Templates
+from genesys_dice.tui.tabs import Tray, SavedRolls
 
 
 class AppScreen(Screen):
@@ -23,8 +24,8 @@ class AppScreen(Screen):
         with TabbedContent(initial="tray-tab"):
             with TabPane("Dice Tray", id="tray-tab"):
                 yield Tray(id="Tray")
-            with TabPane("Templates", id="template-tab"):
-                yield Templates(id="Templates")
+            with TabPane("Saved Rolls", id="savedrolls-tab"):
+                yield SavedRolls(id="SavedRolls")
 
         yield Footer(id="Footer")
 
@@ -44,7 +45,7 @@ class DiceApp(App):
         await self.push_screen(AppScreen())
         if self.starting_dice is not None:
             self.query_one(Tray).set_dice(self.starting_dice)
-            # self.query_one("#Save", Button).press()
+            self.query_one("#Save", Button).press()
 
     def action_show_dice_faces_modal(self) -> None:
         self.push_screen(DiceFacesModal())

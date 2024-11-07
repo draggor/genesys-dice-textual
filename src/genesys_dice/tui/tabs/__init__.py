@@ -1,8 +1,8 @@
 from genesys_dice.tui.tabs.tray import Tray
-from genesys_dice.tui.tabs.templates import Templates
+from genesys_dice.tui.tabs.saved_rolls import SavedRolls
 
 
 __all__ = [
     "Tray",
-    "Templates",
+    "SavedRolls",
 ]

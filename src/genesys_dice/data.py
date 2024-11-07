@@ -49,11 +49,6 @@ class SavedRoll:
 
         return parsed_data
 
-    def __init__(self, name: str, dice: str, description: Optional[str] = None) -> None:
-        self.name = name
-        self.dice = dice
-        self.description = description
-
 
 def main() -> None:
     print(

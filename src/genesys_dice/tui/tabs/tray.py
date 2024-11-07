@@ -30,7 +30,7 @@ from genesys_dice.tui.widgets import (
     TitleButton,
     TitleContainer,
 )
-from genesys_dice.tui.tabs.templates import Templates
+from genesys_dice.tui.tabs.saved_rolls import SavedRolls
 
 
 class DiceMenu(TitleContainer):
@@ -161,5 +161,5 @@ class Tray(Vertical):
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
         if not self.dice_pool.is_empty():
-            callback: SavedRollFn = switch_tab("template-tab", self.app, Templates)
+            callback: SavedRollFn = switch_tab("savedrolls-tab", self.app, SavedRolls)
             self.app.push_screen(SaveModal().data_bind(Tray.dice_pool), callback)
