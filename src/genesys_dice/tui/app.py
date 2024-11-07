@@ -1,7 +1,6 @@
 from typing import Iterable, Optional
 
 
-
 from textual.app import App, ComposeResult, SystemCommand
 from textual.screen import Screen
 from textual.widgets import (
