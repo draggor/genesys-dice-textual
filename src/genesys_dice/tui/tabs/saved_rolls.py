@@ -135,5 +135,5 @@ class SavedRolls(Container):
 
     def set_data(self, roll: Optional[DicePool] = None) -> None:
         if roll is not None:
-            self.notify(str(asdict(roll)))
+            self.notify(str(roll.asdict()))
             self.add_roll(roll)
