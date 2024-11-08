@@ -9,11 +9,11 @@ from genesys_dice.data import SavedRoll
 
 def switch_tab[T](tab_str: str, app: App, tab_class=None) -> Callable[[T], None]:
     def inner[U](modal_return: Optional[U] = None) -> None:
-        app.set_focus(None)
-        tab = app.query_one(TabbedContent)
-        tab.active = tab_str
-
         if modal_return is not None:
+            app.set_focus(None)
+            tab = app.query_one(TabbedContent)
+            tab.active = tab_str
+
             if tab_class is None:
                 raise Exception(
                     "tab_class parameter required if accepting data from modal"

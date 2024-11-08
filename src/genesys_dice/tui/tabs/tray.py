@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Optional, cast
 
 import pyperclip  # type: ignore
 
@@ -12,6 +12,7 @@ from textual.widgets import (
     Button,
 )
 
+from genesys_dice import data
 from genesys_dice.dice import (
     Dice,
     DicePool,
@@ -81,6 +82,7 @@ class Tray(Vertical):
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
     roll_result: reactive[Result] = reactive(Result)
+    saved_roll: reactive[Optional[data.SavedRoll]] = reactive(None)
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="TrayUpper"):
@@ -128,8 +130,14 @@ class Tray(Vertical):
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
 
+    def watch_saved_dice(self) -> None:
+        pass
+
     def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)
+
+    def set_data(self, saved_roll: data.SavedRoll) -> None:
+        self.saved_roll = saved_roll
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
