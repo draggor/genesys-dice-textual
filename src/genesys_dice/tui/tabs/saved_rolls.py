@@ -1,15 +1,23 @@
 from collections.abc import Callable
+from dataclasses import asdict
 from typing import Optional, List
 
 from textual import on, events
 from textual.app import ComposeResult
-from textual.containers import Center, Container, Grid, Horizontal, ScrollableContainer
+from textual.containers import (
+    Center,
+    Container,
+    Grid,
+    Horizontal,
+    ScrollableContainer,
+    ItemGrid,
+)
 from textual.geometry import Size
 from textual.reactive import reactive
 from textual.widgets import Placeholder, Label, Static, Button, RichLog
 
 from genesys_dice import data
-from genesys_dice.dice import get_dice_from_str
+from genesys_dice.dice import DicePool, get_dice_from_str
 from genesys_dice.tui.widgets.button_plus import ButtonPlus
 from genesys_dice.tui.widgets.die_button import DieButton
 
@@ -33,7 +41,7 @@ class Roll(Container):
                 width: auto;
                 min-width: 9;
                 height: auto;
-                margin: 1 0;
+                margin: 1;
                 padding: 1 0;
                 background: $primary-background-lighten-1;
                 text-align: center;
@@ -51,9 +59,9 @@ class Roll(Container):
 
     """
 
-    roll: reactive[data.SavedRoll] = reactive(data.SavedRoll)
+    roll: reactive[DicePool] = reactive(DicePool)
 
-    def __init__(self, roll: data.SavedRoll, *args, **kwargs) -> None:
+    def __init__(self, roll: DicePool, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.roll = roll
         self.border_title: str = roll.name
@@ -62,7 +70,8 @@ class Roll(Container):
         with Center():
             with Horizontal():
                 yield Label("Dice: ", id="-roll-label")
-                for die_type in get_dice_from_str(self.roll.dice):
+                # for die_type in get_dice_from_str(self.roll.dice):
+                for die_type in self.roll.get_dice():
                     yield DieButton(die_type, disabled=True)
         if self.roll.description is not None:
             yield Static(self.roll.description, id="-roll-description")
@@ -86,7 +95,7 @@ class RollGrid(ScrollableContainer):
     }
     """
 
-    saved_rolls: reactive[List[data.SavedRoll]] = reactive(list, recompose=True)
+    saved_rolls: reactive[List[DicePool]] = reactive(list, recompose=True)
 
     def compose(self) -> ComposeResult:
         for idx, roll in enumerate(self.saved_rolls):
@@ -96,7 +105,7 @@ class RollGrid(ScrollableContainer):
 
     # TODO: figure out how to solve the equal Roll border box size issue
     #       This doesn't work, onlyhappens once, adding a widget after breaks it.
-    #def on_show(self) -> None:
+    # def on_show(self) -> None:
     #    two = []
     #    for box in self.query(Roll):
     #        two.append(box)
@@ -110,20 +119,21 @@ class RollGrid(ScrollableContainer):
 
 class SavedRolls(Container):
 
-    saved_rolls: reactive[List[data.SavedRoll]] = reactive(list, always_update=True)
+    saved_rolls: reactive[List[DicePool]] = reactive(list, always_update=True)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        self.saved_rolls = data.SavedRoll.load_from_file('test-data.yaml')
+        self.saved_rolls = data.load_from_file("test-data.yaml")
 
     def compose(self) -> ComposeResult:
         yield RollGrid(id="RollGrid").data_bind(SavedRolls.saved_rolls)
 
-    def add_roll(self, roll: data.SavedRoll) -> None:
+    def add_roll(self, roll: DicePool) -> None:
         self.saved_rolls.append(roll)
         self.mutate_reactive(SavedRolls.saved_rolls)
 
-    def set_data(self, roll: Optional[data.SavedRoll] = None) -> None:
+    def set_data(self, roll: Optional[DicePool] = None) -> None:
         if roll is not None:
+            self.notify(str(asdict(roll)))
             self.add_roll(roll)

@@ -1,5 +1,5 @@
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass, InitVar
 from enum import StrEnum
 import itertools
 import random
@@ -327,11 +327,36 @@ class DicePool:
 
         return d
 
-    dice_counts: Dict[Dice, int] = field(default_factory=default_dice, init=False)
-    dice: str = ""
+    @staticmethod
+    def dict_factory(dict_src: List[Tuple[str, Any]]) -> Dict[str, Any]:
+        dict_dest = {
+            "name": None,
+            "dice": None,
+            "description": None,
+        }
 
-    def __post_init__(self) -> None:
-        for die_type in get_dice_from_str(self.dice):
+        for key, value in dict_src:
+            if is_dataclass(value) and not isinstance(value, type):
+                dict_dest[key] = asdict(value)
+            else:
+                dict_dest[key] = value
+
+        return dict_dest
+
+    dice: str = ""
+    name: str = ""
+    description: str = ""
+    dice_counts: InitVar[Optional[Dict[Dice, int]]] = None
+
+    def __post_init__(self, _) -> None:
+        self.dice_counts = DicePool.default_dice()
+        self.set_dice(self.dice)
+
+    def asdict(self) -> Dict[str, Any]:
+        return asdict(self, dict_factory=DicePool.dict_factory)
+
+    def set_dice(self, dice_str: str) -> Self:
+        for die_type in get_dice_from_str(dice_str):
             self.dice_counts[die_type] += 1
 
     def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:

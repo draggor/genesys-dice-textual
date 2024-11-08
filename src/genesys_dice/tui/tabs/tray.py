@@ -82,7 +82,6 @@ class Tray(Vertical):
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
     roll_result: reactive[Result] = reactive(Result)
-    saved_roll: reactive[Optional[data.SavedRoll]] = reactive(None)
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="TrayUpper"):
@@ -136,8 +135,8 @@ class Tray(Vertical):
     def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)
 
-    def set_data(self, saved_roll: data.SavedRoll) -> None:
-        self.saved_roll = saved_roll
+    def set_data(self, dice_pool: DicePool) -> None:
+        self.dice_pool = dice_pool
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
