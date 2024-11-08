@@ -11,3 +11,52 @@
     This is an unskilled roll
 
     The related ability is 2, and it's easy difficulty
+
+- name: Biotic Blast
+  dice: PPAD
+  description: |
+    Biotic blast starts at difficulty 1, easy, and gets harder as you stack more effects.
+
+    Consult the Biotic Blast table accordingly.
+
+- name: Biotic Barrier
+  dice: PPAD
+  description: |
+    Biotic Barrier starts at difficulty 1, easy, and gets harder as you stack more effects.
+
+    Consult the Biotic Barrier table accordingly.
+
+- name: Roll6
+  dice: AADS
+  description: |
+    just more filler
+
+- name: Roll7
+  dice: AADS
+
+- name: Roll8
+  dice: AADS
+  description: |
+    just more filler
+
+- name: Roll9
+  dice: AADS
+  description: |
+    just more filler
+
+- name: Roll10
+  dice: AADS
+  description: |
+    just more filler
+
+- name: Roll11
+  dice: AADS
+  description: |
+    just more filler
+
+- name: Telekinesis
+  dice: PADDD
+  description: |
+    Move things with your mind!  You can do a lot with it, but the more precise the movements, the harder it's going to be.
+
+    Also difficult if the item is on a person.

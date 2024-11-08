@@ -27,9 +27,9 @@ def load_from_file(path: Optional[str] = None):
 
 @dataclass
 class SavedRoll:
-    name: str
-    dice: str
-    description: Optional[str] = None
+    name: str = ''
+    dice: str = ''
+    description: str = '' 
 
     @staticmethod
     def load_from_file(path: Optional[str] = None) -> List["SavedRoll"]:

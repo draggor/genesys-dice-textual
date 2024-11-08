@@ -1,160 +1,121 @@
 from collections.abc import Callable
 from typing import Optional, List
 
-from rich.pretty import Pretty
-
 from textual import on, events
 from textual.app import ComposeResult
-from textual.containers import Center, Container, Grid, Horizontal
+from textual.containers import Center, Container, Grid, Horizontal, ScrollableContainer
+from textual.geometry import Size
 from textual.reactive import reactive
 from textual.widgets import Placeholder, Label, Static, Button, RichLog
 
 from genesys_dice import data
+from genesys_dice.dice import get_dice_from_str
 from genesys_dice.tui.widgets.button_plus import ButtonPlus
+from genesys_dice.tui.widgets.die_button import DieButton
 
 
-class Roll(Container, can_focus=True):
+class Roll(Container):
     DEFAULT_CSS = """
     Roll {
-        width: auto;
+        width: 100%;
         height: auto;
         border: solid white;
+        margin: 0 1;
         content-align: center middle;
         background: $primary-background-darken-1;
-
-        &:focus {
-            border: thick white;
-        }
-
-        /*
-        &.-hover {
-            background: black;
-        }
-
-        &.-hover Label {
-            background: black;
-        }
-
-        &:focus {
-            border: thick white;
-        }
-        */
 
         Horizontal {
             width: auto;
             height: auto;
+            content-align: center middle;
 
-            Label {
+            #-roll-label {
                 width: auto;
+                min-width: 9;
                 height: auto;
-                border: solid white;
-                background: red;
+                margin: 1 0;
+                padding: 1 0;
+                background: $primary-background-lighten-1;
+                text-align: center;
+
+                &:hover {
+                    background: $primary-background-lighten-1;
+                }
             }
         }
 
+        #-roll-description {
+            margin: 0 1;
+        }
     }
 
     """
 
-    # saved_roll: reactive[SavedRoll] = reactive(SavedRoll, recompose=True)
-    roll: data.SavedRoll
+    roll: reactive[data.SavedRoll] = reactive(data.SavedRoll)
 
     def __init__(self, roll: data.SavedRoll, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.roll = roll
-        self.border_title = roll.name
+        self.border_title: str = roll.name
 
     def compose(self) -> ComposeResult:
-        # with Center():
-        #    yield Static(self.roll.name)
-        with Horizontal():
-            yield Label("And more text Dice: ")
-            yield Label(self.roll.dice)
+        with Center():
+            with Horizontal():
+                yield Label("Dice: ", id="-roll-label")
+                for die_type in get_dice_from_str(self.roll.dice):
+                    yield DieButton(die_type, disabled=True)
+        if self.roll.description is not None:
+            yield Static(self.roll.description, id="-roll-description")
 
-    # @on(events.Enter)
-    # @on(events.Leave)
-    # def on_enter(self, event: events.Enter):
-    #    event.stop()
-    #    self.set_class(self.is_mouse_over, "-hover")
-
-
-class HoverButton(Button):
-    DEFAULT_CSS = """
-    HoverButton {
-        width: auto;
-        content-align: center middle;
-        &.-hover {
-            border-top: tall $panel;
-            background: $panel-darken-2;
-        }
-        &.-hover * {
-            background: $panel-darken-2;
-        }
-
-        &.-active {
-            background: $panel;
-            border-bottom: tall $panel-lighten-2;
-            border-top: tall $panel-darken-2;
-            tint: $background 30%;
-        }
-
-        &.-active * {
-            background: $panel;
-            tint: $background 30%;
-        }
-
-        &> * {
-            content-align: center middle;
-        }
-    }
-    """
-
-    def get_content_width(self, container, viewport) -> int:
-        return self.query_children().first().get_content_width(container, viewport) + 2
-
-    @on(events.Enter)
-    @on(events.Leave)
-    def on_enter(self, event: events.Enter):
-        event.stop()
-        self.set_class(self.is_mouse_over, "-hover")
+    def get_content_width(self, container: Size, viewport: Size) -> int:
+        orig: int = super().get_content_width(container, viewport)
+        return max(orig, len(self.border_title) + 6)
 
 
-class RollGrid(Container):
+class RollGrid(ScrollableContainer):
     DEFAULT_CSS = """
     RollGrid {
         layout: grid;
         grid-size: 2;
         grid-gutter: 1;
         grid-rows: auto;
-        grid-columns: auto;
+
+        .-grid-button {
+            height: 100%;
+        }
     }
     """
 
     saved_rolls: reactive[List[data.SavedRoll]] = reactive(list, recompose=True)
-    display = ""
 
     def compose(self) -> ComposeResult:
-        hover_button = HoverButton()
-        styles = hover_button.styles
-        # self.display = Pretty(styles, expand_all=True)
-        rich_log = RichLog()
-        rich_log.write(styles)
-
-        for roll in self.saved_rolls:
-            # yield Roll(roll)
-            with HoverButton(""):
+        for idx, roll in enumerate(self.saved_rolls):
+            with ButtonPlus("", id=f"-button-{idx}", classes="-grid-button"):
                 with Center():
                     yield Roll(roll)
 
-        with hover_button:
-            yield Static("did it work?")
+    # TODO: figure out how to solve the equal Roll border box size issue
+    #       This doesn't work, onlyhappens once, adding a widget after breaks it.
+    #def on_show(self) -> None:
+    #    two = []
+    #    for box in self.query(Roll):
+    #        two.append(box)
 
-        # yield RichLog(id="--styles")
+    #        if len(two) == 2:
+    #            height = max(two[0].content_size.height, two[1].content_size.height) + 2
+    #            two[0].styles.height = height
+    #            two[1].styles.height = height
+    #            two = []
 
 
 class SavedRolls(Container):
 
     saved_rolls: reactive[List[data.SavedRoll]] = reactive(list, always_update=True)
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.saved_rolls = data.SavedRoll.load_from_file('test-data.yaml')
 
     def compose(self) -> ComposeResult:
         yield RollGrid(id="RollGrid").data_bind(SavedRolls.saved_rolls)

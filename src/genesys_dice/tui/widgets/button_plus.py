@@ -9,7 +9,7 @@ from rich.console import ConsoleRenderable, RenderableType
 from rich.text import Text, TextType
 from typing_extensions import Literal, Self
 
-from textual import events
+from textual import events, on
 
 if TYPE_CHECKING:
     from textual.app import RenderResult
@@ -61,16 +61,30 @@ class ButtonPlus(Widget, can_focus=True):
         &:focus {
             text-style: bold reverse;
         }
-        &:hover {
+        &.-hover {
             border-top: tall $panel;
             background: $panel-darken-2;
             color: $text;
         }
+
+        &.-hover * {
+            background: $panel-darken-2;
+        }
+
         &.-active {
             background: $panel;
             border-bottom: tall $panel-lighten-2;
             border-top: tall $panel-darken-2;
             tint: $background 30%;
+        }
+
+        &.-active * {
+            background: $panel;
+            tint: $background 30%;
+        }
+
+        &> * {
+            content-align: center middle;
         }
 
         &.-primary {
@@ -218,11 +232,7 @@ class ButtonPlus(Widget, can_focus=True):
             self.tooltip = tooltip
 
     def get_content_width(self, container: Size, viewport: Size) -> int:
-        try:
-            return max([cell_len(line) for line in self.label.plain.splitlines()]) + 2
-        except ValueError:
-            # Empty string label
-            return 2
+        return max([child.get_content_width(container, viewport) for child in self.query_children()]) + 2
 
     def __rich_repr__(self) -> rich.repr.Result:
         yield from super().__rich_repr__()
@@ -298,6 +308,12 @@ class ButtonPlus(Widget, can_focus=True):
         """Activate a press of the button."""
         if not self.has_class("-active"):
             self.press()
+
+    @on(events.Enter)
+    @on(events.Leave)
+    def hover_enter_leave(self, event: events.Enter | events.Leave) -> None:
+        event.stop()
+        self.set_class(self.is_mouse_over, '-hover')
 
     @classmethod
     def success(
