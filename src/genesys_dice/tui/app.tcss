@@ -1,15 +1,6 @@
-/*
-TabbedContent {
-    width: 100%;
-    height: 1fr;
-    overflow-y: auto;
-} 
-TabPane {
-    height: auto;
-    min-height: 100%;
-    padding: 0;
+AppScreen {
+   align-horizontal: center;
 }
-*/
 
 #TrayUpper {
     max-height: 31;

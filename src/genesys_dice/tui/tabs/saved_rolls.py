@@ -90,24 +90,25 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
         self.set_class(self.is_mouse_over, "-hover")
 
 
-class SavedRolls(Screen):
-    CSS = """
+class SavedRolls(Vertical):
+    DEFAULT_CSS = """
     SavedRolls {
         align-horizontal: center;
         ItemGrid {
-            margin: 2 4;
-            padding: 1 2;
+            margin: 0 1 0 0;
+            padding: 0;
             background: $boost;
             width: 1fr;
             height: auto;
-            grid-gutter: 1 1;
+            grid-gutter: 0;
             grid-rows: auto;
         }
-
     }
     """
 
-    saved_rolls: reactive[List[DicePool]] = reactive(list, always_update=True)
+    saved_rolls: reactive[List[DicePool]] = reactive(
+        list, always_update=True, recompose=True
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

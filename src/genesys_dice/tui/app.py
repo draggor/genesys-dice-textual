@@ -7,13 +7,13 @@ from textual.widgets import (
     Button,
     Header,
     Footer,
+    Label,
     TabbedContent,
     TabPane,
 )
 
 from genesys_dice.tui.modals import DiceFacesModal
 from genesys_dice.tui.tabs import Tray, SavedRolls
-from genesys_dice.tui.tabs.demo import ProjectsScreen
 
 
 class AppScreen(Screen):
@@ -22,13 +22,11 @@ class AppScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
 
-        with TabbedContent(initial="demo-tab"):
+        with TabbedContent(initial="savedrolls-tab"):
             with TabPane("Dice Tray", id="tray-tab"):
                 yield Tray(id="Tray")
             with TabPane("Saved Rolls", id="savedrolls-tab"):
                 yield SavedRolls(id="SavedRolls")
-            with TabPane("Demo", id="demo-tab"):
-                yield ProjectsScreen(id="Demo")
 
         yield Footer(id="Footer")
 
@@ -45,11 +43,11 @@ class DiceApp(App):
         self.starting_dice = dice_str
 
     async def on_mount(self) -> None:
-        await self.push_screen(SavedRolls())
-        # await self.push_screen(AppScreen())
-        # if self.starting_dice is not None:
-        #    self.query_one(Tray).set_dice(self.starting_dice)
-        #    self.query_one("#Save", Button).press()
+        await self.push_screen(AppScreen())
+
+        if self.starting_dice is not None:
+            self.query_one(Tray).set_dice(self.starting_dice)
+            # self.query_one("#Save", Button).press()
 
     def action_show_dice_faces_modal(self) -> None:
         self.push_screen(DiceFacesModal())
