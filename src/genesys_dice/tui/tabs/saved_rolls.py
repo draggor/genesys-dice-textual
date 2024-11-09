@@ -7,56 +7,66 @@ from textual.app import ComposeResult
 from textual.containers import (
     Center,
     Container,
-    Grid,
     Horizontal,
-    ScrollableContainer,
     ItemGrid,
+    ItemGrid,
+    Middle,
+    Vertical,
+    VerticalGroup,
+    VerticalScroll,
 )
 from textual.geometry import Size
 from textual.reactive import reactive
-from textual.widgets import Placeholder, Label, Static, Button, RichLog
+from textual.screen import Screen
+from textual.widgets import Placeholder, Label, Static, Button, RichLog, TextArea
 
 from genesys_dice import data
 from genesys_dice.dice import DicePool, get_dice_from_str
-from genesys_dice.tui.widgets.button_plus import ButtonPlus
 from genesys_dice.tui.widgets.die_button import DieButton
 
 
-class Roll(Container):
+class Roll(Vertical, can_focus=True, can_focus_children=False):
     DEFAULT_CSS = """
     Roll {
-        width: 100%;
+        width: 1fr;
         height: auto;
+        padding: 1 1 0 1;
         border: solid white;
-        margin: 0 1;
-        content-align: center middle;
-        background: $primary-background-darken-1;
+        background: $panel;
+        color: $text;
+        text-align: center;
+        text-style: bold;
+        box-sizing: border-box;
 
-        Horizontal {
+        &:focus {
+            border: tall white;
+            border-title-color: $text;
+            background: $primary-background-lighten-3 40%;
+            opacity: 1.0;
+        }
+
+        &.-hover {
+            background: $primary 60%;
+            opacity: 1.0;
+        }
+
+        #-dice-container {
             width: auto;
-            height: auto;
-            content-align: center middle;
+            height: 3;
+        }
 
-            #-roll-label {
-                width: auto;
-                min-width: 9;
-                height: auto;
-                margin: 1;
-                padding: 1 0;
-                background: $primary-background-lighten-1;
-                text-align: center;
+        .-button-display {
+            margin: 0 1;
 
-                &:hover {
-                    background: $primary-background-lighten-1;
-                }
+            &:disabled {
+                opacity: 1;
             }
         }
 
         #-roll-description {
-            margin: 0 1;
+            margin: 1 0 0 0;
         }
     }
-
     """
 
     roll: reactive[DicePool] = reactive(DicePool)
@@ -68,56 +78,34 @@ class Roll(Container):
 
     def compose(self) -> ComposeResult:
         with Center():
-            with Horizontal():
-                yield Label("Dice: ", id="-roll-label")
-                # for die_type in get_dice_from_str(self.roll.dice):
+            with Horizontal(id="-dice-container"):
                 for die_type in self.roll.get_dice():
-                    yield DieButton(die_type, disabled=True)
-        if self.roll.description is not None:
-            yield Static(self.roll.description, id="-roll-description")
+                    yield DieButton(die_type, disabled=True, classes="-button-display")
+        yield Static(self.roll.description, id="-roll-description")
 
-    def get_content_width(self, container: Size, viewport: Size) -> int:
-        orig: int = super().get_content_width(container, viewport)
-        return max(orig, len(self.border_title) + 6)
+    @on(events.Enter)
+    @on(events.Leave)
+    def on_enter(self, event: events.Enter):
+        event.stop()
+        self.set_class(self.is_mouse_over, "-hover")
 
 
-class RollGrid(ScrollableContainer):
-    DEFAULT_CSS = """
-    RollGrid {
-        layout: grid;
-        grid-size: 2;
-        grid-gutter: 1;
-        grid-rows: auto;
-
-        .-grid-button {
-            height: 100%;
+class SavedRolls(Screen):
+    CSS = """
+    SavedRolls {
+        align-horizontal: center;
+        ItemGrid {
+            margin: 2 4;
+            padding: 1 2;
+            background: $boost;
+            width: 1fr;
+            height: auto;
+            grid-gutter: 1 1;
+            grid-rows: auto;
         }
+
     }
     """
-
-    saved_rolls: reactive[List[DicePool]] = reactive(list, recompose=True)
-
-    def compose(self) -> ComposeResult:
-        for idx, roll in enumerate(self.saved_rolls):
-            with ButtonPlus("", id=f"-button-{idx}", classes="-grid-button"):
-                with Center():
-                    yield Roll(roll)
-
-    # TODO: figure out how to solve the equal Roll border box size issue
-    #       This doesn't work, onlyhappens once, adding a widget after breaks it.
-    # def on_show(self) -> None:
-    #    two = []
-    #    for box in self.query(Roll):
-    #        two.append(box)
-
-    #        if len(two) == 2:
-    #            height = max(two[0].content_size.height, two[1].content_size.height) + 2
-    #            two[0].styles.height = height
-    #            two[1].styles.height = height
-    #            two = []
-
-
-class SavedRolls(Container):
 
     saved_rolls: reactive[List[DicePool]] = reactive(list, always_update=True)
 
@@ -127,7 +115,11 @@ class SavedRolls(Container):
         self.saved_rolls = data.load_from_file("test-data.yaml")
 
     def compose(self) -> ComposeResult:
-        yield RollGrid(id="RollGrid").data_bind(SavedRolls.saved_rolls)
+        with VerticalScroll() as container:
+            container.can_focus = False
+            with ItemGrid(min_column_width=32):
+                for roll in self.saved_rolls:
+                    yield Roll(roll)
 
     def add_roll(self, roll: DicePool) -> None:
         self.saved_rolls.append(roll)
@@ -135,5 +127,4 @@ class SavedRolls(Container):
 
     def set_data(self, roll: Optional[DicePool] = None) -> None:
         if roll is not None:
-            self.notify(str(roll.asdict()))
             self.add_roll(roll)

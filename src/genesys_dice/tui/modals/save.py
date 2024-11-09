@@ -59,6 +59,10 @@ class SaveModal(ModalScreen):
                 grid-rows: 5;
                 grid-columns: 7;
                 height: auto;
+
+                DieButton:disabled {
+                    opacity: 1;
+                }
             }
         }
     }
