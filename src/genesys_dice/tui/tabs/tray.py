@@ -7,6 +7,7 @@ from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
+from textual.message import Message
 from textual.screen import Screen
 from textual.reactive import reactive
 from textual.widgets import (
@@ -22,6 +23,7 @@ from genesys_dice.dice import (
     modifier_display,
     Result,
 )
+from genesys_dice.tui.messages import SwitchTabMessage
 from genesys_dice.tui.modals import SaveModal
 from genesys_dice.tui.modals.callbacks import (
     switch_tab,
@@ -32,7 +34,7 @@ from genesys_dice.tui.widgets import (
     TitleButton,
     TitleContainer,
 )
-from genesys_dice.tui.tabs.saved_rolls import SavedRolls
+from genesys_dice.tui.tabs.data_tab import DataTab
 
 
 class DiceMenu(TitleContainer):
@@ -79,73 +81,12 @@ class Pending(TitleContainer):
             yield Horizontal(*row)
 
 
-class Tray(Vertical):
-    DEFAULT_CSS = """
-    #TrayUpper {
-        max-height: 31;
-    }
-    #TrayLower {
-        max-height: 10;
-    }
-    Pending {
-        height: auto;
-        min-height: 16;
-        max-height: 31;
-        width: 1fr;
-        border: solid white;
-    }
+class Tray(Vertical, DataTab[DicePool]):
 
-    DiceMenu {
-        height: auto;
-        min-height: 16;
-        max-height: 31;
-        width: auto;
-        min-width: 16;
-        max-width: 31;
-        border: solid white;
-    }
-
-    #RollButtons {
-        height: 100%;
-        min-height: 6;
-        max-height: 10;
-        width: 100%;
-        min-width: 16;
-        max-width: 31;
-        border: solid white;
-        align: center middle;
-        layout: grid;
-        grid-size: 2 2;
-        grid-rows: 1fr;
-        grid-columns: 1fr;
-        grid-gutter: 1;
-    }
-
-    #RollString {
-        height: 100%;
-        max-height: 10;
-        width: 1fr;
-        border: solid white;
-        content-align: center middle;
-    }
-
-    #RollDetails {
-        height: 100%;
-        max-height: 10;
-        width: 1fr;
-        border: solid white;
-        content-align: center middle;
-    }
-
-    #RollResult {
-        height: 100%;
-        max-height: 10;
-        width: 1fr;
-        border: solid white;
-        content-align: center middle;
-    }
-
-    """
+    class SaveRollMessage(Message):
+        def __init__(self, dice: DicePool) -> None:
+            super().__init__()
+            self.dice = dice
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
     roll_result: reactive[Result] = reactive(Result)
@@ -178,6 +119,7 @@ class Tray(Vertical):
     def watch_dice_pool(self) -> None:
         dice_roll_str = self.dice_pool.roll_str()
         self.query_one("#RollString", TitleButton).label = dice_roll_str
+        self.query_one(Pending).border_subtitle = self.dice_pool.name
 
     def watch_roll_result(self, roll_result: Result) -> None:
         roll_result_button = self.query_one("#RollResult", TitleButton)
@@ -235,5 +177,4 @@ class Tray(Vertical):
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
         if not self.dice_pool.is_empty():
-            callback: SavedRollFn = switch_tab("savedrolls-tab", self.app, SavedRolls)
-            self.app.push_screen(SaveModal().data_bind(Tray.dice_pool), callback)
+            self.post_message(Tray.SaveRollMessage(self.dice_pool))

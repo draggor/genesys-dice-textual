@@ -16,13 +16,16 @@ from textual.containers import (
     VerticalScroll,
 )
 from textual.geometry import Size
+from textual.message import Message
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import Placeholder, Label, Static, Button, RichLog, TextArea
 
 from genesys_dice import data
 from genesys_dice.dice import DicePool, get_dice_from_str
+from genesys_dice.tui.messages import SwitchTabMessage
 from genesys_dice.tui.widgets.die_button import DieButton
+from genesys_dice.tui.tabs.data_tab import DataTab
 
 
 class Roll(Vertical, can_focus=True, can_focus_children=False):
@@ -69,19 +72,23 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     }
     """
 
-    roll: reactive[DicePool] = reactive(DicePool)
+    dice: reactive[DicePool] = reactive(DicePool)
 
-    def __init__(self, roll: DicePool, *args, **kwargs) -> None:
+    def __init__(self, dice: DicePool, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.roll = roll
-        self.border_title: str = roll.name
+        self.dice = dice
+        self.border_title: str = dice.name
 
     def compose(self) -> ComposeResult:
         with Center():
             with Horizontal(id="-dice-container"):
-                for die_type in self.roll.get_dice():
+                for die_type in self.dice.get_dice():
                     yield DieButton(die_type, disabled=True, classes="-button-display")
-        yield Static(self.roll.description, id="-roll-description")
+        yield Static(self.dice.description, id="-roll-description")
+
+    def on_focus(self) -> None:
+        self.app.set_focus(None)
+        self.post_message(SwitchTabMessage("tray-tab", self.dice))
 
     @on(events.Enter)
     @on(events.Leave)
@@ -90,7 +97,7 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
         self.set_class(self.is_mouse_over, "-hover")
 
 
-class SavedRolls(Vertical):
+class SavedRolls(Vertical, DataTab[DicePool]):
     DEFAULT_CSS = """
     SavedRolls {
         align-horizontal: center;
