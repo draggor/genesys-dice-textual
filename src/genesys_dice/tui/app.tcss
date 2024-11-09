@@ -1,3 +1,7 @@
+AppScreen {
+   align-horizontal: center;
+}
+
 #TrayUpper {
     max-height: 31;
 }

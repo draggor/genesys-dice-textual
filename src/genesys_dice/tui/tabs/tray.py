@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Optional, cast
 
 import pyperclip  # type: ignore
 
@@ -7,11 +7,13 @@ from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
+from textual.screen import Screen
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
 )
 
+from genesys_dice import data
 from genesys_dice.dice import (
     Dice,
     DicePool,
@@ -78,6 +80,72 @@ class Pending(TitleContainer):
 
 
 class Tray(Vertical):
+    DEFAULT_CSS = """
+    #TrayUpper {
+        max-height: 31;
+    }
+    #TrayLower {
+        max-height: 10;
+    }
+    Pending {
+        height: auto;
+        min-height: 16;
+        max-height: 31;
+        width: 1fr;
+        border: solid white;
+    }
+
+    DiceMenu {
+        height: auto;
+        min-height: 16;
+        max-height: 31;
+        width: auto;
+        min-width: 16;
+        max-width: 31;
+        border: solid white;
+    }
+
+    #RollButtons {
+        height: 100%;
+        min-height: 6;
+        max-height: 10;
+        width: 100%;
+        min-width: 16;
+        max-width: 31;
+        border: solid white;
+        align: center middle;
+        layout: grid;
+        grid-size: 2 2;
+        grid-rows: 1fr;
+        grid-columns: 1fr;
+        grid-gutter: 1;
+    }
+
+    #RollString {
+        height: 100%;
+        max-height: 10;
+        width: 1fr;
+        border: solid white;
+        content-align: center middle;
+    }
+
+    #RollDetails {
+        height: 100%;
+        max-height: 10;
+        width: 1fr;
+        border: solid white;
+        content-align: center middle;
+    }
+
+    #RollResult {
+        height: 100%;
+        max-height: 10;
+        width: 1fr;
+        border: solid white;
+        content-align: center middle;
+    }
+
+    """
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
     roll_result: reactive[Result] = reactive(Result)
@@ -128,8 +196,14 @@ class Tray(Vertical):
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
 
+    def watch_saved_dice(self) -> None:
+        pass
+
     def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)
+
+    def set_data(self, dice_pool: DicePool) -> None:
+        self.dice_pool = dice_pool
 
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:

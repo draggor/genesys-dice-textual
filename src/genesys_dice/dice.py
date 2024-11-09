@@ -1,5 +1,5 @@
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass, InitVar
 from enum import StrEnum
 import itertools
 import random
@@ -327,12 +327,42 @@ class DicePool:
 
         return d
 
-    dice_counts: Dict[Dice, int] = field(default_factory=default_dice, init=False)
+    @staticmethod
+    def dict_factory(dict_src: List[Tuple[str, Any]]) -> Dict[str, Any]:
+        """
+        We don't want to export dice_counts, internal use only
+        """
+        dict_dest: Dict[str, Any] = {
+            "name": None,
+            "dice": None,
+            "description": None,
+        }
+
+        for key, value in dict_src:
+            if key in dict_dest:
+                if is_dataclass(value) and not isinstance(value, type):
+                    dict_dest[key] = asdict(value)
+                else:
+                    dict_dest[key] = value
+
+        return dict_dest
+
     dice: str = ""
+    name: str = ""
+    description: str = ""
+    dice_counts: Dict[Dice, int] = field(default_factory=default_dice, init=False)
 
     def __post_init__(self) -> None:
-        for die_type in get_dice_from_str(self.dice):
+        self.set_dice(self.dice)
+
+    def asdict(self) -> Dict[str, Any]:
+        return asdict(self, dict_factory=DicePool.dict_factory)
+
+    def set_dice(self, dice_str: str) -> Self:
+        for die_type in get_dice_from_str(dice_str):
             self.dice_counts[die_type] += 1
+
+        return self
 
     def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:
         die = dice_map[die_type]

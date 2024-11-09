@@ -7,6 +7,7 @@ from textual.widgets import (
     Button,
     Header,
     Footer,
+    Label,
     TabbedContent,
     TabPane,
 )
@@ -21,7 +22,7 @@ class AppScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
 
-        with TabbedContent(initial="tray-tab"):
+        with TabbedContent(initial="savedrolls-tab"):
             with TabPane("Dice Tray", id="tray-tab"):
                 yield Tray(id="Tray")
             with TabPane("Saved Rolls", id="savedrolls-tab"):
@@ -43,9 +44,10 @@ class DiceApp(App):
 
     async def on_mount(self) -> None:
         await self.push_screen(AppScreen())
+
         if self.starting_dice is not None:
             self.query_one(Tray).set_dice(self.starting_dice)
-            self.query_one("#Save", Button).press()
+            # self.query_one("#Save", Button).press()
 
     def action_show_dice_faces_modal(self) -> None:
         self.push_screen(DiceFacesModal())

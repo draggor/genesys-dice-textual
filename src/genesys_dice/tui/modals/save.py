@@ -5,7 +5,6 @@ from textual.reactive import reactive
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label
 
-from genesys_dice.data import SavedRoll
 from genesys_dice.dice import DicePool
 from genesys_dice.tui.widgets import DieButton, LabelInput
 
@@ -60,6 +59,10 @@ class SaveModal(ModalScreen):
                 grid-rows: 5;
                 grid-columns: 7;
                 height: auto;
+
+                DieButton:disabled {
+                    opacity: 1;
+                }
             }
         }
     }
@@ -90,8 +93,8 @@ class SaveModal(ModalScreen):
     @on(Button.Pressed, "#-save-button")
     def save_modal(self, message: Button.Pressed) -> None:
         name = self.query_one(Input).value
-        dice_str = self.dice_pool.roll_str()
-        self.dismiss(SavedRoll(name, dice_str))
+        self.dice_pool.name = name
+        self.dismiss(self.dice_pool)
 
     @on(Button.Pressed, "#-cancel-button")
     def cancel_modal(self) -> None:
