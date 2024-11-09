@@ -62,7 +62,7 @@ class DiceApp(App):
         tabs.active = message.destination
         if message.dice is not None:
             tabs.query_one(f"#{message.destination}").query_children().first(
-                DataTab[DicePool]
+                DataTab
             ).set_data(message.dice)
 
     @work
