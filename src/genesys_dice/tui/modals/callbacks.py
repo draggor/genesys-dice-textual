@@ -1,14 +1,18 @@
 from collections.abc import Callable
-from typing import Optional
+from typing import Optional, TypeVar
 
 from textual.app import App
 from textual.widgets import TabbedContent
 
 from genesys_dice.dice import DicePool
 
+T = TypeVar("T")
 
-def switch_tab[T](tab_str: str, app: App, tab_class=None) -> Callable[[T], None]:
-    def inner[U](modal_return: Optional[U] = None) -> None:
+
+def switch_tab(tab_str: str, app: App, tab_class=None) -> Callable[[T], None]:
+    U = TypeVar("U")
+
+    def inner(modal_return: Optional[U] = None) -> None:
         if modal_return is not None:
             app.set_focus(None)
             tab = app.query_one(TabbedContent)
@@ -26,4 +30,4 @@ def switch_tab[T](tab_str: str, app: App, tab_class=None) -> Callable[[T], None]
     return inner
 
 
-type SavedRollFn = Callable[[Optional[DicePool]], None]
+SavedRollFn = Callable[[Optional[DicePool]], None]

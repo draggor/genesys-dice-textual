@@ -6,7 +6,7 @@ authors = [
 ]
 description = "A die roller for the Genesys table top role playing game system and its special dice."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "click>=8.1.7",
     "platformdirs>=4.3.6",
@@ -45,6 +45,7 @@ dev-dependencies = [
     "black>=24.10.0",
     "mypy>=1.13.0",
     "pdoc3>=0.11.1",
+    "py2wasm>=2.6.3",
     "pyinstaller>=6.11.0",
     "pytest>=8.3.3",
     "textual-dev>=1.6.1",

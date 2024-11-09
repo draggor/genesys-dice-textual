@@ -69,8 +69,8 @@ dice_short_codes = {}
 for die_type, code in dice_display.items():
     dice_short_codes[code] = die_type
 
-type Face = int | Symbol | list[Symbol]
-type DieResult = tuple[Dice, Face]
+Face = int | Symbol | list[Symbol]
+DieResult = tuple[Dice, Face]
 
 
 @dataclass
