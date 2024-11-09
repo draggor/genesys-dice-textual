@@ -45,5 +45,9 @@ When run without arguments, you get the textual TUI interface.  Click on the but
 ## WSL
 For me, I had to manually add `/mnt/c/Windows/System32` to my `$PATH` in order to get access to `clip.exe`.
 
-# More Screenshots
+<details>
+<summary>More Screenshots</summary>
 ![genesys-dice-face-table](docs/screenshots/genesys-dice-face-table.png)
+![genesys-dice](docs/screenshots/genesys-dice-example-roll-failure.svg)
+![genesys-dice](docs/screenshots/genesys-dice-example-save-dialog.svg)
+![genesys-dice](docs/screenshots/genesys-dice-example-saved-rolls.svg)
