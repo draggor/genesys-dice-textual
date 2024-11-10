@@ -13,10 +13,12 @@ from genesys_dice.dice import DicePool
 PLATFORM_DIRS = PlatformDirs("genesys-dice")
 DATA_FILE_NAME = "genesys-dice-saved-rolls.yaml"
 
+def resource_path(relative):
+    return os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), relative)))
 
 def load_from_file(path: Optional[str] = None) -> List[DicePool]:
     if path is not None:
-        data_file_path = path
+        data_file_path = resource_path(path)
     else:
         data_file_path = os.path.join(PLATFORM_DIRS.user_data_dir, DATA_FILE_NAME)
 
