@@ -19,7 +19,15 @@ from textual.geometry import Size
 from textual.message import Message
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import Placeholder, Label, Static, Button, RichLog, TextArea
+from textual.widgets import (
+    Placeholder,
+    Label,
+    Static,
+    Button,
+    RichLog,
+    TextArea,
+    TabPane,
+)
 
 from genesys_dice import data
 from genesys_dice.dice import DicePool, get_dice_from_str
@@ -72,6 +80,8 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     }
     """
 
+    BINDINGS = (("enter", "send_roll_to_tray()", "Send roll to tray"),)
+
     dice: reactive[DicePool] = reactive(DicePool)
 
     def __init__(self, dice: DicePool, *args, **kwargs) -> None:
@@ -86,7 +96,7 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
                     yield DieButton(die_type, disabled=True, classes="-button-display")
         yield Static(self.dice.description, id="-roll-description")
 
-    def on_focus(self) -> None:
+    def action_send_roll_to_tray(self) -> None:
         self.app.set_focus(None)
         self.post_message(SwitchTabMessage("tray-tab", self.dice))
 
@@ -96,8 +106,25 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
         event.stop()
         self.set_class(self.is_mouse_over, "-hover")
 
+    @on(events.Click)
+    def handle_click(self, event: events.Click):
+        """
+        A widget becomse focused on mouse_down right away.
+        We use -activated class to check if we're ready
+        to send the roll to the tray, aka, need to click twice.
+        """
+        event.stop()
+        if self.is_mouse_over and self.has_class("-activated"):
+            self.action_send_roll_to_tray()
+        else:
+            self.add_class("-activated")
 
-class SavedRolls(Vertical, DataTab[DicePool]):
+    @on(events.Blur)
+    def handle_unfocus(self):
+        self.remove_class("-activated")
+
+
+class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
     DEFAULT_CSS = """
     SavedRolls {
         align-horizontal: center;
@@ -116,6 +143,7 @@ class SavedRolls(Vertical, DataTab[DicePool]):
     saved_rolls: reactive[List[DicePool]] = reactive(
         list, always_update=True, recompose=True
     )
+    next_show_cb: Optional[Callable] = None
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -123,11 +151,16 @@ class SavedRolls(Vertical, DataTab[DicePool]):
         self.saved_rolls = data.load_from_file("test-data.yaml")
 
     def compose(self) -> ComposeResult:
-        with VerticalScroll() as container:
+        with VerticalScroll(id="-scroll-window") as container:
             container.can_focus = False
-            with ItemGrid(min_column_width=32):
+            with ItemGrid(id="-item-grid", min_column_width=32):
                 for roll in self.saved_rolls:
                     yield Roll(roll)
+
+    def on_show(self, event):
+        if self.next_show_cb is not None:
+            self.next_show_cb()
+            self.next_show_cb = None
 
     def add_roll(self, roll: DicePool) -> None:
         self.saved_rolls.append(roll)
@@ -136,3 +169,11 @@ class SavedRolls(Vertical, DataTab[DicePool]):
     def set_data(self, roll: Optional[DicePool] = None) -> None:
         if roll is not None:
             self.add_roll(roll)
+
+            def next_show_cb():
+                self.query_one("#-scroll-window", VerticalScroll).scroll_end(
+                    animate=False
+                )
+                self.app.set_focus(self.query(Roll).last())
+
+            self.next_show_cb = next_show_cb

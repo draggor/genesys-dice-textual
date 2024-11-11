@@ -6,12 +6,14 @@ from rich.text import Text
 
 from textual import on
 from textual.app import ComposeResult
+from textual.binding import BindingsMap
 from textual.containers import Container, Horizontal, Vertical
 from textual.message import Message
 from textual.screen import Screen
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
+    TabPane,
 )
 
 from genesys_dice import data
@@ -37,7 +39,7 @@ from genesys_dice.tui.widgets import (
 from genesys_dice.tui.tabs.data_tab import DataTab
 
 
-class DiceMenu(TitleContainer):
+class DiceMenu(TitleContainer, can_focus=True):
 
     def compose(self) -> ComposeResult:
         for die_type in dice_display.keys():
@@ -54,8 +56,8 @@ class DiceMenu(TitleContainer):
                         DieButton(
                             die_type,
                             modifier=mod,
-                            id=f"{die_type.name}-{mod.name}",
-                            classes="tray modifier",
+                            id=f"menu-{die_type.name}-{mod.name}",
+                            classes=f"tray modifier {die_type.name} {mod.name}",
                         )
                     )
             yield Horizontal(*row)
@@ -81,7 +83,13 @@ class Pending(TitleContainer):
             yield Horizontal(*row)
 
 
-class Tray(Vertical, DataTab[DicePool]):
+class Tray(TabPane, DataTab[DicePool], can_focus=True):
+
+    BINDINGS = (
+        ("ctrl+s", "app.press_button('#Save')", "Save Roll"),
+        ("ctrl+r", "app.press_button('#Roll')", "Roll Dice"),
+        ("ctrl+l", "app.press_button('#Clear')", "Clear"),
+    )
 
     class SaveRollMessage(Message):
         def __init__(self, dice: DicePool) -> None:
@@ -116,6 +124,29 @@ class Tray(Vertical, DataTab[DicePool]):
                 yield Button("Clear!", id="Clear", variant="error")
                 yield Button("Save!", id="Save", variant="primary")
 
+    def on_mount(self) -> None:
+        self._bindings = self.get_bindings_map()
+        self.refresh_bindings()
+
+    def get_bindings_map(self) -> BindingsMap:
+        bindings_maps_to_merge = [self._bindings]
+
+        bindings = []
+        for die in (
+            self.query("DieButton.modifier")
+            .exclude("UPGRADE")
+            .exclude("DOWNGRADE")
+            .results(DieButton)
+        ):
+            bindings.extend(die.get_bindings())
+
+        bindings_maps_to_merge.append(BindingsMap(bindings=bindings))
+
+        return BindingsMap.merge(bindings_maps_to_merge)
+
+    def action_modify_dice(self, button_id: str) -> None:
+        self.query_one(button_id, DieButton).press()
+
     def watch_dice_pool(self) -> None:
         dice_roll_str = self.dice_pool.roll_str()
         self.query_one("#RollString", TitleButton).label = dice_roll_str
@@ -137,9 +168,6 @@ class Tray(Vertical, DataTab[DicePool]):
 
         formatted_details = Text(roll_result.details_str(), justify="left")
         self.query_one("#RollDetails", TitleButton).label = formatted_details
-
-    def watch_saved_dice(self) -> None:
-        pass
 
     def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)

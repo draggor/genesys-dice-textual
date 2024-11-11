@@ -1,3 +1,6 @@
+from typing import List
+
+from textual.binding import Binding, BindingsMap
 from textual.css._error_tools import friendly_list
 from textual.widgets import Button
 
@@ -265,7 +268,11 @@ class DieButton(Button):
     """
 
     def __init__(
-        self, die_type: Dice, modifier: Optional[Modifier] = None, *args, **kwargs
+        self,
+        die_type: Dice,
+        modifier: Optional[Modifier] = None,
+        *args,
+        **kwargs,
     ):
         super().__init__(variant=die_type, *args, **kwargs)  # type: ignore
         self.die_type = die_type
@@ -273,6 +280,27 @@ class DieButton(Button):
         self.label = dice_display[die_type]
         if modifier is not None:
             self.label += modifier_display[modifier]
+
+    def get_bindings(self) -> List[Binding]:
+        if self.modifier in [Modifier.ADD, Modifier.REMOVE]:
+            key = self.die_type.name[0].lower()
+
+            if self.die_type is Dice.PERCENTILE:
+                key = "t"
+
+            if self.modifier is Modifier.REMOVE:
+                key = key.upper()
+
+            return [
+                Binding(
+                    key,
+                    f"modify_dice('#{self.id}')",
+                    f"{self.die_type} {self.modifier}",
+                    show=False,
+                ),
+            ]
+
+        return []
 
     def validate_variant(self, variant: str) -> str:
         if variant not in _VALID_DIE_VARIANTS:

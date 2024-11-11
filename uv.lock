@@ -230,7 +230,7 @@ dependencies = [
     { name = "textual" },
 ]
 
-[package.dependency-groups]
+[package.dev-dependencies]
 dev = [
     { name = "black" },
     { name = "mypy" },
@@ -251,7 +251,7 @@ requires-dist = [
     { name = "textual", specifier = ">=0.84.0" },
 ]
 
-[package.metadata.dependency-groups]
+[package.metadata.requires-dev]
 dev = [
     { name = "black", specifier = ">=24.10.0" },
     { name = "mypy", specifier = ">=1.13.0" },
