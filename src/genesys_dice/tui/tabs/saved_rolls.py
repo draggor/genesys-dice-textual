@@ -67,7 +67,9 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     }
     """
 
-    BINDINGS = (("enter", "send_roll_to_tray()", "Send roll to tray"),)
+    BINDINGS = [
+        ("enter", "send_roll_to_tray()", "Send roll to tray"),
+    ]
 
     dice: reactive[DicePool] = reactive(DicePool)
 

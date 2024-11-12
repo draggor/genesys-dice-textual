@@ -81,11 +81,11 @@ class Pending(TitleContainer):
 
 class Tray(TabPane, DataTab[DicePool], can_focus=True):
 
-    BINDINGS = (
+    BINDINGS = [
         ("ctrl+s", "app.press_button('#Save')", "Save Roll"),
         ("ctrl+r", "app.press_button('#Roll')", "Roll Dice"),
         ("ctrl+l", "app.press_button('#Clear')", "Clear"),
-    )
+    ]
 
     class SaveRollMessage(Message):
         def __init__(self, dice: DicePool) -> None:
@@ -148,21 +148,34 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
         self.query_one(Pending).border_subtitle = self.dice_pool.name
 
     def watch_roll_result(self, roll_result: Result) -> None:
+        formatted_details = Text(roll_result.details_str(), justify="left")
+        self.query_one("#RollDetails", TitleButton).label = formatted_details
+
+        match roll_result.success:
+            case True:
+                variant, subtitle = "success", "Success"
+            case False:
+                variant, subtitle = "error", "Failure"
+            case None:
+                variant, subtitle = "default", ""
+            case _:
+                raise Exception(f"Invalid result.success value: {roll_result.success}")
+
         roll_result_button = self.query_one("#RollResult", TitleButton)
         roll_result_button.label = str(roll_result)
 
-        if roll_result.success is None:
-            roll_result_button.variant = "default"
-            roll_result_button.border_subtitle = ""
-        elif roll_result.success:
-            roll_result_button.variant = "success"
-            roll_result_button.border_subtitle = "Success"
-        elif not roll_result.success:
-            roll_result_button.variant = "error"
-            roll_result_button.border_subtitle = "Failure"
+        roll_result_button.variant = variant
+        roll_result_button.border_subtitle = subtitle
 
-        formatted_details = Text(roll_result.details_str(), justify="left")
-        self.query_one("#RollDetails", TitleButton).label = formatted_details
+        # if roll_result.success is None:
+        #    roll_result_button.variant = "default"
+        #    roll_result_button.border_subtitle = ""
+        # elif roll_result.success:
+        #    roll_result_button.variant = "success"
+        #    roll_result_button.border_subtitle = "Success"
+        # elif not roll_result.success:
+        #    roll_result_button.variant = "error"
+        #    roll_result_button.border_subtitle = "Failure"
 
     def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)

@@ -65,7 +65,9 @@ class DiceApp(App):
         tabs = self.query_one(TabbedContent)
         tabs.active = message.destination
         if message.dice is not None:
-            tabs.query_one(f"#{message.destination}", DataTab).set_data(message.dice)
+            tabs.query(f"#{message.destination}").only_one(DataTab).set_data(
+                message.dice
+            )
 
     @work
     @on(Tray.SaveRollMessage)
