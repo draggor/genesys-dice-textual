@@ -95,10 +95,10 @@ class DieButton(Button):
 
     DieButton {
         width: 5;
-        min-width: 2;
+        min-width: 5;
         max-width: 5;
         height: 3;
-        min-height: 1;
+        min-height: 3;
         max-height: 3;
         background: $panel;
         color: $text;
@@ -112,7 +112,7 @@ class DieButton(Button):
 
         &.modifier {
             width: 6;
-            min-width: 2;
+            min-width: 6;
             max-width: 6;
         }
 

@@ -7,7 +7,12 @@ from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import BindingsMap
-from textual.containers import Container, Horizontal, Vertical
+from textual.containers import (
+    Container,
+    Horizontal,
+    Vertical,
+    ItemGrid,
+)
 from textual.message import Message
 from textual.screen import Screen
 from textual.reactive import reactive
@@ -100,29 +105,28 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
     roll_result: reactive[Result] = reactive(Result)
 
     def compose(self) -> ComposeResult:
-        with Horizontal(id="TrayUpper"):
-            yield Pending(id="Pending", border_title="Pending Dice").data_bind(
-                Tray.dice_pool
+        with ItemGrid(id="TrayUpper", min_column_width=17):
+            yield TitleButton(
+                label="",
+                id="RollString",
+                classes="copy",
+                border_title="Short Code",
             )
-            yield DiceMenu(id="DiceMenu", border_title="Dice Menu")
-        with Horizontal(id="TrayLower"):
-            with Horizontal():
-                yield TitleButton(
-                    label="",
-                    id="RollString",
-                    classes="copy",
-                    border_title="Short Code",
-                )
-                yield TitleButton(
-                    label="", id="RollDetails", classes="copy", border_title="Details"
-                )
-                yield TitleButton(
-                    label="", id="RollResult", classes="copy", border_title="Result"
-                )
+            yield TitleButton(
+                label="", id="RollDetails", classes="copy", border_title="Details"
+            )
+            yield TitleButton(
+                label="", id="RollResult", classes="copy", border_title="Result"
+            )
             with Container(id="RollButtons"):
                 yield Button("Roll!", id="Roll", variant="success")
                 yield Button("Clear!", id="Clear", variant="error")
                 yield Button("Save!", id="Save", variant="primary")
+        with Horizontal(id="TrayLower"):
+            yield Pending(id="Pending", border_title="Pending Dice").data_bind(
+                Tray.dice_pool
+            )
+            yield DiceMenu(id="DiceMenu", border_title="Dice Menu")
 
     def on_mount(self) -> None:
         self._bindings = self.get_bindings_map()
