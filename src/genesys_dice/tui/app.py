@@ -2,18 +2,14 @@ from typing import Iterable, Optional
 
 from textual import on, work
 from textual.app import App, ComposeResult, SystemCommand
-from textual.app import BindingsMap
 from textual.screen import Screen
 from textual.widgets import (
     Button,
     Header,
     Footer,
-    Label,
     TabbedContent,
-    TabPane,
 )
 
-from genesys_dice.dice import DicePool
 from genesys_dice.tui.messages import SwitchTabMessage
 from genesys_dice.tui.modals import DiceFacesModal, SaveModal
 from genesys_dice.tui.tabs import Tray, SavedRolls

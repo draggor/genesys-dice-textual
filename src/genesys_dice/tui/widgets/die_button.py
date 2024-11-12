@@ -1,6 +1,6 @@
 from typing import List
 
-from textual.binding import Binding, BindingsMap
+from textual.binding import Binding
 from textual.css._error_tools import friendly_list
 from textual.widgets import Button
 

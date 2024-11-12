@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 import pyperclip  # type: ignore
 
@@ -10,18 +10,15 @@ from textual.binding import BindingsMap
 from textual.containers import (
     Container,
     Horizontal,
-    Vertical,
     ItemGrid,
 )
 from textual.message import Message
-from textual.screen import Screen
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
     TabPane,
 )
 
-from genesys_dice import data
 from genesys_dice.dice import (
     Dice,
     DicePool,
@@ -29,12 +26,6 @@ from genesys_dice.dice import (
     Modifier,
     modifier_display,
     Result,
-)
-from genesys_dice.tui.messages import SwitchTabMessage
-from genesys_dice.tui.modals import SaveModal
-from genesys_dice.tui.modals.callbacks import (
-    switch_tab,
-    SavedRollFn,
 )
 from genesys_dice.tui.widgets import (
     DieButton,

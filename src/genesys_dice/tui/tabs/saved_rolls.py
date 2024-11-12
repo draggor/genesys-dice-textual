@@ -1,36 +1,23 @@
 from collections.abc import Callable
-from dataclasses import asdict
 from typing import Optional, List
 
 from textual import on, events
 from textual.app import ComposeResult
 from textual.containers import (
     Center,
-    Container,
     Horizontal,
     ItemGrid,
-    ItemGrid,
-    Middle,
     Vertical,
-    VerticalGroup,
     VerticalScroll,
 )
-from textual.geometry import Size
-from textual.message import Message
 from textual.reactive import reactive
-from textual.screen import Screen
 from textual.widgets import (
-    Placeholder,
-    Label,
     Static,
-    Button,
-    RichLog,
-    TextArea,
     TabPane,
 )
 
 from genesys_dice import data
-from genesys_dice.dice import DicePool, get_dice_from_str
+from genesys_dice.dice import DicePool
 from genesys_dice.tui.messages import SwitchTabMessage
 from genesys_dice.tui.widgets.die_button import DieButton
 from genesys_dice.tui.tabs.data_tab import DataTab

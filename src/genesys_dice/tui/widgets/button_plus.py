@@ -4,7 +4,6 @@ from functools import partial
 from typing import TYPE_CHECKING, cast
 
 import rich.repr
-from rich.cells import cell_len
 from rich.console import ConsoleRenderable, RenderableType
 from rich.text import Text, TextType
 from typing_extensions import Literal, Self
