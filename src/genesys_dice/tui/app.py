@@ -2,6 +2,7 @@ from typing import Iterable, Optional
 
 from textual import on, work
 from textual.app import App, ComposeResult, SystemCommand
+from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import (
     Button,
@@ -9,6 +10,7 @@ from textual.widgets import (
     Footer,
     TabbedContent,
 )
+from textual.widgets.tabbed_content import ContentTabs
 
 from genesys_dice.tui.messages import SwitchTabMessage
 from genesys_dice.tui.modals import DiceFacesModal, SaveModal
@@ -30,8 +32,12 @@ class AppScreen(Screen):
 
 
 class DiceApp(App):
+    COMMAND_PALETTE_BINDING = "ctrl+backslash"
+
     BINDINGS = [
-        ("f", "show_dice_faces_modal()", "Show Dice Faces"),
+        Binding("f", "show_dice_faces_modal()", "Show Dice Faces", show=False),
+        ("ctrl+n", "next_tab()", "Next Tab"),
+        ("ctrl+p", "previous_tab()", "Previous Tab"),
     ]
 
     starting_dice: Optional[str] = None
@@ -54,6 +60,12 @@ class DiceApp(App):
 
     def action_press_button(self, button_id: str) -> None:
         self.query_one(button_id, Button).press()
+
+    def action_next_tab(self) -> None:
+        self.query_one(TabbedContent).query_one(ContentTabs).action_next_tab()
+
+    def action_previous_tab(self) -> None:
+        self.query_one(TabbedContent).query_one(ContentTabs).action_previous_tab()
 
     @on(TabbedContent.TabActivated)
     def set_pane_focus(self, message: TabbedContent.TabActivated) -> None:
@@ -83,6 +95,7 @@ class DiceApp(App):
             "Show Dice Faces",
             "Pop up a modal window with the dice faces table.",
             self.action_show_dice_faces_modal,
+            show=False,
         )
 
 
