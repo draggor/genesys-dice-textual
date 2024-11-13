@@ -167,16 +167,6 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
         roll_result_button.variant = variant
         roll_result_button.border_subtitle = subtitle
 
-        # if roll_result.success is None:
-        #    roll_result_button.variant = "default"
-        #    roll_result_button.border_subtitle = ""
-        # elif roll_result.success:
-        #    roll_result_button.variant = "success"
-        #    roll_result_button.border_subtitle = "Success"
-        # elif not roll_result.success:
-        #    roll_result_button.variant = "error"
-        #    roll_result_button.border_subtitle = "Failure"
-
     def set_dice(self, dice_str: str = "") -> None:
         self.dice_pool = DicePool(dice_str)
 

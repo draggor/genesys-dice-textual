@@ -228,6 +228,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "rich" },
     { name = "textual" },
+    { name = "textual-serve" },
 ]
 
 [package.dev-dependencies]
@@ -249,6 +250,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "rich", specifier = ">=13.9.3" },
     { name = "textual", specifier = ">=0.84.0" },
+    { name = "textual-serve", specifier = ">=1.1.1" },
 ]
 
 [package.metadata.requires-dev]
