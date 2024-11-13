@@ -5,6 +5,8 @@ from rich.console import Console
 from rich.pretty import pprint
 from rich.table import Table
 
+import textual.drivers.web_driver
+
 from genesys_dice.dice import (
     dice_display,
     DicePool,
