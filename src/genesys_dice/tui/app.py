@@ -95,7 +95,6 @@ class DiceApp(App):
             "Show Dice Faces",
             "Pop up a modal window with the dice faces table.",
             self.action_show_dice_faces_modal,
-            show=False,
         )
 
 
