@@ -358,6 +358,9 @@ class DicePool:
     def asdict(self) -> Dict[str, Any]:
         return asdict(self, dict_factory=DicePool.dict_factory)
 
+    def count(self) -> int:
+        return len(self.dice)
+
     def set_dice(self, dice_str: str) -> Self:
         for die_type in get_dice_from_str(dice_str):
             self.dice_counts[die_type] += 1
@@ -403,10 +406,21 @@ class DicePool:
 
         return roll_result.reduce()
 
-    def get_dice(self) -> List[Dice]:
+    def get_dice(self, keys: Optional[List[Dice]] = None) -> List[Dice]:
+        """
+        Get all dice as a list.  If keys is supplied, only get the dice for
+        those keys.
+        """
         dice = []
 
-        for die_type, count in self.dice_counts.items():
+        if keys is not None:
+            dice_items = {
+                k: v for k, v in self.dice_counts.items() if k in keys
+            }.items()
+        else:
+            dice_items = self.dice_counts.items()
+
+        for die_type, count in dice_items:
             for _ in range(1, count + 1):
                 dice.append(die_type)
 

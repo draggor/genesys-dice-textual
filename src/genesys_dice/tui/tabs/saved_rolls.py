@@ -1,4 +1,5 @@
 from collections.abc import Callable
+import math
 from typing import Optional, List
 
 from textual import on, events
@@ -48,13 +49,23 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
             opacity: 1.0;
         }
 
+        #-center-dice-container {
+            width: 100%;
+            height: auto;
+        }
+
         #-dice-container {
+            layout: grid;
+            grid-size: 6;
+            grid-rows: auto;
+            grid-columns: auto;
+            grid-gutter: 0 1;
             width: auto;
-            height: 3;
+            height: auto;
         }
 
         .-button-display {
-            margin: 0 1;
+            margin: 0 0;
 
             &:disabled {
                 opacity: 1;
@@ -69,6 +80,7 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
 
     BINDINGS = [
         ("enter", "send_roll_to_tray()", "Send roll to tray"),
+        ("e", "edit_roll()", "Edit selected roll"),
     ]
 
     dice: reactive[DicePool] = reactive(DicePool)
@@ -79,8 +91,8 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
         self.border_title: str = dice.name
 
     def compose(self) -> ComposeResult:
-        with Center():
-            with Horizontal(id="-dice-container"):
+        with Center(id="-center-dice-container"):
+            with ItemGrid(id="-dice-container"):
                 for die_type in self.dice.get_dice():
                     yield DieButton(die_type, disabled=True, classes="-button-display")
         yield Static(self.dice.description, id="-roll-description")
@@ -88,6 +100,22 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     def action_send_roll_to_tray(self) -> None:
         self.app.set_focus(None)
         self.post_message(SwitchTabMessage("tray-tab", self.dice))
+
+    def action_edit_roll(self) -> None:
+
+    def calculate_grid_columns(self):
+        available_size = self.container_size.width - 3
+        max_dice = math.floor(available_size / 6)
+        dice_count = self.dice.count()
+        columns = dice_count if dice_count < max_dice else max_dice
+        # self.notify(str(columns))
+        self.query_one(ItemGrid).styles.grid_size_columns = columns
+
+    def on_show(self):
+        self.calculate_grid_columns()
+
+    def on_resize(self):
+        self.calculate_grid_columns()
 
     @on(events.Enter)
     @on(events.Leave)
@@ -98,7 +126,7 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     @on(events.Click)
     def handle_click(self, event: events.Click):
         """
-        A widget becomse focused on mouse_down right away.
+        A widget becomes focused on mouse_down right away.
         We use -activated class to check if we're ready
         to send the roll to the tray, aka, need to click twice.
         """
