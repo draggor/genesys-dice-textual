@@ -18,21 +18,16 @@ class SaveModal(ModalScreen):
 
         #-save-container {
             padding: 0 1;
-            width: 60;
+            width: auto;
+            max-width: 80%;
             height: auto;
             border: thick $background 80%;
             background: $surface;
 
-            #-save-footer {
-                dock: bottom;
-                width: 100%;
-                height: 4;
-
-                Button {
-                    width: 1fr;
-                    height: 3;
-                    margin: 1 1 0 1;
-                }
+            Button {
+                width: 1fr;
+                height: 3;
+                margin: 1 1 0 1;
             }
 
             #-save-title {
@@ -110,9 +105,8 @@ class SaveModal(ModalScreen):
                 },
             )
 
-            with Horizontal(id="-save-footer"):
-                yield Button("Save", variant="primary", id="-save-button")
-                yield Button("Cancel", variant="error", id="-cancel-button")
+            yield Button("Save", variant="primary", id="-save-button")
+            yield Button("Cancel", variant="error", id="-cancel-button")
 
     @on(Button.Pressed, "#-save-button")
     def save_modal(self, message: Button.Pressed) -> None:
