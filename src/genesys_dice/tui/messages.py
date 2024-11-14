@@ -12,6 +12,12 @@ class ModalMessage(Message):
         super().__init__()
 
 
+class SaveRollMessage(Message):
+    def __init__(self, dice: DicePool) -> None:
+        super().__init__()
+        self.dice = dice
+
+
 # class SwitchTabMessage[T](Message):
 #    def __init__(self, destination: str, dice: Optional[T]) -> None:
 #        super().__init__()

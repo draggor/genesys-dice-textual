@@ -12,7 +12,7 @@ from textual.widgets import (
 )
 from textual.widgets.tabbed_content import ContentTabs
 
-from genesys_dice.tui.messages import SwitchTabMessage
+from genesys_dice.tui.messages import SaveRollMessage, SwitchTabMessage
 from genesys_dice.tui.modals import DiceFacesModal, SaveModal
 from genesys_dice.tui.tabs import Tray, SavedRolls
 from genesys_dice.tui.tabs.data_tab import DataTab
@@ -82,8 +82,8 @@ class DiceApp(App):
             )
 
     @work
-    @on(Tray.SaveRollMessage)
-    async def save_roll_message(self, message: Tray.SaveRollMessage) -> None:
+    @on(SaveRollMessage)
+    async def save_roll_message(self, message: SaveRollMessage) -> None:
         dice = await self.push_screen_wait(SaveModal(message.dice))
         if dice is not None:
             self.set_focus(None)

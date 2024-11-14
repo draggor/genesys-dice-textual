@@ -27,6 +27,7 @@ from genesys_dice.dice import (
     modifier_display,
     Result,
 )
+from genesys_dice.tui.messages import SaveRollMessage
 from genesys_dice.tui.widgets import (
     DieButton,
     TitleButton,
@@ -86,11 +87,6 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
         ("ctrl+r", "app.press_button('#Roll')", "Roll Dice"),
         ("ctrl+l", "app.press_button('#Clear')", "Clear"),
     ]
-
-    class SaveRollMessage(Message):
-        def __init__(self, dice: DicePool) -> None:
-            super().__init__()
-            self.dice = dice
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
     roll_result: reactive[Result] = reactive(Result)
@@ -203,4 +199,4 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
     @on(Button.Pressed, "#Save")
     def save_dice(self, message: Button.Pressed) -> None:
         if not self.dice_pool.is_empty():
-            self.post_message(Tray.SaveRollMessage(self.dice_pool))
+            self.post_message(SaveRollMessage(self.dice_pool))

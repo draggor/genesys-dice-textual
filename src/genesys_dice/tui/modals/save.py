@@ -6,6 +6,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label
 
 from genesys_dice.dice import DicePool
+from genesys_dice.tui.messages import SaveRollMessage
 from genesys_dice.tui.widgets import DieButton, LabelInput
 
 
@@ -81,7 +82,11 @@ class SaveModal(ModalScreen):
             yield LabelInput(
                 label_args=["Name of the roll"],
                 label_kwargs={"classes": "inner"},
-                input_kwargs={"placeholder": "Name of the roll", "classes": "inner"},
+                input_kwargs={
+                    "placeholder": "Name of the roll",
+                    "classes": "inner",
+                    "value": self.dice_pool.name,
+                },
             )
 
             yield Label("Save these dice:", classes="info")

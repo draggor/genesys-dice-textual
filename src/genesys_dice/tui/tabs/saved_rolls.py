@@ -2,7 +2,7 @@ from collections.abc import Callable
 import math
 from typing import Optional, List
 
-from textual import on, events
+from textual import on, events, work
 from textual.app import ComposeResult
 from textual.containers import (
     Center,
@@ -19,7 +19,7 @@ from textual.widgets import (
 
 from genesys_dice import data
 from genesys_dice.dice import DicePool
-from genesys_dice.tui.messages import SwitchTabMessage
+from genesys_dice.tui.messages import SaveRollMessage, SwitchTabMessage
 from genesys_dice.tui.widgets.die_button import DieButton
 from genesys_dice.tui.tabs.data_tab import DataTab
 
@@ -83,30 +83,31 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
         ("e", "edit_roll()", "Edit selected roll"),
     ]
 
-    dice: reactive[DicePool] = reactive(DicePool)
+    dice_pool: reactive[DicePool] = reactive(DicePool)
 
-    def __init__(self, dice: DicePool, *args, **kwargs) -> None:
+    def __init__(self, dice_pool: DicePool, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.dice = dice
-        self.border_title: str = dice.name
+        self.dice_pool = dice_pool
+        self.border_title: str = dice_pool.name
 
     def compose(self) -> ComposeResult:
         with Center(id="-center-dice-container"):
             with ItemGrid(id="-dice-container"):
-                for die_type in self.dice.get_dice():
+                for die_type in self.dice_pool.get_dice():
                     yield DieButton(die_type, disabled=True, classes="-button-display")
-        yield Static(self.dice.description, id="-roll-description")
+        yield Static(self.dice_pool.description, id="-roll-description")
 
     def action_send_roll_to_tray(self) -> None:
         self.app.set_focus(None)
-        self.post_message(SwitchTabMessage("tray-tab", self.dice))
+        self.post_message(SwitchTabMessage("tray-tab", self.dice_pool))
 
     def action_edit_roll(self) -> None:
+        self.post_message(SaveRollMessage(self.dice_pool))
 
     def calculate_grid_columns(self):
         available_size = self.container_size.width - 3
         max_dice = math.floor(available_size / 6)
-        dice_count = self.dice.count()
+        dice_count = self.dice_pool.count()
         columns = dice_count if dice_count < max_dice else max_dice
         # self.notify(str(columns))
         self.query_one(ItemGrid).styles.grid_size_columns = columns
@@ -180,7 +181,8 @@ class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
             self.next_show_cb = None
 
     def add_roll(self, roll: DicePool) -> None:
-        self.saved_rolls.append(roll)
+        if roll not in self.saved_rolls:
+            self.saved_rolls.append(roll)
         self.mutate_reactive(SavedRolls.saved_rolls)
 
     def set_data(self, roll: Optional[DicePool] = None) -> None:
