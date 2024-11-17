@@ -65,6 +65,15 @@ dice_display = {
     Dice.PERCENTILE: "%",
 }
 
+dice_foundry_codes = {
+    Dice.PROFICIENCY: "dp",
+    Dice.ABILITY: "da",
+    Dice.BOOST: "db",
+    Dice.CHALLENGE: "dc",
+    Dice.DIFFICULTY: "di",
+    Dice.SETBACK: "ds",
+}
+
 dice_short_codes = {}
 for die_type, code in dice_display.items():
     dice_short_codes[code] = die_type
@@ -481,6 +490,34 @@ class DicePool:
 
     def is_empty(self) -> bool:
         return sum(self.dice_counts.values()) == 0
+
+    def to_foundry_str(self) -> str:
+        macro_args = []
+
+        foundry_dice = []
+
+        for die_type, count in self.dice_counts.items():
+            if die_type is Dice.PERCENTILE:
+                continue
+
+            foundry_code = dice_foundry_codes[die_type]
+            foundry_dice.append(f"{count}{foundry_code}")
+
+        macro_args.append("roll=" + "+".join(foundry_dice))
+
+        if len(self.name) > 0:
+            escaped_name = self.name.strip().replace(" ", "|")
+            macro_args.append(f"title={escaped_name}")
+
+        if len(self.description) > 0:
+            escaped_description = (
+                self.description.strip().replace(" ", "|").replace("\n", "\\n")
+            )
+            macro_args.append(f"description={escaped_description}")
+
+        macro_str = "/macro dice " + " ".join(macro_args)
+
+        return macro_str
 
     def __str__(self) -> str:
         return self.dice

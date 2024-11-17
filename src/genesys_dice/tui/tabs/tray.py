@@ -172,7 +172,9 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
     @on(Button.Pressed, ".copy")
     def copy_roll_str(self, message: TitleButton.Pressed) -> None:
         text = message.control.label
-        if text is not None and len(text) > 0:
+        if message.control.id == "RollString":
+            pyperclip.copy(self.dice_pool.to_foundry_str())
+        elif text is not None and len(text) > 0:
             pyperclip.copy(text)
 
     @on(Button.Pressed, ".tray")
