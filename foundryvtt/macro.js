@@ -180,16 +180,20 @@ function replaceSymbols(text, key) {
     return text.replaceAll(key, symbol_display[key]);
 }
 
-let description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
-const title = scope.title?.replaceAll('|', ' ');
-if (title) {
-    description = `<label>${title}</label><br>${description}<br>`;
+function main (scope) {
+    let description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
+    const title = scope.title?.replaceAll('|', ' ');
+    if (title) {
+        description = `<label>${title}</label><br>${description}<br>`;
+    }
+
+    description = Object.keys(symbol_display).reduce(replaceSymbols, description);
+
+    const formula = scope.roll;
+
+    GenesysRoller.skillRoll({token,actor,formula,description});
 }
 
-description = Object.keys(symbol_display).reduce(replaceSymbols, description);
-
-const formula = scope.roll;
-
-GenesysRoller.skillRoll({token,actor,formula,description});
+main(scope);
 
 })();
