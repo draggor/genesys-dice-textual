@@ -117,7 +117,6 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
         max_dice = math.floor(available_size / 6)
         dice_count = self.dice_pool.count()
         columns = dice_count if dice_count < max_dice else max_dice
-        # self.notify(str(columns))
         self.query_one(ItemGrid).styles.grid_size_columns = columns
 
     def on_show(self):

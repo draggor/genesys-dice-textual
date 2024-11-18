@@ -57,7 +57,6 @@ class DiceApp(App):
 
         if self.starting_dice is not None:
             self.query_one(Tray).set_dice(self.starting_dice)
-            # self.query_one("#Save", Button).press()
 
         self.set_focus(self.query_one(Tray))
 

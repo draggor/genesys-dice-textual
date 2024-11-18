@@ -26,13 +26,6 @@ class SaveRollMessage(DicePoolMessage):
     pass
 
 
-# class SwitchTabMessage[T](Message):
-#    def __init__(self, destination: str, dice: Optional[T]) -> None:
-#        super().__init__()
-#        self.destination = destination
-#        self.dice = dice
-
-
 class SwitchTabMessage(Message):
     def __init__(self, destination: str, dice_pool: Optional[DicePool]) -> None:
         super().__init__()

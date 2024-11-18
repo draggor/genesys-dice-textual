@@ -6,9 +6,6 @@ import random
 from typing import Any, Dict, List, Optional, Tuple, Self, cast
 
 
-# TODO: Formatting for foundry, see https://github.com/StarWarsFoundryVTT/StarWarsFFG/wiki/FAQ#how-do-i-manually-roll-dice
-
-
 class Symbol(StrEnum):
     TRIUMPH = "triumph"
     SUCCESS = "success"
