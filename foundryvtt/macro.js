@@ -1,11 +1,12 @@
 (() => {
+
 class GenesysRoller {
   static async skillRoll({ actor, characteristic, skillId, formula, symbols, description }) {
     var _a2, _b;
     const roll = new Roll(formula, { symbols });
     await roll.evaluate({ async: true });
     const results = this.parseRollResults(roll);
-    
+
     if (description) {
 
     } else if (skillId === "-") {
@@ -162,11 +163,33 @@ class GenesysRoller {
   }
 }
 
+function makeSpan(symbol, color) {
+    return `<span style="font-family: 'Genesys Symbols', sans-serif; color: ${color}; -webkit-text-stroke: 1px black;">${symbol}</span>`;
+}
+
+const symbols = {
+    "{P}": makeSpan('P', '#fff200'),
+    "{A}": makeSpan('A', '#41ad49'),
+    "{B}": makeSpan('B', '#72cddc'),
+    "{C}": makeSpan('C', '#761213'),
+    "{D}": makeSpan('D', '#522380'),
+    "{S}": makeSpan('S', '#1e1e1e'),
+}
+
+function replaceSymbols(text, key) {
+    return text.replaceAll(key, symbols[key]);
+}
+
 var description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
 const title = scope.title?.replaceAll('|', ' ');
 if (title) {
     description = `<label>${title}</label><br>${description}<br>`;
 }
+
+description = Object.keys(symbols).reduce(replaceSymbols, description);
+
 const formula = scope.roll;
+
 GenesysRoller.skillRoll({token,actor,formula,description});
+
 })();

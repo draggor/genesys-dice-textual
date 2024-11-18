@@ -5,19 +5,25 @@
 
     Not much else to it
 
-- name: Another Roll
-  dice: AAD
+    {P}{P}{A}{D}{D}
+
+- name: All Dice Test
+  dice: PABCDS
   description: |
     This is an unskilled roll
 
     The related ability is 2, and it's easy difficulty
 
-- name: Biotic Blast
-  dice: PPAD
+    {P}{A}{B}{C}{D}{S}
+
+- name: Biotic Blast + Sunder
+  dice: PPADD
   description: |
     Biotic blast starts at difficulty 1, easy, and gets harder as you stack more effects.
 
     Consult the Biotic Blast table accordingly.
+
+    This blast is modified with Sunder(+{D})
 
 - name: Biotic Barrier
   dice: PPAD
