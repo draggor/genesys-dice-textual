@@ -27,7 +27,7 @@ from genesys_dice.dice import (
     modifier_display,
     Result,
 )
-from genesys_dice.tui.messages import SaveRollMessage
+from genesys_dice.tui.messages import CopyCommandMessage, SaveRollMessage
 from genesys_dice.tui.widgets import (
     DieButton,
     TitleButton,
@@ -86,6 +86,7 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
         ("ctrl+s", "app.press_button('#Save')", "Save Roll"),
         ("ctrl+r", "app.press_button('#Roll')", "Roll Dice"),
         ("ctrl+l", "app.press_button('#Clear')", "Clear"),
+        ("ctrl+o", "copy_command_text()", "Copy Command"),
     ]
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)
@@ -137,6 +138,9 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
 
     def action_modify_dice(self, button_id: str) -> None:
         self.query_one(button_id, DieButton).press()
+
+    def action_copy_command_text(self) -> None:
+        self.post_message(CopyCommandMessage(self.dice_pool))
 
     def watch_dice_pool(self) -> None:
         dice_roll_str = self.dice_pool.roll_str()

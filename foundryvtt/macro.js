@@ -167,7 +167,7 @@ function makeSpan(symbol, color) {
     return `<span style="font-family: 'Genesys Symbols', sans-serif; color: ${color}; -webkit-text-stroke: 1px black;">${symbol}</span>`;
 }
 
-const symbols = {
+const symbol_display = {
     "{P}": makeSpan('P', '#fff200'),
     "{A}": makeSpan('A', '#41ad49'),
     "{B}": makeSpan('B', '#72cddc'),
@@ -177,16 +177,16 @@ const symbols = {
 }
 
 function replaceSymbols(text, key) {
-    return text.replaceAll(key, symbols[key]);
+    return text.replaceAll(key, symbol_display[key]);
 }
 
-var description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
+let description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
 const title = scope.title?.replaceAll('|', ' ');
 if (title) {
     description = `<label>${title}</label><br>${description}<br>`;
 }
 
-description = Object.keys(symbols).reduce(replaceSymbols, description);
+description = Object.keys(symbol_display).reduce(replaceSymbols, description);
 
 const formula = scope.roll;
 

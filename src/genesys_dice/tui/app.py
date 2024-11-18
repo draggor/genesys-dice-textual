@@ -1,5 +1,7 @@
 from typing import Iterable, Optional
 
+import pyperclip  # type: ignore
+
 from textual import on, work
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
@@ -12,7 +14,11 @@ from textual.widgets import (
 )
 from textual.widgets.tabbed_content import ContentTabs
 
-from genesys_dice.tui.messages import SaveRollMessage, SwitchTabMessage
+from genesys_dice.tui.messages import (
+    CopyCommandMessage,
+    SaveRollMessage,
+    SwitchTabMessage,
+)
 from genesys_dice.tui.modals import DiceFacesModal, SaveModal
 from genesys_dice.tui.tabs import Tray, SavedRolls
 from genesys_dice.tui.tabs.data_tab import DataTab
@@ -67,6 +73,11 @@ class DiceApp(App):
     def action_previous_tab(self) -> None:
         self.query_one(TabbedContent).query_one(ContentTabs).action_previous_tab()
 
+    @on(CopyCommandMessage)
+    def copy_command_text(self, message: CopyCommandMessage) -> None:
+        dice_pool = message.dice_pool
+        pyperclip.copy(dice_pool.to_foundry_str())
+
     @on(TabbedContent.TabActivated)
     def set_pane_focus(self, message: TabbedContent.TabActivated) -> None:
         self.set_focus(message.pane)
@@ -76,18 +87,18 @@ class DiceApp(App):
         self.set_focus(None)
         tabs = self.query_one(TabbedContent)
         tabs.active = message.destination
-        if message.dice is not None:
+        if message.dice_pool is not None:
             tabs.query(f"#{message.destination}").only_one(DataTab).set_data(
-                message.dice
+                message.dice_pool
             )
 
     @work
     @on(SaveRollMessage)
     async def save_roll_message(self, message: SaveRollMessage) -> None:
-        dice = await self.push_screen_wait(SaveModal(message.dice))
-        if dice is not None:
+        dice_pool = await self.push_screen_wait(SaveModal(message.dice_pool))
+        if dice_pool is not None:
             self.set_focus(None)
-            self.post_message(SwitchTabMessage("savedrolls-tab", dice))
+            self.post_message(SwitchTabMessage("savedrolls-tab", dice_pool))
 
     def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
         yield from super().get_system_commands(screen)

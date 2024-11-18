@@ -19,7 +19,11 @@ from textual.widgets import (
 
 from genesys_dice import data
 from genesys_dice.dice import DicePool
-from genesys_dice.tui.messages import SaveRollMessage, SwitchTabMessage
+from genesys_dice.tui.messages import (
+    CopyCommandMessage,
+    SaveRollMessage,
+    SwitchTabMessage,
+)
 from genesys_dice.tui.widgets.die_button import DieButton
 from genesys_dice.tui.tabs.data_tab import DataTab
 
@@ -81,6 +85,7 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     BINDINGS = [
         ("enter", "send_roll_to_tray()", "Send roll to tray"),
         ("e", "edit_roll()", "Edit selected roll"),
+        ("ctrl+o", "copy_command_text()", "Copy Command"),
     ]
 
     dice_pool: reactive[DicePool] = reactive(DicePool)
@@ -96,6 +101,9 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
                 for die_type in self.dice_pool.get_dice():
                     yield DieButton(die_type, disabled=True, classes="-button-display")
         yield Static(self.dice_pool.description, id="-roll-description")
+
+    def action_copy_command_text(self) -> None:
+        self.post_message(CopyCommandMessage(self.dice_pool))
 
     def action_send_roll_to_tray(self) -> None:
         self.app.set_focus(None)
