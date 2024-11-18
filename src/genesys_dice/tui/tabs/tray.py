@@ -1,4 +1,4 @@
-from typing import cast
+from typing import cast, List
 
 import pyperclip  # type: ignore
 
@@ -40,7 +40,7 @@ class DiceMenu(TitleContainer, can_focus=True):
 
     def compose(self) -> ComposeResult:
         for die_type in dice_display.keys():
-            row = []
+            row: List[DieButton] = []
 
             for mod in modifier_display.keys():
                 if die_type is Dice.PERCENTILE and mod in [
@@ -68,7 +68,7 @@ class Pending(TitleContainer):
         css_id: int = 0
 
         for die_type, count in self.dice_pool.dice_counts.items():
-            row = []
+            row: List[DieButton] = []
             for _ in range(1, count + 1):
                 css_id += 1
                 row.append(
