@@ -1,0 +1,59 @@
+- name: Biotic Attack Additional Effects
+  options:
+    - name: Blast
+      description: The attack gains the Blast quality with a rating equal to the character's ranks in Knowledge (PhysSci).
+      difficulty: D
+    - name: Close Combat
+      description: asdf
+      difficulty: D
+    - name: Reave
+      description: asdf
+      difficulty: D
+    - name: Annihilation
+      description: asdf
+      difficulty: D
+    - name: Lift
+      description: asdf
+      difficulty: D
+    - name: Shockwave
+      description: asdf
+      difficulty: D
+    - name: Non-Lethal
+      description: asdf
+      difficulty: D
+    - name: Pull
+      description: asdf
+      difficulty: D
+    - name: Charge
+      description: asdf
+      difficulty: D
+    - name: Range
+      description: asdf
+      difficulty: D
+    - name: Priming
+      description: asdf
+      difficulty: D
+    - name: Warp
+      description: asdf
+      difficulty: DD
+    - name: Detonating
+      description: asdf
+      difficulty: DD
+
+- name: Biotic Barrier Additional Effects
+  options:
+    - name: Additional Target
+      description: asdf
+      difficulty: D
+    - name: Range
+      description: asdf
+      difficulty: D
+    - name: Add Defense
+      description: asdf
+      difficulty: DD
+    - name: Empowered
+      description: asdf
+      difficulty: DD
+    - name: Backlash
+      description: asdf
+      difficulty: DD

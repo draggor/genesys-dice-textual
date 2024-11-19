@@ -173,7 +173,7 @@ class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        self.saved_rolls = data.load_from_file("test-data.yaml")
+        self.saved_rolls = data.load_from_file("test-data.yaml", DicePool)
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(id="-scroll-window") as container:

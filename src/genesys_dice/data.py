@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, TypeVar
 
 from platformdirs import PlatformDirs
 
@@ -7,15 +7,22 @@ from rich.pretty import pprint
 
 import yaml
 
-from genesys_dice.dice import DicePool
+from genesys_dice.dice import (
+    DicePool,
+    AdditionalEffects,
+)
 
 PLATFORM_DIRS = PlatformDirs("genesys-dice")
 DATA_FILE_NAME = "genesys-dice-saved-rolls.yaml"
 
-def resource_path(relative):
-    return os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), relative)))
 
-def load_from_file(path: Optional[str] = None) -> List[DicePool]:
+def resource_path(relative):
+    return os.path.join(
+        os.path.abspath(os.path.join(os.path.dirname(__file__), relative))
+    )
+
+
+def _load_from_file(path: Optional[str] = None) -> List[DicePool]:
     if path is not None:
         data_file_path = resource_path(path)
     else:
@@ -33,19 +40,42 @@ def load_from_file(path: Optional[str] = None) -> List[DicePool]:
     return parsed_data
 
 
+T = TypeVar("T")
+
+
+def load_from_file(path: str, cls: type[T]) -> List[T]:
+    data_file_path = resource_path(path)
+
+    with open(data_file_path, "r") as file:
+        data = yaml.safe_load(file)
+
+    parsed_data = []
+
+    for item in data:
+        instance = cls(**item)
+        parsed_data.append(instance)
+
+    return parsed_data
+
+
 def main() -> None:
-    print(
-        yaml.dump(
-            [
-                DicePool(name="A test roll", dice="PAADD").asdict(),
-                DicePool(
-                    name="Another one", dice="AAD", description="Whatever yo"
-                ).asdict(),
-            ],
-            sort_keys=False,
-        )
-    )
-    pprint(load_from_file("test-data.yaml"))
+    # print(
+    #    yaml.dump(
+    #        [
+    #            DicePool(name="A test roll", dice="PAADD").asdict(),
+    #            DicePool(
+    #                name="Another one", dice="AAD", description="Whatever yo"
+    #            ).asdict(),
+    #        ],
+    #        sort_keys=False,
+    #    )
+    # )
+    # pprint(load_from_file("test-data.yaml"))
+    # load_additional_effects()
+    # pprint(additional_effects)
+    items = load_from_file("roll-builders.yaml", AdditionalEffects)
+    # items = load_from_file("test-data.yaml", DicePool)
+    pprint(items)
 
 
 if __name__ == "__main__":

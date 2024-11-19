@@ -520,6 +520,29 @@ class DicePool:
         return self.dice
 
 
+@dataclass
+class AdditionalEffectOption:
+    name: str
+    description: str
+    difficulty: List[Dice]
+
+
+@dataclass
+class AdditionalEffects:
+    name: str
+    options: List[AdditionalEffectOption]
+
+
+additional_effects: Dict[str, AdditionalEffects] = {}
+
+
+def add_additional_effects(effects: AdditionalEffects) -> None:
+    if effects.name in additional_effects:
+        raise Exception(f"Effects with name {effects.name} already exists!")
+
+    additional_effects[effects.name] = effects
+
+
 def get_dice_from_str(dice_str: str) -> List[Dice]:
     dice = []
     for die_str in dice_str.strip().upper():
