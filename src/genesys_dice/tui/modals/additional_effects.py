@@ -44,6 +44,10 @@ class AdditionalEffectsModal(ModalScreen):
     }
     """
 
+    BINDINGS = [
+        ("escape", "app.pop_screen()", "Cancel"),
+    ]
+
     additional_effects: AdditionalEffects
     effect_display: reactive[Optional[AdditionalEffectOption]] = reactive(None)
 
