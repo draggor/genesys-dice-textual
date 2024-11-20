@@ -2,11 +2,10 @@ from collections.abc import Callable
 import math
 from typing import Optional, List
 
-from textual import on, events, work
+from textual import on, events
 from textual.app import ComposeResult
 from textual.containers import (
     Center,
-    Horizontal,
     ItemGrid,
     Vertical,
     VerticalScroll,

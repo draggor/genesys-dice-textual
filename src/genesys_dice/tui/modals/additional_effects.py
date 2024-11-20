@@ -1,30 +1,21 @@
 from typing import Optional
 
-from rich.color import Color
 from rich.padding import Padding
 from rich.panel import Panel
-from rich.text import Text
 
 from textual.app import ComposeResult
-from textual.containers import Grid, Horizontal, Vertical, ItemGrid
+from textual.containers import Horizontal
 from textual.reactive import reactive
 from textual.screen import ModalScreen
 from textual.widgets import (
-    Button,
-    Input,
-    Label,
-    TextArea,
     SelectionList,
-    Placeholder,
     Static,
 )
 from textual.widgets.selection_list import Selection
 
 from genesys_dice import data
-from genesys_dice.dice import DicePool, AdditionalEffects, AdditionalEffectOption
-from genesys_dice.tui.messages import SaveRollMessage
+from genesys_dice.dice import AdditionalEffects, AdditionalEffectOption
 from genesys_dice.tui.rich.dice_faces import get_dice_symbols
-from genesys_dice.tui.widgets import DieButton, LabelInput, LabelTextArea
 
 
 class AdditionalEffectsModal(ModalScreen):

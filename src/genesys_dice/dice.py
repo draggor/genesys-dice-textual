@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field, is_dataclass
 from enum import StrEnum
 import itertools
 import random
-from typing import Any, Dict, List, Literal, Optional, Tuple, Self, Set, cast
+from typing import Any, Dict, List, Literal, Optional, Tuple, Self, cast
 
 
 ResultSymbol = Literal["❂", "✷", "▲", "⦻", "⨯", "⎊", "□"]

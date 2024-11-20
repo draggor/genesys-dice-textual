@@ -1,5 +1,3 @@
-from rich.color import Color
-from rich.style import Style
 from rich.table import Table
 from rich.text import Text
 
