@@ -520,11 +520,12 @@ class DicePool:
         return self.dice
 
 
-@dataclass
+@dataclass(eq=True, frozen=True)
 class AdditionalEffectOption:
     name: str
     description: str
-    difficulty: List[Dice]
+    # difficulty: List[Dice]
+    difficulty: str
 
 
 @dataclass

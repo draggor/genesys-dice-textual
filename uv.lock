@@ -164,6 +164,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dataclass-wizard"
+version = "0.28.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/16/c36dd73162f305dc01643994994c88c1e43cc771ff088d9aa165df210a08/dataclass-wizard-0.28.0.tar.gz", hash = "sha256:dd295cff8df6d8167a79048b77e91a3a1287a5905363f8df4de819b50d83b03a", size = 173114 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/77/da0c3e5ca273899da178a037786ee8b2c0b9a15427fe06bd48aa21618c3d/dataclass_wizard-0.28.0-py2.py3-none-any.whl", hash = "sha256:996fa46475b9192a48a057c34f04597bc97be5bc2f163b99cb1de6f778ca1f7f", size = 96275 },
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -223,6 +232,7 @@ version = "0.0.3a0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
+    { name = "dataclass-wizard" },
     { name = "platformdirs" },
     { name = "pyperclip" },
     { name = "pyyaml" },
@@ -245,6 +255,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.1.7" },
+    { name = "dataclass-wizard", specifier = ">=0.28.0" },
     { name = "platformdirs", specifier = ">=4.3.6" },
     { name = "pyperclip", specifier = ">=1.9.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },

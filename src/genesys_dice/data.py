@@ -1,6 +1,8 @@
 import os
 from typing import List, Optional, TypeVar
 
+from dataclass_wizard import fromdict
+
 from platformdirs import PlatformDirs
 
 from rich.pretty import pprint
@@ -52,7 +54,8 @@ def load_from_file(path: str, cls: type[T]) -> List[T]:
     parsed_data = []
 
     for item in data:
-        instance = cls(**item)
+        # instance = cls(**item)
+        instance = fromdict(cls, item)
         parsed_data.append(instance)
 
     return parsed_data

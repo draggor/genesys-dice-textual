@@ -4,56 +4,56 @@
       description: The attack gains the Blast quality with a rating equal to the character's ranks in Knowledge (PhysSci).
       difficulty: D
     - name: Close Combat
-      description: asdf
+      description: May select a target engaged with the character.  If the attack has the Blast quality, the character is unaffected by it.
       difficulty: D
     - name: Reave
-      description: asdf
+      description: The attack gains a Critical rating of 2.  The attack also gains the Vicious quality with a rating equal to the character's ranks in Knowledge (LifeSci). Reave may only be used against organic targets.
       difficulty: D
     - name: Annihilation
-      description: asdf
+      description: The attack gains the Burn quality with a rating equal to the character's ranks in Discipline.
       difficulty: D
     - name: Lift
-      description: asdf
+      description: The attack gains the Ensanre quality with a rating equal to the character's ranks in Discipline.
       difficulty: D
     - name: Shockwave
-      description: asdf
+      description: The attack gains the Knockdown quality.  The attakc also gains the Disorient quality with a rating equal to the character's ranks in Knowledge (PhysSci).
       difficulty: D
     - name: Non-Lethal
-      description: asdf
+      description: The attack gains the Stun Damage quality.
       difficulty: D
     - name: Pull
-      description: asdf
+      description: If the attack hits, you may spend {advantage} to move the target up to one range band horizontally.
       difficulty: D
     - name: Charge
-      description: asdf
+      description: If the attack hits, you may move one range band closer to the target.  You may spend {advantage}{advantage} multiple times to move an additional range band closer to the target.
       difficulty: D
     - name: Range
-      description: asdf
+      description: Increase the range of the attack by one range band.  This may be added multiple times, increasing the range by one range band each time.
       difficulty: D
     - name: Priming
-      description: asdf
-      difficulty: D
+      description: The attack deals no damage, but any of its qualities may still be activated if it hits.  This effect may not be combined with the Annihilation, Blast, or Detonating effects.
+      difficulty: -D
     - name: Warp
-      description: asdf
+      description: The attack gains the Sunder quality.  The attack also gains the Pierce quality with a rating equal to the character's ranks in Knowledge (PhysSci).
       difficulty: DD
     - name: Detonating
-      description: asdf
+      description: The attack deals damage equal to twice the character's Willpower.  If the attack has the Blast quality, it affects all characters within short range instead of engaged.
       difficulty: DD
 
 - name: Biotic Barrier Additional Effects
   options:
     - name: Additional Target
-      description: asdf
+      description: The poawer affects one additional target within range.  In addition, after using the power, you may spend {advantage} to affect one additional target within range (and may trigger this multiple times, spending {advantage} each time).
       difficulty: D
     - name: Range
-      description: asdf
+      description: Increase the range of the power by one range band.  This may be added multiple times, increasing the range by one range band each time.
       difficulty: D
     - name: Add Defense
-      description: asdf
+      description: Each affected target gains ranged and melee defense equal to your ranks in Knowledge (PhysSci).
       difficulty: DD
     - name: Empowered
-      description: asdf
+      description: The barrier reduces damage equal to the number of uncancelled {success} instead of the normal effect.
       difficulty: DD
     - name: Backlash
-      description: asdf
+      description: If an opponent makes an attack against an affected target and generates {threat}{threat}{threat} or {despair} on the check, after the check is resolved, they suffer a hit dealing damage equal to the total damage of the attack.
       difficulty: DD

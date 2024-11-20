@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.1.7",
+    "dataclass-wizard>=0.28.0",
     "platformdirs>=4.3.6",
     "pyperclip>=1.9.0",
     "pyyaml>=6.0.2",
