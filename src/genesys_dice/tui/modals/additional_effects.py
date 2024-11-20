@@ -36,6 +36,11 @@ class AdditionalEffectsModal(ModalScreen):
     DEFAULT_CSS = """
     AdditionalEffectsModal {
         align: center middle;
+
+        #-effects-container {
+            max-width: 80%;
+            max-height: 90%;
+        }
     }
     """
 
@@ -52,4 +57,5 @@ class AdditionalEffectsModal(ModalScreen):
         for option in self.additional_effects.options:
             options.append(AdditionalEffectOption(option))
 
-        yield OptionList(*options)
+        with Vertical(id="-effects-container"):
+            yield OptionList(*options)
