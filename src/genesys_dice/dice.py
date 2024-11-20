@@ -3,10 +3,12 @@ from dataclasses import asdict, dataclass, field, is_dataclass
 from enum import StrEnum
 import itertools
 import random
-from typing import Any, Dict, List, Optional, Tuple, Self, Set, cast
+from typing import Any, Dict, List, Literal, Optional, Tuple, Self, Set, cast
 
 
-symbol_display: Dict["Symbol", str] = {}
+ResultSymbol = Literal["❂", "✷", "▲", "⦻", "⨯", "⎊", "□"]
+
+symbol_display: Dict["Symbol", ResultSymbol] = {}
 cancel_map: Dict["Symbol", "Symbol"] = {}
 
 
@@ -20,7 +22,7 @@ class Symbol(StrEnum):
     BLANK = "blank"
 
     @property
-    def unicode(self) -> str:
+    def unicode(self) -> ResultSymbol:
         return symbol_display[self]
 
     @property
@@ -45,7 +47,9 @@ cancel_map[Symbol.DESPAIR] = Symbol.SUCCESS
 cancel_map[Symbol.TRIUMPH] = Symbol.FAILURE
 
 
-modifier_display: Dict["Modifier", str] = {}
+ModifierSymbol = Literal["+", "↑", "-", "↓"]
+
+modifier_display: Dict["Modifier", ModifierSymbol] = {}
 
 
 class Modifier(StrEnum):
@@ -55,7 +59,7 @@ class Modifier(StrEnum):
     DOWNGRADE = "downgrade"
 
     @property
-    def unicode(self) -> str:
+    def unicode(self) -> ModifierSymbol:
         return modifier_display[self]
 
 
@@ -64,13 +68,15 @@ modifier_display[Modifier.UPGRADE] = "↑"
 modifier_display[Modifier.REMOVE] = "-"
 modifier_display[Modifier.DOWNGRADE] = "↓"
 
+DieFoundryCode = Literal["dp", "da", "db", "dc", "di", "ds"]
+DieShortCode = Literal["P", "A", "B", "C", "D", "S", "%"]
 
-dice_display: Dict["Dice", str] = {}
+dice_display: Dict["Dice", DieShortCode] = {}
 dice_symbol_display: Dict["Dice", Tuple[str, str]] = {}
-dice_foundry_codes: Dict["Dice", str] = {}
+dice_foundry_codes: Dict["Dice", DieFoundryCode] = {}
 dice_map: Dict["Dice", "Die"] = {}
 
-dice_short_codes: Dict[str, "Dice"] = {}
+dice_short_codes: Dict[DieShortCode, "Dice"] = {}
 
 
 class Dice(StrEnum):
@@ -83,7 +89,7 @@ class Dice(StrEnum):
     PERCENTILE = "percentile"
 
     @property
-    def short_code(self) -> str:
+    def short_code(self) -> DieShortCode:
         return dice_display[self]
 
     @property
@@ -91,7 +97,7 @@ class Dice(StrEnum):
         return dice_symbol_display[self]
 
     @property
-    def foundry(self) -> str:
+    def foundry(self) -> DieFoundryCode:
         return dice_foundry_codes[self]
 
     @property
@@ -604,8 +610,8 @@ def add_additional_effects(effects: AdditionalEffects) -> None:
 def get_dice_from_str(dice_str: str) -> List[Dice]:
     dice = []
     for die_str in dice_str.strip().upper():
-        if die_str in dice_short_codes:
-            dice.append(dice_short_codes[die_str])
+        if Dice.has_short_code(die_str):
+            dice.append(Dice.from_short_code(die_str))
         else:
             raise Exception(f"{die_str} is not a valid short code")
 
