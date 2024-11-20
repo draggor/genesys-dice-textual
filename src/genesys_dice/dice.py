@@ -3,7 +3,11 @@ from dataclasses import asdict, dataclass, field, is_dataclass
 from enum import StrEnum
 import itertools
 import random
-from typing import Any, Dict, List, Optional, Tuple, Self, cast
+from typing import Any, Dict, List, Optional, Tuple, Self, Set, cast
+
+
+symbol_display: Dict["Symbol", str] = {}
+cancel_map: Dict["Symbol", "Symbol"] = {}
 
 
 class Symbol(StrEnum):
@@ -15,16 +19,33 @@ class Symbol(StrEnum):
     THREAT = "threat"
     BLANK = "blank"
 
+    @property
+    def unicode(self) -> str:
+        return symbol_display[self]
 
-symbol_display = {
-    Symbol.TRIUMPH: "❂",
-    Symbol.SUCCESS: "✷",
-    Symbol.ADVANTAGE: "▲",
-    Symbol.DESPAIR: "⦻",
-    Symbol.FAILURE: "⨯",
-    Symbol.THREAT: "⎊",
-    Symbol.BLANK: "□",
-}
+    @property
+    def opposite(self) -> "Symbol":
+        return cancel_map[self]
+
+
+symbol_display[Symbol.TRIUMPH] = "❂"
+symbol_display[Symbol.SUCCESS] = "✷"
+symbol_display[Symbol.ADVANTAGE] = "▲"
+symbol_display[Symbol.DESPAIR] = "⦻"
+symbol_display[Symbol.FAILURE] = "⨯"
+symbol_display[Symbol.THREAT] = "⎊"
+symbol_display[Symbol.BLANK] = "□"
+
+
+cancel_map[Symbol.THREAT] = Symbol.ADVANTAGE
+cancel_map[Symbol.ADVANTAGE] = Symbol.THREAT
+cancel_map[Symbol.FAILURE] = Symbol.SUCCESS
+cancel_map[Symbol.SUCCESS] = Symbol.FAILURE
+cancel_map[Symbol.DESPAIR] = Symbol.SUCCESS
+cancel_map[Symbol.TRIUMPH] = Symbol.FAILURE
+
+
+modifier_display: Dict["Modifier", str] = {}
 
 
 class Modifier(StrEnum):
@@ -33,45 +54,97 @@ class Modifier(StrEnum):
     REMOVE = "remove"
     DOWNGRADE = "downgrade"
 
+    @property
+    def unicode(self) -> str:
+        return modifier_display[self]
 
-modifier_display = {
-    Modifier.ADD: "+",
-    Modifier.UPGRADE: "↑",
-    Modifier.REMOVE: "-",
-    Modifier.DOWNGRADE: "↓",
-}
+
+modifier_display[Modifier.ADD] = "+"
+modifier_display[Modifier.UPGRADE] = "↑"
+modifier_display[Modifier.REMOVE] = "-"
+modifier_display[Modifier.DOWNGRADE] = "↓"
+
+
+dice_display: Dict["Dice", str] = {}
+dice_symbol_display: Dict["Dice", Tuple[str, str]] = {}
+dice_foundry_codes: Dict["Dice", str] = {}
+dice_map: Dict["Dice", "Die"] = {}
+
+dice_short_codes: Dict[str, "Dice"] = {}
 
 
 class Dice(StrEnum):
-    BOOST = "boost"
-    SETBACK = "setback"
-    ABILITY = "ability"
-    DIFFICULTY = "difficulty"
     PROFICIENCY = "proficiency"
+    ABILITY = "ability"
+    BOOST = "boost"
     CHALLENGE = "challenge"
+    DIFFICULTY = "difficulty"
+    SETBACK = "setback"
     PERCENTILE = "percentile"
 
+    @property
+    def short_code(self) -> str:
+        return dice_display[self]
 
-dice_display = {
-    Dice.PROFICIENCY: "P",
-    Dice.ABILITY: "A",
-    Dice.BOOST: "B",
-    Dice.CHALLENGE: "C",
-    Dice.DIFFICULTY: "D",
-    Dice.SETBACK: "S",
-    Dice.PERCENTILE: "%",
-}
+    @property
+    def symbol(self) -> Tuple[str, str]:
+        return dice_symbol_display[self]
 
-dice_foundry_codes = {
-    Dice.PROFICIENCY: "dp",
-    Dice.ABILITY: "da",
-    Dice.BOOST: "db",
-    Dice.CHALLENGE: "dc",
-    Dice.DIFFICULTY: "di",
-    Dice.SETBACK: "ds",
-}
+    @property
+    def foundry(self) -> str:
+        return dice_foundry_codes[self]
 
-dice_short_codes = {}
+    @property
+    def die(self) -> "Die":
+        return dice_map[self]
+
+    @property
+    def faces(self) -> List["Face"]:
+        return dice_map[self].faces
+
+    @property
+    def upgrade(self) -> Optional["Dice"]:
+        return dice_map[self].upgrade
+
+    @property
+    def downgrade(self) -> Optional["Dice"]:
+        return dice_map[self].downgrade
+
+    def roll(self) -> "DieResult":
+        return dice_map[self].roll()
+
+    @staticmethod
+    def has_short_code(short_code) -> bool:
+        return short_code in dice_short_codes
+
+    @staticmethod
+    def from_short_code(short_code) -> "Dice":
+        return dice_short_codes[short_code]
+
+
+dice_display[Dice.PROFICIENCY] = "P"
+dice_display[Dice.ABILITY] = "A"
+dice_display[Dice.BOOST] = "B"
+dice_display[Dice.CHALLENGE] = "C"
+dice_display[Dice.DIFFICULTY] = "D"
+dice_display[Dice.SETBACK] = "S"
+dice_display[Dice.PERCENTILE] = "%"
+
+dice_symbol_display[Dice.PROFICIENCY] = ("⬣", "#fff200")
+dice_symbol_display[Dice.ABILITY] = ("⯁", "#41ad49")
+dice_symbol_display[Dice.BOOST] = ("◼", "#72cddc")
+dice_symbol_display[Dice.CHALLENGE] = ("⬣", "#761213")
+dice_symbol_display[Dice.DIFFICULTY] = ("⯁", "#BB76DD")
+dice_symbol_display[Dice.SETBACK] = ("◼", "#000000")
+dice_symbol_display[Dice.PERCENTILE] = ("◼", "#A4B0BB")
+
+dice_foundry_codes[Dice.PROFICIENCY] = "dp"
+dice_foundry_codes[Dice.ABILITY] = "da"
+dice_foundry_codes[Dice.BOOST] = "db"
+dice_foundry_codes[Dice.CHALLENGE] = "dc"
+dice_foundry_codes[Dice.DIFFICULTY] = "di"
+dice_foundry_codes[Dice.SETBACK] = "ds"
+
 for die_type, code in dice_display.items():
     dice_short_codes[code] = die_type
 
@@ -188,25 +261,13 @@ Challenge = Die(
 
 Percentile = Die(Dice.PERCENTILE, list(range(1, 101)))
 
-dice_map = {
-    Dice.BOOST: Boost,
-    Dice.SETBACK: Setback,
-    Dice.ABILITY: Ability,
-    Dice.DIFFICULTY: Difficulty,
-    Dice.PROFICIENCY: Proficiency,
-    Dice.CHALLENGE: Challenge,
-    Dice.PERCENTILE: Percentile,
-}
-
-
-cancel_map = {
-    Symbol.THREAT: Symbol.ADVANTAGE,
-    Symbol.ADVANTAGE: Symbol.THREAT,
-    Symbol.FAILURE: Symbol.SUCCESS,
-    Symbol.SUCCESS: Symbol.FAILURE,
-    Symbol.DESPAIR: Symbol.SUCCESS,
-    Symbol.TRIUMPH: Symbol.FAILURE,
-}
+dice_map[Dice.BOOST] = Boost
+dice_map[Dice.SETBACK] = Setback
+dice_map[Dice.ABILITY] = Ability
+dice_map[Dice.DIFFICULTY] = Difficulty
+dice_map[Dice.PROFICIENCY] = Proficiency
+dice_map[Dice.CHALLENGE] = Challenge
+dice_map[Dice.PERCENTILE] = Percentile
 
 
 @dataclass
@@ -262,10 +323,10 @@ class Result:
             case Symbol.BLANK:
                 pass
             case Symbol():
-                opposite = cancel_map[result]
+                opposite = result.opposite
 
                 if result is Symbol.TRIUMPH or result is Symbol.DESPAIR:
-                    result_add = cancel_map[opposite]
+                    result_add = opposite.opposite
                     self.totals[result] += 1
                 else:
                     result_add = result
@@ -289,16 +350,16 @@ class Result:
         lines = []
 
         for die_type, faces in self.details.items():
-            composed_str = f"{dice_display[die_type]}: "
+            composed_str = f"{die_type.short_code}: "
             str_faces = []
             for face in faces:
                 if type(face) is list:
-                    str_faces.append(" ".join([symbol_display[s] for s in face]))
+                    str_faces.append(" ".join([s.unicode for s in face]))
                 elif type(face) is int:
                     str_faces.append(str(face))
                 else:
-                    symbol_key = cast(Symbol, face)
-                    str_faces.append(symbol_display[symbol_key])
+                    symbol = cast(Symbol, face)
+                    str_faces.append(symbol.unicode)
             composed_str += " | ".join(str_faces)
             lines.append(composed_str)
 
@@ -314,7 +375,7 @@ class Result:
             Symbol.FAILURE,
             Symbol.THREAT,
         ]:
-            composed_str += self.totals[symbol] * symbol_display[symbol]
+            composed_str += self.totals[symbol] * symbol.unicode
 
         composed_str = " ".join(composed_str)
         composed_str += " " + " ".join(map(str, self.totals["Percentile"]))
@@ -328,7 +389,7 @@ class DicePool:
     def default_dice() -> Dict[Dice, int]:
         d = {}
 
-        for die_type in dice_display.keys():
+        for die_type in Dice:
             d[die_type] = 0
 
         return d
@@ -374,15 +435,13 @@ class DicePool:
         return self
 
     def modify(self, die_type: Dice, modifier: Optional[Modifier] = None) -> Self:
-        die = dice_map[die_type]
-
         match modifier:
             case Modifier.ADD:
                 self.dice_counts[die_type] += 1
             case Modifier.UPGRADE:
-                if die.upgrade and self.dice_counts[die_type] > 0:
+                if die_type.upgrade and self.dice_counts[die_type] > 0:
                     self.dice_counts[die_type] -= 1
-                    self.dice_counts[die.upgrade] += 1
+                    self.dice_counts[die_type.upgrade] += 1
                 else:
                     self.dice_counts[die_type] += 1
             case Modifier.REMOVE:
@@ -390,9 +449,9 @@ class DicePool:
                     self.dice_counts[die_type] -= 1
             case Modifier.DOWNGRADE:
                 if self.dice_counts[die_type] > 0:
-                    if die.downgrade:
+                    if die_type.downgrade:
                         self.dice_counts[die_type] -= 1
-                        self.dice_counts[die.downgrade] += 1
+                        self.dice_counts[die_type.downgrade] += 1
                     else:
                         self.dice_counts[die_type] -= 1
             case _:
@@ -406,8 +465,7 @@ class DicePool:
         roll_result = Result()
 
         for die_type in self.get_dice():
-            die = dice_map[die_type]
-            die_result: DieResult = die.roll()
+            die_result: DieResult = die_type.roll()
             roll_result.add(die_result)
 
         return roll_result.reduce()
@@ -436,8 +494,7 @@ class DicePool:
         faces = []
 
         for die_type in self.get_dice():
-            die = dice_map[die_type]
-            faces.append(die.faces)
+            faces.append(die_type.faces)
 
         return faces
 
@@ -462,7 +519,7 @@ class DicePool:
         for combo in product:
             r = str(Result(list(combo)).reduce())
 
-            if symbol_display[Symbol.SUCCESS] in r:
+            if Symbol.SUCCESS.unicode in r:
                 success_count += 1
 
             if r in reduced:
@@ -481,7 +538,7 @@ class DicePool:
         composed_str = ""
 
         for die_type, count in self.dice_counts.items():
-            composed_str += dice_display[die_type] * count
+            composed_str += die_type.short_code * count
 
         return composed_str
 
@@ -497,7 +554,7 @@ class DicePool:
             if die_type is Dice.PERCENTILE:
                 continue
 
-            foundry_code = dice_foundry_codes[die_type]
+            foundry_code = die_type.foundry
             foundry_dice.append(f"{count}{foundry_code}")
 
         macro_args.append("roll=" + "+".join(foundry_dice))
@@ -580,17 +637,21 @@ def dice_faces() -> List[List[str]]:
     for i in range(1, 13):
         table[0].append(str(i))
 
-    for die_type, die in dice_map.items():
-        if die_type is Dice.PERCENTILE:
-            pass
-        else:
-            row = [die_type.name]
-            for face in die.faces:
-                if type(face) is list:
-                    row.append(" ".join([symbol_display[f] for f in face]))
-                else:
-                    symbol = cast(Symbol, face)
-                    row.append(symbol_display[symbol])
-            table.append(row)
+    for die_type in [
+        Dice.BOOST,
+        Dice.SETBACK,
+        Dice.ABILITY,
+        Dice.DIFFICULTY,
+        Dice.PROFICIENCY,
+        Dice.CHALLENGE,
+    ]:
+        row = [die_type.name]
+        for face in die_type.faces:
+            if type(face) is list:
+                row.append(" ".join([f.unicode for f in face]))
+            else:
+                symbol = cast(Symbol, face)
+                row.append(symbol.unicode)
+        table.append(row)
 
     return table

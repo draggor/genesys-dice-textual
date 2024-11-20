@@ -6,7 +6,7 @@ from textual.widgets import Button
 
 from typing_extensions import Literal, Optional
 
-from genesys_dice.dice import Dice, dice_display, Modifier, modifier_display
+from genesys_dice.dice import Dice, Modifier
 
 
 # Currently not used, but here's a reference
@@ -277,9 +277,9 @@ class DieButton(Button):
         super().__init__(variant=die_type, *args, **kwargs)  # type: ignore
         self.die_type = die_type
         self.modifier = modifier
-        self.label = dice_display[die_type]
+        self.label = die_type.short_code
         if modifier is not None:
-            self.label += modifier_display[modifier]
+            self.label += modifier.unicode
 
     def get_bindings(self) -> List[Binding]:
         if self.modifier in [Modifier.ADD, Modifier.REMOVE]:

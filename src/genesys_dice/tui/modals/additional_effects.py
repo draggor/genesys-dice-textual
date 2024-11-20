@@ -1,5 +1,6 @@
 from typing import Optional
 
+from rich.color import Color
 from rich.padding import Padding
 from rich.panel import Panel
 from rich.text import Text
@@ -22,29 +23,8 @@ from textual.widgets.selection_list import Selection
 from genesys_dice import data
 from genesys_dice.dice import DicePool, AdditionalEffects, AdditionalEffectOption
 from genesys_dice.tui.messages import SaveRollMessage
+from genesys_dice.tui.rich.dice_faces import get_dice_symbols
 from genesys_dice.tui.widgets import DieButton, LabelInput, LabelTextArea
-
-
-class EffectDisplay(Static):
-    additional_effect: Optional[AdditionalEffectOption] = reactive(None)
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-    def watch_additional_effect(self, effect) -> None:
-        if effect is not None:
-            self.update(
-                Padding(
-                    Panel(
-                        effect.description,
-                        title=effect.name,
-                        title_align="left",
-                        subtitle=effect.difficulty,
-                        subtitle_align="left",
-                    ),
-                    (0, 0, 1, 0),
-                )
-            )
 
 
 class AdditionalEffectsModal(ModalScreen):
@@ -65,7 +45,7 @@ class AdditionalEffectsModal(ModalScreen):
                 border: solid white;
             }
 
-            EffectDisplay {
+            #-effect-option {
                 width: 2fr;
                 height: auto;
             }
@@ -74,6 +54,7 @@ class AdditionalEffectsModal(ModalScreen):
     """
 
     additional_effects: AdditionalEffects
+    effect_display: reactive[Optional[AdditionalEffectOption]] = reactive(None)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -88,7 +69,20 @@ class AdditionalEffectsModal(ModalScreen):
 
         with Horizontal(id="-effects-container"):
             yield SelectionList[AdditionalEffectOption](*options)
-            yield EffectDisplay(id="-effect-option")
+            yield Static(id="-effect-option")
 
     def on_selection_list_selection_highlighted(self, event) -> None:
-        self.query_one(EffectDisplay).additional_effect = event.selection.value
+        details = self.query_one("#-effect-option", Static)
+        effect = event.selection.value
+        details.update(
+            Padding(
+                Panel(
+                    effect.description,
+                    title=effect.name,
+                    title_align="left",
+                    subtitle=get_dice_symbols(effect.difficulty),
+                    subtitle_align="left",
+                ),
+                (0, 0, 1, 0),
+            )
+        )

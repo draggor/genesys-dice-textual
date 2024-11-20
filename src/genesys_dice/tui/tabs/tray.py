@@ -22,14 +22,13 @@ from textual.widgets import (
 from genesys_dice.dice import (
     Dice,
     DicePool,
-    dice_display,
     Modifier,
-    modifier_display,
     Result,
 )
 from genesys_dice.tui.messages import CopyCommandMessage, SaveRollMessage
 
 from genesys_dice.tui.modals.additional_effects import AdditionalEffectsModal
+from genesys_dice.tui.rich.dice_faces import get_dice_symbols
 from genesys_dice.tui.widgets import (
     DieButton,
     TitleButton,
@@ -41,10 +40,10 @@ from genesys_dice.tui.tabs.data_tab import DataTab
 class DiceMenu(TitleContainer, can_focus=True):
 
     def compose(self) -> ComposeResult:
-        for die_type in dice_display.keys():
+        for die_type in Dice:
             row: List[DieButton] = []
 
-            for mod in modifier_display.keys():
+            for mod in Modifier:
                 if die_type is Dice.PERCENTILE and mod in [
                     Modifier.UPGRADE,
                     Modifier.DOWNGRADE,
@@ -150,7 +149,10 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
 
     def watch_dice_pool(self) -> None:
         dice_roll_str = self.dice_pool.roll_str()
-        self.query_one("#RollString", TitleButton).label = dice_roll_str
+        # self.query_one("#RollString", TitleButton).label = dice_roll_str
+        self.query_one("#RollString", TitleButton).label = Text(
+            dice_roll_str + "\n"
+        ) + get_dice_symbols(dice_roll_str)
         self.query_one(Pending).border_subtitle = self.dice_pool.name
 
     def watch_roll_result(self, roll_result: Result) -> None:

@@ -8,9 +8,7 @@ from rich.table import Table
 import textual.drivers.web_driver
 
 from genesys_dice.dice import (
-    dice_display,
     DicePool,
-    symbol_display,
     Symbol,
 )
 
@@ -52,14 +50,14 @@ def command_roll(dice: str, details: bool):
     result = DicePool(dice).roll()
     if details:
         for die_type, faces in result.details.items():
-            composed_str = f"{dice_display[die_type]}: "
+            composed_str = f"{die_type.short_code}: "
             str_faces = []
             for face in faces:
                 if type(face) is list:
-                    str_faces.append(" ".join([symbol_display[s] for s in face]))
+                    str_faces.append(" ".join([s.unicode for s in face]))
                 else:
-                    symbol_key = cast(Symbol, face)
-                    str_faces.append(symbol_display[symbol_key])
+                    symbol = cast(Symbol, face)
+                    str_faces.append(symbol.unicode)
             composed_str += " | ".join(str_faces)
             click.echo(composed_str)
     click.echo(str(result))

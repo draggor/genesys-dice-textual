@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional, TypeVar
 
-from dataclass_wizard import fromdict
+from dataclass_wizard import fromdict  # type: ignore
 
 from platformdirs import PlatformDirs
 

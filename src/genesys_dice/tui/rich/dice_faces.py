@@ -1,6 +1,9 @@
+from rich.color import Color
+from rich.style import Style
 from rich.table import Table
+from rich.text import Text
 
-from genesys_dice.dice import dice_faces
+from genesys_dice.dice import dice_faces, Dice
 
 
 def get_faces_table() -> Table:
@@ -16,3 +19,21 @@ def get_faces_table() -> Table:
         table.add_row(*row)
 
     return table
+
+
+def get_die_symbol(short_code):
+    die_type = Dice.from_short_code(short_code)
+    symbol, color = die_type.symbol
+
+    return Text(symbol, style=color)
+
+
+def get_dice_symbols(short_codes):
+    symbol_str = Text()
+    for short_code in short_codes:
+        if Dice.has_short_code(short_code):
+            symbol_str += get_die_symbol(short_code)
+        else:
+            symbol_str += Text(short_code)
+
+    return symbol_str
