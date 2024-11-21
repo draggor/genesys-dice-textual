@@ -26,7 +26,7 @@ def get_die_symbol(short_code):
     return Text(symbol, style=color)
 
 
-def get_dice_symbols(short_codes):
+def get_dice_symbols(short_codes, pad=0):
     symbol_str = Text()
     for short_code in short_codes:
         if Dice.has_short_code(short_code):
@@ -34,4 +34,6 @@ def get_dice_symbols(short_codes):
         else:
             symbol_str += Text(short_code)
 
-    return symbol_str
+    to_pad = pad - len(symbol_str)
+
+    return Text(to_pad * " ") + symbol_str

@@ -596,6 +596,9 @@ class AdditionalEffects:
     name: str
     options: List[AdditionalEffectOption]
 
+    def max_difficulty_len(self) -> int:
+        return max(*list(map(len, [o.difficulty for o in self.options])))
+
 
 additional_effects: Dict[str, AdditionalEffects] = {}
 
