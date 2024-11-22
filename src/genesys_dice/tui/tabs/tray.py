@@ -4,7 +4,7 @@ import pyperclip  # type: ignore
 
 from rich.text import Text
 
-from textual import on
+from textual import on, work
 from textual.app import ComposeResult
 from textual.binding import BindingsMap
 from textual.containers import (
@@ -12,6 +12,7 @@ from textual.containers import (
     Horizontal,
     ItemGrid,
 )
+from textual.messages import Message
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
@@ -143,12 +144,13 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
     def action_copy_command_text(self) -> None:
         self.post_message(CopyCommandMessage(self.dice_pool))
 
-    def action_show_additional_effects(self) -> None:
-        self.app.push_screen(AdditionalEffectsModal())
+    @work
+    async def action_show_additional_effects(self) -> None:
+        _ = await self.app.push_screen_wait(AdditionalEffectsModal(self.dice_pool))
+        self.mutate_reactive(Tray.dice_pool)
 
     def watch_dice_pool(self) -> None:
         dice_roll_str = self.dice_pool.roll_str()
-        # self.query_one("#RollString", TitleButton).label = dice_roll_str
         self.query_one("#RollString", TitleButton).label = Text(
             dice_roll_str + "\n"
         ) + get_dice_symbols(dice_roll_str)

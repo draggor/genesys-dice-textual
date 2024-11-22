@@ -16,26 +16,14 @@ from textual.widgets import (
 from textual.widgets.selection_list import Selection
 
 from genesys_dice import data
-from genesys_dice.dice import AdditionalEffects, AdditionalEffectOption
+from genesys_dice.dice import (
+    AdditionalEffects,
+    AdditionalEffectOption,
+    Dice,
+    DicePool,
+    Modifier,
+)
 from genesys_dice.tui.rich.dice_faces import get_dice_symbols
-
-
-class EffectOption(Static):
-
-    def __init__(self, effect: AdditionalEffectOption, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.update(
-            Padding(
-                Panel(
-                    effect.description,
-                    title=effect.name,
-                    title_align="left",
-                    subtitle=get_dice_symbols(effect.difficulty),
-                    subtitle_align="left",
-                ),
-                (0, 0, 1, 0),
-            )
-        )
 
 
 class AdditionalEffectsModal(ModalScreen):
@@ -53,7 +41,7 @@ class AdditionalEffectsModal(ModalScreen):
             grid-rows: auto;
             grid-columns: 1fr 2fr;
 
-            Middle {
+            Vertical {
                 width: 1fr;
                 height: auto;
 
@@ -63,6 +51,20 @@ class AdditionalEffectsModal(ModalScreen):
                     border: solid white;
                 }
             }
+        }
+
+        #-effect-header {
+            width: 1fr;
+            text-align: center;
+            text-style: bold;
+            border: solid white;
+        }
+
+        #-current-dice {
+            width: 2fr;
+            text-align: center;
+            text-style: bold;
+            border: solid white;
         }
 
         #-selected-container {
@@ -83,13 +85,15 @@ class AdditionalEffectsModal(ModalScreen):
     """
 
     BINDINGS = [
-        ("escape", "app.pop_screen()", "Cancel"),
+        ("escape", "dismiss()", "Close"),
     ]
 
     additional_effects: AdditionalEffects
+    dice_pool: Optional[DicePool] = None
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, dice_pool: Optional[DicePool], *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self.dice_pool = dice_pool
         self.additional_effects = data.load_from_file(
             "roll-builders.yaml", AdditionalEffects
         )[0]
@@ -99,10 +103,21 @@ class AdditionalEffectsModal(ModalScreen):
         max_difficulty_len = self.additional_effects.max_difficulty_len()
         for option in self.additional_effects.options:
             symbols = get_dice_symbols(option.difficulty, pad=max_difficulty_len)
-            options.append(Selection(symbols + " " + option.name, option))
+            selected = option in self.dice_pool.additional_effects
+            options.append(
+                Selection(symbols + " " + option.name, option, initial_state=selected)
+            )
 
         with ItemGrid(id="-effects-container"):
-            with Middle():
+            yield Static(
+                "Modify Roll",
+                id="-effect-header",
+            )
+            yield Static(
+                Text("Current Dice: ") + get_dice_symbols(self.dice_pool.roll_str()),
+                id="-current-dice",
+            )
+            with Vertical():
                 yield SelectionList[AdditionalEffectOption](*options)
             with Vertical(id="-selected-container"):
                 yield Static(id="-effect-option")
@@ -134,9 +149,26 @@ class AdditionalEffectsModal(ModalScreen):
             ),
         )
 
+    def update_current_dice(self) -> None:
+        self.query_one("#-current-dice", Static).update(
+            Text("Current Dice: ") + get_dice_symbols(self.dice_pool.roll_str())
+        )
+
+    def on_selection_list_selection_toggled(self, event) -> None:
+        effect = event.selection.value
+        selected = effect in event.selection_list.selected
+
+        if selected:
+            self.dice_pool.add_additional_effect(effect)
+        else:
+            self.dice_pool.remove_additional_effect(effect)
+
+        self.update_current_dice()
+
     def on_selection_list_selected_changed(self, event) -> None:
-        selected_text = []
-        for selected in event.control.selected:
-            selected_text.append(self.format_effect(selected))
-        selected_static = self.query_one("#-effect-selected", Static)
-        selected_static.update(Group(*selected_text))
+        # selected_text = []
+        # for selected in event.control.selected:
+        #    selected_text.append(self.format_effect(selected))
+        # selected_static = self.query_one("#-effect-selected", Static)
+        # selected_static.update(Group(*selected_text))
+        pass

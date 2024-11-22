@@ -50,6 +50,7 @@ cancel_map[Symbol.TRIUMPH] = Symbol.FAILURE
 ModifierSymbol = Literal["+", "↑", "-", "↓"]
 
 modifier_display: Dict["Modifier", ModifierSymbol] = {}
+modifier_opposites: Dict["Modifier", "Modifier"] = {}
 
 
 class Modifier(StrEnum):
@@ -62,11 +63,20 @@ class Modifier(StrEnum):
     def unicode(self) -> ModifierSymbol:
         return modifier_display[self]
 
+    @property
+    def opposite(self) -> "Modifier":
+        return modifier_opposites[self]
+
 
 modifier_display[Modifier.ADD] = "+"
 modifier_display[Modifier.UPGRADE] = "↑"
 modifier_display[Modifier.REMOVE] = "-"
 modifier_display[Modifier.DOWNGRADE] = "↓"
+
+modifier_opposites[Modifier.ADD] = Modifier.REMOVE
+modifier_opposites[Modifier.REMOVE] = Modifier.ADD
+modifier_opposites[Modifier.UPGRADE] = Modifier.DOWNGRADE
+modifier_opposites[Modifier.DOWNGRADE] = Modifier.UPGRADE
 
 DieFoundryCode = Literal["dp", "da", "db", "dc", "di", "ds"]
 DieShortCode = Literal["P", "A", "B", "C", "D", "S", "%"]
@@ -139,7 +149,7 @@ dice_display[Dice.PERCENTILE] = "%"
 dice_symbol_display[Dice.PROFICIENCY] = ("⬣", "#fff200")
 dice_symbol_display[Dice.ABILITY] = ("⯁", "#41ad49")
 dice_symbol_display[Dice.BOOST] = ("◼", "#72cddc")
-dice_symbol_display[Dice.CHALLENGE] = ("⬣", "#761213")
+dice_symbol_display[Dice.CHALLENGE] = ("⬣", "#B25555")
 dice_symbol_display[Dice.DIFFICULTY] = ("⯁", "#BB76DD")
 dice_symbol_display[Dice.SETBACK] = ("◼", "#000000")
 dice_symbol_display[Dice.PERCENTILE] = ("◼", "#A4B0BB")
@@ -423,6 +433,7 @@ class DicePool:
     dice: str = ""
     name: str = ""
     description: str = ""
+    additional_effects: List["AdditionalEffectOption"] = field(default_factory=list)
     dice_counts: Dict[Dice, int] = field(default_factory=default_dice, init=False)
 
     def __post_init__(self) -> None:
@@ -466,6 +477,18 @@ class DicePool:
         self.dice = self.roll_str()
 
         return self
+
+    def add_additional_effect(self, effect: "AdditionalEffectOption") -> None:
+        for die_type in effect.dice:
+            self.modify(die_type, effect.modifier)
+
+        self.additional_effects.append(effect)
+
+    def remove_additional_effect(self, effect: "AdditionalEffectOption") -> None:
+        for die_type in effect.dice:
+            self.modify(die_type, effect.modifier.opposite)
+
+        self.additional_effects.remove(effect)
 
     def roll(self) -> Result:
         roll_result = Result()
@@ -587,8 +610,23 @@ class DicePool:
 class AdditionalEffectOption:
     name: str
     description: str
-    # difficulty: List[Dice]
     difficulty: str
+    modifier: Modifier = field(init=False)
+    dice: List[Dice] = field(default_factory=list, init=False)
+
+    def __post_init__(self) -> None:
+        if self.difficulty[0] == "-":
+            object.__setattr__(self, "modifier", Modifier.REMOVE)
+            dice_str = self.difficulty[1:]
+        else:
+            object.__setattr__(self, "modifier", Modifier.ADD)
+            dice_str = self.difficulty
+
+        for die_str in dice_str:
+            self.dice.append(Dice.from_short_code(die_str))
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.description, self.difficulty))
 
 
 @dataclass
