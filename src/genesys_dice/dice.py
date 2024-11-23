@@ -1,15 +1,17 @@
 from collections import Counter
 from dataclasses import asdict, dataclass, field, is_dataclass
-from enum import StrEnum
+from enum import StrEnum, Enum
 import itertools
 import random
-from typing import Any, Dict, List, Literal, Optional, Tuple, Self, cast
-
-
-ResultSymbol = Literal["❂", "✷", "▲", "⦻", "⨯", "⎊", "□"]
-
-symbol_display: Dict["Symbol", ResultSymbol] = {}
-cancel_map: Dict["Symbol", "Symbol"] = {}
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Self,
+    cast,
+)
 
 
 class Symbol(StrEnum):
@@ -22,35 +24,32 @@ class Symbol(StrEnum):
     BLANK = "blank"
 
     @property
-    def unicode(self) -> ResultSymbol:
-        return symbol_display[self]
+    def unicode(self) -> "SymbolDisplay":
+        return SymbolDisplay[self.name]
 
     @property
     def opposite(self) -> "Symbol":
-        return cancel_map[self]
+        return Symbol[CancelMap[self.name].name]
 
 
-symbol_display[Symbol.TRIUMPH] = "❂"
-symbol_display[Symbol.SUCCESS] = "✷"
-symbol_display[Symbol.ADVANTAGE] = "▲"
-symbol_display[Symbol.DESPAIR] = "⦻"
-symbol_display[Symbol.FAILURE] = "⨯"
-symbol_display[Symbol.THREAT] = "⎊"
-symbol_display[Symbol.BLANK] = "□"
+class SymbolDisplay(StrEnum):
+    TRIUMPH = "❂"
+    SUCCESS = "✷"
+    ADVANTAGE = "▲"
+    DESPAIR = "⦻"
+    FAILURE = "⨯"
+    THREAT = "⎊"
+    BLANK = "□"
 
 
-cancel_map[Symbol.THREAT] = Symbol.ADVANTAGE
-cancel_map[Symbol.ADVANTAGE] = Symbol.THREAT
-cancel_map[Symbol.FAILURE] = Symbol.SUCCESS
-cancel_map[Symbol.SUCCESS] = Symbol.FAILURE
-cancel_map[Symbol.DESPAIR] = Symbol.SUCCESS
-cancel_map[Symbol.TRIUMPH] = Symbol.FAILURE
-
-
-ModifierSymbol = Literal["+", "↑", "-", "↓"]
-
-modifier_display: Dict["Modifier", ModifierSymbol] = {}
-modifier_opposites: Dict["Modifier", "Modifier"] = {}
+class CancelMap(StrEnum):
+    THREAT = Symbol.ADVANTAGE
+    ADVANTAGE = Symbol.THREAT
+    FAILURE = Symbol.SUCCESS
+    SUCCESS = Symbol.FAILURE
+    DESPAIR = Symbol.SUCCESS
+    TRIUMPH = Symbol.FAILURE
+    BLANK = Symbol.BLANK
 
 
 class Modifier(StrEnum):
@@ -60,33 +59,62 @@ class Modifier(StrEnum):
     DOWNGRADE = "downgrade"
 
     @property
-    def unicode(self) -> ModifierSymbol:
-        return modifier_display[self]
+    def unicode(self) -> "ModifierDisplay":
+        return ModifierDisplay[self.name]
 
     @property
     def opposite(self) -> "Modifier":
-        return modifier_opposites[self]
+        return Modifier[ModifierOpposite[self.name].name]
 
 
-modifier_display[Modifier.ADD] = "+"
-modifier_display[Modifier.UPGRADE] = "↑"
-modifier_display[Modifier.REMOVE] = "-"
-modifier_display[Modifier.DOWNGRADE] = "↓"
+class ModifierDisplay(StrEnum):
+    ADD = "+"
+    UPGRADE = "↑"
+    REMOVE = "-"
+    DOWNGRADE = "↓"
 
-modifier_opposites[Modifier.ADD] = Modifier.REMOVE
-modifier_opposites[Modifier.REMOVE] = Modifier.ADD
-modifier_opposites[Modifier.UPGRADE] = Modifier.DOWNGRADE
-modifier_opposites[Modifier.DOWNGRADE] = Modifier.UPGRADE
 
-DieFoundryCode = Literal["dp", "da", "db", "dc", "di", "ds"]
-DieShortCode = Literal["P", "A", "B", "C", "D", "S", "%"]
+class ModifierOpposite(StrEnum):
+    ADD = Modifier.REMOVE
+    REMOVE = Modifier.ADD
+    UPGRADE = Modifier.DOWNGRADE
+    DOWNGRADE = Modifier.UPGRADE
 
-dice_display: Dict["Dice", DieShortCode] = {}
+
 dice_symbol_display: Dict["Dice", Tuple[str, str]] = {}
-dice_foundry_codes: Dict["Dice", DieFoundryCode] = {}
 dice_map: Dict["Dice", "Die"] = {}
 
-dice_short_codes: Dict[DieShortCode, "Dice"] = {}
+
+class FoundryCode(StrEnum):
+    PROFICIENCY = "dp"
+    ABILITY = "da"
+    BOOST = "db"
+    CHALLENGE = "dc"
+    DIFFICULTY = "di"
+    SETBACK = "ds"
+    PERCENTILE = ""
+
+
+class DiceShortCode(StrEnum):
+    PROFICIENCY = "P"
+    ABILITY = "A"
+    BOOST = "B"
+    CHALLENGE = "C"
+    DIFFICULTY = "D"
+    SETBACK = "S"
+    PERCENTILE = "%"
+
+    @staticmethod
+    def exists(short_code: str) -> bool:
+        try:
+            DiceShortCode(short_code)
+            return True
+        except:
+            return False
+
+    @property
+    def die(self) -> "Dice":
+        return Dice[self.name]
 
 
 class Dice(StrEnum):
@@ -99,16 +127,16 @@ class Dice(StrEnum):
     PERCENTILE = "percentile"
 
     @property
-    def short_code(self) -> DieShortCode:
-        return dice_display[self]
+    def short_code(self) -> DiceShortCode:
+        return DiceShortCode[self.name]
 
     @property
-    def symbol(self) -> Tuple[str, str]:
-        return dice_symbol_display[self]
+    def symbol(self) -> Tuple["DiceSymbolDisplay", "DiceSymbolColor"]:
+        return DiceSymbolDisplay[self.name], DiceSymbolColor[self.name]
 
     @property
-    def foundry(self) -> DieFoundryCode:
-        return dice_foundry_codes[self]
+    def foundry(self) -> FoundryCode:
+        return FoundryCode[self.name]
 
     @property
     def die(self) -> "Die":
@@ -131,38 +159,36 @@ class Dice(StrEnum):
 
     @staticmethod
     def has_short_code(short_code: str) -> bool:
-        return short_code in dice_short_codes
+        try:
+            DiceShortCode(short_code)
+            return True
+        except:
+            return False
 
     @staticmethod
     def from_short_code(short_code: str) -> "Dice":
-        return dice_short_codes[cast(DieShortCode, short_code)]
+        return Dice[DiceShortCode(short_code).name]
 
 
-dice_display[Dice.PROFICIENCY] = "P"
-dice_display[Dice.ABILITY] = "A"
-dice_display[Dice.BOOST] = "B"
-dice_display[Dice.CHALLENGE] = "C"
-dice_display[Dice.DIFFICULTY] = "D"
-dice_display[Dice.SETBACK] = "S"
-dice_display[Dice.PERCENTILE] = "%"
+class DiceSymbolDisplay(StrEnum):
+    PROFICIENCY = "⬣"
+    ABILITY = "⯁"
+    BOOST = "◼"
+    CHALLENGE = "⬣"
+    DIFFICULTY = "⯁"
+    SETBACK = "◼"
+    PERCENTILE = "◼"
 
-dice_symbol_display[Dice.PROFICIENCY] = ("⬣", "#fff200")
-dice_symbol_display[Dice.ABILITY] = ("⯁", "#41ad49")
-dice_symbol_display[Dice.BOOST] = ("◼", "#72cddc")
-dice_symbol_display[Dice.CHALLENGE] = ("⬣", "#B25555")
-dice_symbol_display[Dice.DIFFICULTY] = ("⯁", "#BB76DD")
-dice_symbol_display[Dice.SETBACK] = ("◼", "#000000")
-dice_symbol_display[Dice.PERCENTILE] = ("◼", "#A4B0BB")
 
-dice_foundry_codes[Dice.PROFICIENCY] = "dp"
-dice_foundry_codes[Dice.ABILITY] = "da"
-dice_foundry_codes[Dice.BOOST] = "db"
-dice_foundry_codes[Dice.CHALLENGE] = "dc"
-dice_foundry_codes[Dice.DIFFICULTY] = "di"
-dice_foundry_codes[Dice.SETBACK] = "ds"
+class DiceSymbolColor(StrEnum):
+    PROFICIENCY = "#fff200"
+    ABILITY = "#41ad49"
+    BOOST = "#72cddc"
+    CHALLENGE = "#B25555"
+    DIFFICULTY = "#BB76DD"
+    SETBACK = "#000000"
+    PERCENTILE = "#A4B0BB"
 
-for die_type, code in dice_display.items():
-    dice_short_codes[code] = die_type
 
 Face = int | Symbol | list[Symbol]
 DieResult = tuple[Dice, Face]
@@ -621,10 +647,10 @@ class AdditionalEffectOption:
                 mod, index = Modifier.REMOVE, 1
             case "+":
                 mod, index = Modifier.ADD, 1
-            case _ if prefix in dice_short_codes:
+            case _ if DiceShortCode.exists(prefix):
                 mod, index = Modifier.ADD, 0
             case _:
-                raise Exception(f"Invalid prefix: {prefix}")
+                raise Exception(f"Invalid prefix or short code: {prefix}")
 
         object.__setattr__(self, "modifier", mod)
         dice_str = self.difficulty[index:]
@@ -658,7 +684,7 @@ def add_additional_effects(effects: AdditionalEffects) -> None:
 def get_dice_from_str(dice_str: str) -> List[Dice]:
     dice = []
     for die_str in dice_str.strip().upper():
-        if Dice.has_short_code(die_str):
+        if DiceShortCode.exists(die_str):
             dice.append(Dice.from_short_code(die_str))
         else:
             raise Exception(f"{die_str} is not a valid short code")
