@@ -6,6 +6,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Middle, Horizontal, Vertical, ItemGrid
 from textual.reactive import reactive
 from textual.screen import ModalScreen
@@ -85,13 +86,15 @@ class AdditionalEffectsModal(ModalScreen):
     """
 
     BINDINGS = [
-        ("escape", "dismiss()", "Close"),
+        ("escape,m", "dismiss()", "Close"),
+        Binding("j", "focused.cursor_down", "Down", show=False),
+        Binding("k", "focused.cursor_up", "Up", show=False),
     ]
 
     additional_effects: AdditionalEffects
-    dice_pool: Optional[DicePool] = None
+    dice_pool: DicePool
 
-    def __init__(self, dice_pool: Optional[DicePool], *args, **kwargs) -> None:
+    def __init__(self, dice_pool: DicePool, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.dice_pool = dice_pool
         self.additional_effects = data.load_from_file(
