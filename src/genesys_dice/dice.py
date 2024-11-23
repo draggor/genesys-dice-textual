@@ -130,12 +130,12 @@ class Dice(StrEnum):
         return dice_map[self].roll()
 
     @staticmethod
-    def has_short_code(short_code) -> bool:
+    def has_short_code(short_code: str) -> bool:
         return short_code in dice_short_codes
 
     @staticmethod
-    def from_short_code(short_code) -> "Dice":
-        return dice_short_codes[short_code]
+    def from_short_code(short_code: str) -> "Dice":
+        return dice_short_codes[cast(DieShortCode, short_code)]
 
 
 dice_display[Dice.PROFICIENCY] = "P"
