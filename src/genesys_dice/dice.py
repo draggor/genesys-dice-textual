@@ -1,6 +1,6 @@
 from collections import Counter
 from dataclasses import asdict, dataclass, field, is_dataclass
-from enum import StrEnum, Enum
+from enum import StrEnum, Enum, nonmember
 import itertools
 import random
 from typing import (
@@ -81,7 +81,6 @@ class ModifierOpposite(StrEnum):
     DOWNGRADE = Modifier.UPGRADE
 
 
-dice_symbol_display: Dict["Dice", Tuple[str, str]] = {}
 dice_map: Dict["Dice", "Die"] = {}
 
 
@@ -126,6 +125,18 @@ class Dice(StrEnum):
     SETBACK = "setback"
     PERCENTILE = "percentile"
 
+    @nonmember
+    class DieMap:
+        _die_map: Dict["Dice", "Die"] = {}
+
+        @staticmethod
+        def add(die: "Die") -> None:
+            Dice.DieMap._die_map[die.die_type] = die
+
+        @staticmethod
+        def get(die_type: "Dice") -> "Die":
+            return Dice.DieMap._die_map[die_type]
+
     @property
     def short_code(self) -> DiceShortCode:
         return DiceShortCode[self.name]
@@ -140,7 +151,7 @@ class Dice(StrEnum):
 
     @property
     def die(self) -> "Die":
-        return dice_map[self]
+        return Dice.DieMap.get(self)
 
     @property
     def faces(self) -> List["Face"]:
@@ -200,6 +211,9 @@ class Die:
     faces: List[Face] = field(default_factory=list)
     upgrade: Optional[Dice] = None
     downgrade: Optional[Dice] = None
+
+    def __post_init__(self):
+        Dice.DieMap.add(self)
 
     def roll(self) -> DieResult:
         return self.die_type, random.choice(self.faces)
@@ -302,14 +316,6 @@ Challenge = Die(
 )
 
 Percentile = Die(Dice.PERCENTILE, list(range(1, 101)))
-
-dice_map[Dice.BOOST] = Boost
-dice_map[Dice.SETBACK] = Setback
-dice_map[Dice.ABILITY] = Ability
-dice_map[Dice.DIFFICULTY] = Difficulty
-dice_map[Dice.PROFICIENCY] = Proficiency
-dice_map[Dice.CHALLENGE] = Challenge
-dice_map[Dice.PERCENTILE] = Percentile
 
 
 @dataclass
