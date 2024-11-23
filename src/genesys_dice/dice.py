@@ -737,9 +737,12 @@ def dice_faces() -> List[List[str]]:
     return table
 
 
+from rich.pretty import pprint
+
+
 def test_enum_names(*enums):
-    names = [member.name for enum in enums for member in enum]
-    product = list(itertools.product(enums, names))
+    names = {member.name for enum in enums for member in enum}
+    product = itertools.product(enums, names)
     errors = []
     for enum, name in product:
         try:
