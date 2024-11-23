@@ -735,3 +735,19 @@ def dice_faces() -> List[List[str]]:
         table.append(row)
 
     return table
+
+
+def test_enum_names(root_enum, *rest):
+    names = [e.name for e in root_enum]
+    enums = [root_enum, *rest]
+    product = list(itertools.product(enums, names))
+    for enum, name in product:
+        try:
+            enum[name]
+        except:
+            raise Exception(f"Enum {enum} doesn't have member {name}")
+
+
+test_enum_names(Symbol, SymbolDisplay, CancelMap)
+test_enum_names(Modifier, ModifierDisplay, ModifierOpposite)
+test_enum_names(Dice, FoundryCode, DiceShortCode, DiceSymbolDisplay, DiceSymbolColor)
