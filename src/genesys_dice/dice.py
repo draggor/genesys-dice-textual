@@ -737,15 +737,18 @@ def dice_faces() -> List[List[str]]:
     return table
 
 
-def test_enum_names(root_enum, *rest):
-    names = [e.name for e in root_enum]
-    enums = [root_enum, *rest]
+def test_enum_names(*enums):
+    names = [member.name for enum in enums for member in enum]
     product = list(itertools.product(enums, names))
+    errors = []
     for enum, name in product:
         try:
             enum[name]
         except:
-            raise Exception(f"Enum {enum} doesn't have member {name}")
+            errors.append(Exception(f"Enum {enum} doesn't have member {name}"))
+
+    if len(errors) > 0:
+        raise ExceptionGroup("Unaligned Enums", errors)
 
 
 test_enum_names(Symbol, SymbolDisplay, CancelMap)
