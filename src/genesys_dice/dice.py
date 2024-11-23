@@ -615,12 +615,19 @@ class AdditionalEffectOption:
     dice: List[Dice] = field(default_factory=list, init=False)
 
     def __post_init__(self) -> None:
-        if self.difficulty[0] == "-":
-            object.__setattr__(self, "modifier", Modifier.REMOVE)
-            dice_str = self.difficulty[1:]
-        else:
-            object.__setattr__(self, "modifier", Modifier.ADD)
-            dice_str = self.difficulty
+        prefix = self.difficulty[0]
+        match prefix:
+            case "-":
+                mod, index = Modifier.REMOVE, 1
+            case "+":
+                mod, index = Modifier.ADD, 1
+            case _ if prefix in dice_short_codes:
+                mod, index = Modifier.ADD, 0
+            case _:
+                raise Exception(f"Invalid prefix: {prefix}")
+
+        object.__setattr__(self, "modifier", mod)
+        dice_str = self.difficulty[index:]
 
         for die_str in dice_str:
             self.dice.append(Dice.from_short_code(die_str))

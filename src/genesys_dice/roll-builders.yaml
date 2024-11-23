@@ -2,7 +2,7 @@
   options:
     - name: Blast
       description: The attack gains the Blast quality with a rating equal to the character's ranks in Knowledge (PhysSci).
-      difficulty: D
+      difficulty: +D
     - name: Close Combat
       description: May select a target engaged with the character.  If the attack has the Blast quality, the character is unaffected by it.
       difficulty: D
