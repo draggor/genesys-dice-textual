@@ -3,6 +3,8 @@ These are wrappers around common widgets to allow
 border_title and border_subtitle as kwargs
 """
 
+from typing import Any
+
 from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import Button, Label
 

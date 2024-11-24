@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from rich.console import Group
 from rich.padding import Padding
@@ -27,7 +27,7 @@ from genesys_dice.dice import (
 from genesys_dice.tui.rich.dice_faces import get_dice_symbols
 
 
-class AdditionalEffectsModal(ModalScreen):
+class AdditionalEffectsModal(ModalScreen[Any]):
     DEFAULT_CSS = """
     AdditionalEffectsModal {
         align: center middle;
@@ -126,7 +126,9 @@ class AdditionalEffectsModal(ModalScreen):
                 yield Static(id="-effect-option")
                 yield Static(id="-effect-selected")
 
-    def on_selection_list_selection_highlighted(self, event) -> None:
+    def on_selection_list_selection_highlighted(
+        self, event: SelectionList.SelectionHighlighted[AdditionalEffectOption]
+    ) -> None:
         details = self.query_one("#-effect-option", Static)
         effect = event.selection.value
         details.update(
@@ -141,7 +143,7 @@ class AdditionalEffectsModal(ModalScreen):
             )
         )
 
-    def format_effect(self, effect):
+    def format_effect(self, effect: AdditionalEffectOption) -> Padding:
         return Padding(
             Panel(
                 effect.description,
@@ -157,7 +159,9 @@ class AdditionalEffectsModal(ModalScreen):
             Text("Current Dice: ") + get_dice_symbols(self.dice_pool.roll_str())
         )
 
-    def on_selection_list_selection_toggled(self, event) -> None:
+    def on_selection_list_selection_toggled(
+        self, event: SelectionList.SelectionToggled[AdditionalEffectOption]
+    ) -> None:
         effect = event.selection.value
         selected = effect in event.selection_list.selected
 
@@ -167,11 +171,3 @@ class AdditionalEffectsModal(ModalScreen):
             self.dice_pool.remove_additional_effect(effect)
 
         self.update_current_dice()
-
-    def on_selection_list_selected_changed(self, event) -> None:
-        # selected_text = []
-        # for selected in event.control.selected:
-        #    selected_text.append(self.format_effect(selected))
-        # selected_static = self.query_one("#-effect-selected", Static)
-        # selected_static.update(Group(*selected_text))
-        pass

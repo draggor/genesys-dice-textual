@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from typing import Any, Iterable, Optional
 
 import pyperclip  # type: ignore
 
@@ -24,7 +24,7 @@ from genesys_dice.tui.tabs import Tray, SavedRolls
 from genesys_dice.tui.tabs.data_tab import DataTab
 
 
-class AppScreen(Screen):
+class AppScreen(Screen[Any]):
     CSS_PATH = "app.tcss"
 
     def compose(self) -> ComposeResult:
@@ -37,7 +37,7 @@ class AppScreen(Screen):
         yield Footer(id="Footer")
 
 
-class DiceApp(App):
+class DiceApp(App[Any]):
     COMMAND_PALETTE_BINDING = "ctrl+backslash"
 
     BINDINGS = [
@@ -99,7 +99,7 @@ class DiceApp(App):
             self.set_focus(None)
             self.post_message(SwitchTabMessage("savedrolls-tab", dice_pool))
 
-    def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
+    def get_system_commands(self, screen: Screen[Any]) -> Iterable[SystemCommand]:
         yield from super().get_system_commands(screen)
         yield SystemCommand(
             "Show Dice Faces",

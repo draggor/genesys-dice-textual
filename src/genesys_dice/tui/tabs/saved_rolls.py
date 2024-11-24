@@ -111,27 +111,27 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
     def action_edit_roll(self) -> None:
         self.post_message(SaveRollMessage(self.dice_pool))
 
-    def calculate_grid_columns(self):
+    def calculate_grid_columns(self) -> None:
         available_size = self.container_size.width - 3
         max_dice = math.floor(available_size / 6)
         dice_count = self.dice_pool.count()
         columns = dice_count if dice_count < max_dice else max_dice
         self.query_one(ItemGrid).styles.grid_size_columns = columns
 
-    def on_show(self):
+    def on_show(self) -> None:
         self.calculate_grid_columns()
 
-    def on_resize(self):
+    def on_resize(self) -> None:
         self.calculate_grid_columns()
 
     @on(events.Enter)
     @on(events.Leave)
-    def on_enter(self, event: events.Enter):
+    def on_enter(self, event: events.Enter) -> None:
         event.stop()
         self.set_class(self.is_mouse_over, "-hover")
 
     @on(events.Click)
-    def handle_click(self, event: events.Click):
+    def handle_click(self, event: events.Click) -> None:
         """
         A widget becomes focused on mouse_down right away.
         We use -activated class to check if we're ready
@@ -144,7 +144,7 @@ class Roll(Vertical, can_focus=True, can_focus_children=False):
             self.add_class("-activated")
 
     @on(events.Blur)
-    def handle_unfocus(self):
+    def handle_unfocus(self) -> None:
         self.remove_class("-activated")
 
 
@@ -167,7 +167,7 @@ class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
     saved_rolls: reactive[List[DicePool]] = reactive(
         list, always_update=True, recompose=True
     )
-    next_show_cb: Optional[Callable] = None
+    next_show_cb: Optional[Callable[[], None]] = None
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -181,7 +181,7 @@ class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
                 for roll in self.saved_rolls:
                     yield Roll(roll)
 
-    def on_show(self, event):
+    def on_show(self) -> None:
         if self.next_show_cb is not None:
             self.next_show_cb()
             self.next_show_cb = None
@@ -195,7 +195,7 @@ class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
         if roll is not None:
             self.add_roll(roll)
 
-            def next_show_cb():
+            def next_show_cb() -> None:
                 self.query_one("#-scroll-window", VerticalScroll).scroll_end(
                     animate=False
                 )

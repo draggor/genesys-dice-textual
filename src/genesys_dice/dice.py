@@ -155,18 +155,18 @@ class Dice(StrEnum):
 
     @property
     def faces(self) -> List["Face"]:
-        return dice_map[self].faces
+        return Dice.DieMap.get(self).faces
 
     @property
     def upgrade(self) -> Optional["Dice"]:
-        return dice_map[self].upgrade
+        return Dice.DieMap.get(self).upgrade
 
     @property
     def downgrade(self) -> Optional["Dice"]:
-        return dice_map[self].downgrade
+        return Dice.DieMap.get(self).downgrade
 
     def roll(self) -> "DieResult":
-        return dice_map[self].roll()
+        return Dice.DieMap.get(self).roll()
 
     @staticmethod
     def has_short_code(short_code: str) -> bool:
@@ -212,7 +212,7 @@ class Die:
     upgrade: Optional[Dice] = None
     downgrade: Optional[Dice] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         Dice.DieMap.add(self)
 
     def roll(self) -> DieResult:

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 from textual import on
 from textual.app import ComposeResult
@@ -9,7 +9,7 @@ from textual.widgets import Static
 from genesys_dice.tui.rich import get_faces_table
 
 
-class DiceFacesModal(ModalScreen):
+class DiceFacesModal(ModalScreen[Any]):
     DEFAULT_CSS = """
     DiceFacesModal {
         align: center middle;

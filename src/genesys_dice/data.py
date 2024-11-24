@@ -18,7 +18,7 @@ PLATFORM_DIRS = PlatformDirs("genesys-dice")
 DATA_FILE_NAME = "genesys-dice-saved-rolls.yaml"
 
 
-def resource_path(relative):
+def resource_path(relative: str) -> str:
     return os.path.join(
         os.path.abspath(os.path.join(os.path.dirname(__file__), relative))
     )
