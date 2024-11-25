@@ -1,24 +1,37 @@
 from collections import Counter
 from dataclasses import asdict, dataclass, field, is_dataclass
-from enum import StrEnum, nonmember
+from enum import StrEnum, nonmember, EnumType
 import itertools
 import random
-from typing import (
-    Any,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Self,
-    cast,
-)
+from typing import Any, Dict, List, Optional, Tuple, Self, cast
 
 
 class enum_template:
-    def __init__(self, src_enum) -> None:
+    """
+    This is a decorator to aid in aligning members of multiple enums.
+    It requires the decorated enum to have exactly the same members.
+
+    Usage:
+
+        class A(Enum):
+            FIELD1: auto()
+            FIELD2: auto()
+
+        @enum_template(A)
+        class B(StrEnum):
+            FIELD1: 'homer'
+            FIELD3: 'simpson'
+
+    The above would produce two errors: FIELD2 missing in B, and
+    FIELD3 extra not allowed in B.
+    """
+
+    src_enum: EnumType
+
+    def __init__(self, src_enum: EnumType) -> None:
         self.src_enum = src_enum
 
-    def __call__(self, enum):
+    def __call__(self, enum: EnumType) -> EnumType:
         src_names = self.src_enum.__members__.keys()
         names = enum.__members__.keys()
         missing = []
