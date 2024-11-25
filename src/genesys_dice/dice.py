@@ -29,7 +29,7 @@ class Symbol(StrEnum):
 
     @property
     def opposite(self) -> "Symbol":
-        return Symbol(CancelMap[self.name])
+        return Symbol(SymbolOpposite[self.name])
 
 
 class SymbolDisplay(StrEnum):
@@ -42,7 +42,7 @@ class SymbolDisplay(StrEnum):
     BLANK = "□"
 
 
-class CancelMap(StrEnum):
+class SymbolOpposite(StrEnum):
     THREAT = Symbol.ADVANTAGE
     ADVANTAGE = Symbol.THREAT
     FAILURE = Symbol.SUCCESS
@@ -757,6 +757,6 @@ def test_enum_names(*enums):
         raise ExceptionGroup("Unaligned Enums", errors)
 
 
-test_enum_names(Symbol, SymbolDisplay, CancelMap)
+test_enum_names(Symbol, SymbolDisplay, SymbolOpposite)
 test_enum_names(Modifier, ModifierDisplay, ModifierOpposite)
 test_enum_names(Dice, FoundryCode, DiceShortCode, DiceSymbolDisplay, DiceSymbolColor)
