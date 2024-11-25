@@ -1,6 +1,6 @@
 from collections import Counter
 from dataclasses import asdict, dataclass, field, is_dataclass
-from enum import StrEnum, Enum, nonmember
+from enum import StrEnum, nonmember
 import itertools
 import random
 from typing import (
@@ -12,6 +12,37 @@ from typing import (
     Self,
     cast,
 )
+
+
+class enum_template:
+    def __init__(self, src_enum) -> None:
+        self.src_enum = src_enum
+
+    def __call__(self, enum):
+        src_names = self.src_enum.__members__.keys()
+        names = enum.__members__.keys()
+        missing = []
+        extra = []
+        errors = []
+
+        for key in src_names:
+            if key not in names:
+                missing.append(key)
+
+        for key in names:
+            if key not in src_names:
+                extra.append(key)
+
+        if len(missing) > 0:
+            errors.append(Exception(f"Failed to implement keys: {', '.join(missing)}"))
+        if len(extra) > 0:
+            errors.append(Exception(f"Extra keys not allowed: {', '.join(extra)}"))
+
+        if len(errors) > 0:
+            errors.append(Exception(f"Allowed keys: {', '.join(src_names)}"))
+            raise ExceptionGroup("Enum Template Errors", errors)
+
+        return enum
 
 
 class Symbol(StrEnum):
@@ -32,6 +63,7 @@ class Symbol(StrEnum):
         return Symbol(SymbolOpposite[self.name])
 
 
+@enum_template(Symbol)
 class SymbolDisplay(StrEnum):
     TRIUMPH = "❂"
     SUCCESS = "✷"
@@ -42,6 +74,7 @@ class SymbolDisplay(StrEnum):
     BLANK = "□"
 
 
+@enum_template(Symbol)
 class SymbolOpposite(StrEnum):
     THREAT = Symbol.ADVANTAGE
     ADVANTAGE = Symbol.THREAT
@@ -67,6 +100,7 @@ class Modifier(StrEnum):
         return Modifier[ModifierOpposite[self.name].name]
 
 
+@enum_template(Modifier)
 class ModifierDisplay(StrEnum):
     ADD = "+"
     UPGRADE = "↑"
@@ -74,6 +108,7 @@ class ModifierDisplay(StrEnum):
     DOWNGRADE = "↓"
 
 
+@enum_template(Modifier)
 class ModifierOpposite(StrEnum):
     ADD = Modifier.REMOVE
     REMOVE = Modifier.ADD
@@ -82,38 +117,6 @@ class ModifierOpposite(StrEnum):
 
 
 dice_map: Dict["Dice", "Die"] = {}
-
-
-class FoundryCode(StrEnum):
-    PROFICIENCY = "dp"
-    ABILITY = "da"
-    BOOST = "db"
-    CHALLENGE = "dc"
-    DIFFICULTY = "di"
-    SETBACK = "ds"
-    PERCENTILE = ""
-
-
-class DiceShortCode(StrEnum):
-    PROFICIENCY = "P"
-    ABILITY = "A"
-    BOOST = "B"
-    CHALLENGE = "C"
-    DIFFICULTY = "D"
-    SETBACK = "S"
-    PERCENTILE = "%"
-
-    @staticmethod
-    def exists(short_code: str) -> bool:
-        try:
-            DiceShortCode(short_code)
-            return True
-        except:
-            return False
-
-    @property
-    def die(self) -> "Dice":
-        return Dice[self.name]
 
 
 class Dice(StrEnum):
@@ -138,7 +141,7 @@ class Dice(StrEnum):
             return Dice.DieMap._die_map[die_type]
 
     @property
-    def short_code(self) -> DiceShortCode:
+    def short_code(self) -> "DiceShortCode":
         return DiceShortCode[self.name]
 
     @property
@@ -146,7 +149,7 @@ class Dice(StrEnum):
         return DiceSymbolDisplay[self.name], DiceSymbolColor[self.name]
 
     @property
-    def foundry(self) -> FoundryCode:
+    def foundry(self) -> "FoundryCode":
         return FoundryCode[self.name]
 
     @property
@@ -181,6 +184,41 @@ class Dice(StrEnum):
         return Dice[DiceShortCode(short_code).name]
 
 
+@enum_template(Dice)
+class FoundryCode(StrEnum):
+    PROFICIENCY = "dp"
+    ABILITY = "da"
+    BOOST = "db"
+    CHALLENGE = "dc"
+    DIFFICULTY = "di"
+    SETBACK = "ds"
+    PERCENTILE = ""
+
+
+@enum_template(Dice)
+class DiceShortCode(StrEnum):
+    PROFICIENCY = "P"
+    ABILITY = "A"
+    BOOST = "B"
+    CHALLENGE = "C"
+    DIFFICULTY = "D"
+    SETBACK = "S"
+    PERCENTILE = "%"
+
+    @staticmethod
+    def exists(short_code: str) -> bool:
+        try:
+            DiceShortCode(short_code)
+            return True
+        except:
+            return False
+
+    @property
+    def die(self) -> "Dice":
+        return Dice[self.name]
+
+
+@enum_template(Dice)
 class DiceSymbolDisplay(StrEnum):
     PROFICIENCY = "⬣"
     ABILITY = "⯁"
@@ -191,6 +229,7 @@ class DiceSymbolDisplay(StrEnum):
     PERCENTILE = "◼"
 
 
+@enum_template(Dice)
 class DiceSymbolColor(StrEnum):
     PROFICIENCY = "#fff200"
     ABILITY = "#41ad49"
