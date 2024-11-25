@@ -29,7 +29,7 @@ class Symbol(StrEnum):
 
     @property
     def opposite(self) -> "Symbol":
-        return Symbol[CancelMap[self.name].name]
+        return Symbol(CancelMap[self.name])
 
 
 class SymbolDisplay(StrEnum):
