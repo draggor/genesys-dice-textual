@@ -46,7 +46,7 @@ def command_faces() -> None:
     console.print(table)
 
 
-def command_roll(dice: str, details: bool):
+def command_roll(dice: str, details: bool) -> None:
     result = DicePool(dice).roll()
     if details:
         for die_type, faces in result.details.items():
@@ -70,7 +70,7 @@ def command_roll(dice: str, details: bool):
 @click.option("-f", is_flag=True, help="Print the faces of the dice")
 @click.option("-u", is_flag=True, help="Run the TUI with initial dice")
 @click.argument("dice", required=False)
-def main(d, t, s, f, u, dice):
+def main(d: bool, t: bool, s: bool, f: bool, u: bool, dice: str) -> None:
     """
     \b
     A dice roller and probablity calculator for the Genesys RPG system.

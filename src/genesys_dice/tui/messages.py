@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from textual.message import Message
+from textual.screen import Screen
 
 from genesys_dice.dice import DicePool
 
@@ -16,7 +17,7 @@ class CopyCommandMessage(DicePoolMessage):
 
 
 class ModalMessage(Message):
-    def __init__(self, screen, data: Any):
+    def __init__(self, screen: Screen[None], data: Any):
         self.screen = screen
         self.data = data
         super().__init__()

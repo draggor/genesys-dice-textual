@@ -1,3 +1,5 @@
+from typing import Optional
+
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Grid, Vertical
@@ -9,7 +11,7 @@ from genesys_dice.dice import DicePool
 from genesys_dice.tui.widgets import DieButton, LabelInput, LabelTextArea
 
 
-class SaveModal(ModalScreen):
+class SaveModal(ModalScreen[Optional[DicePool]]):
 
     DEFAULT_CSS = """
     SaveModal {

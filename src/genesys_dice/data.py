@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, TypeVar
+from typing import Any, List, Optional, TypeVar
 
 from dataclass_wizard import fromdict  # type: ignore
 
@@ -18,7 +18,7 @@ PLATFORM_DIRS = PlatformDirs("genesys-dice")
 DATA_FILE_NAME = "genesys-dice-saved-rolls.yaml"
 
 
-def resource_path(relative):
+def resource_path(relative: str) -> str:
     return os.path.join(
         os.path.abspath(os.path.join(os.path.dirname(__file__), relative))
     )
@@ -26,7 +26,7 @@ def resource_path(relative):
 
 def _load_from_file(path: Optional[str] = None) -> List[DicePool]:
     if path is not None:
-        data_file_path = resource_path(path)
+        data_file_path: str = resource_path(path)
     else:
         data_file_path = os.path.join(PLATFORM_DIRS.user_data_dir, DATA_FILE_NAME)
 

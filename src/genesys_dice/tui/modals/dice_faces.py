@@ -9,7 +9,7 @@ from textual.widgets import Static
 from genesys_dice.tui.rich import get_faces_table
 
 
-class DiceFacesModal(ModalScreen):
+class DiceFacesModal(ModalScreen[None]):
     DEFAULT_CSS = """
     DiceFacesModal {
         align: center middle;

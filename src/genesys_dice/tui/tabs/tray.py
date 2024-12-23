@@ -12,7 +12,6 @@ from textual.containers import (
     Horizontal,
     ItemGrid,
 )
-from textual.messages import Message
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
