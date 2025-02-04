@@ -16,7 +16,7 @@
       description: The attack gains the Ensanre quality with a rating equal to the character's ranks in Discipline.
       difficulty: D
     - name: Shockwave
-      description: The attack gains the Knockdown quality.  The attakc also gains the Disorient quality with a rating equal to the character's ranks in Knowledge (PhysSci).
+      description: The attack gains the Knockdown quality.  The attack also gains the Disorient quality with a rating equal to the character's ranks in Knowledge (PhysSci).
       difficulty: D
     - name: Non-Lethal
       description: The attack gains the Stun Damage quality.

@@ -87,7 +87,7 @@ class Tray(TabPane, DataTab[DicePool], can_focus=True):
         ("ctrl+r", "app.press_button('#Roll')", "Roll Dice"),
         ("ctrl+l", "app.press_button('#Clear')", "Clear"),
         ("ctrl+o", "copy_command_text()", "Copy Command"),
-        ("m", "show_additional_effects()", "Addiotional Effects"),
+        ("m", "show_additional_effects()", "Additional Effects"),
     ]
 
     dice_pool: reactive[DicePool] = reactive(DicePool, always_update=True)

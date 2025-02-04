@@ -592,11 +592,19 @@ class DicePool:
             escaped_name = self.name.strip().replace(" ", "|")
             macro_args.append(f"title={escaped_name}")
 
+        description_arg = ""
+
         if len(self.description) > 0:
-            escaped_description = (
+            description_arg += (
                 self.description.strip().replace(" ", "|").replace("\n", "\\n")
             )
-            macro_args.append(f"description={escaped_description}")
+
+        if len(self.additional_effects) > 0:
+            names = [ae.name for ae in self.additional_effects]
+            description_arg += "\\n\\nModified|with:|" + ",|".join(names)
+
+        if len(description_arg) > 0:
+            macro_args.append(f"description={description_arg}")
 
         macro_str = "/macro dice " + " ".join(macro_args)
 
