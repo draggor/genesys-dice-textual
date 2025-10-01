@@ -195,7 +195,7 @@ class SavedRolls(TabPane, DataTab[DicePool], can_focus=True):
             title, *children, name=name, id=id, classes=classes, disabled=disabled
         )
 
-        self.saved_rolls = data.load_from_file("test-data.yaml", DicePool)
+        #self.saved_rolls = data.load_from_file("laelia-data.yaml", DicePool)
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(id="-scroll-window") as container:

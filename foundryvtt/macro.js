@@ -1,33 +1,46 @@
 (() => {
 
 class GenesysRoller {
-  static async skillRoll({ actor, characteristic, skillId, formula, symbols, description }) {
-    var _a2, _b;
+  static async skillRoll({
+    actor,
+    characteristic,
+    usesSuperCharacteristic,
+    skillId,
+    formula,
+    symbols,
+    description
+  }) {
+    var _a3, _b2;
     const roll = new Roll(formula, { symbols });
-    await roll.evaluate({ async: true });
+    await roll.evaluate();
     const results = this.parseRollResults(roll);
 
     if (description) {
 
-    } else if (skillId === "-") {
-      if (characteristic) {
-        description = game.i18n.format("Genesys.Rolls.Description.Characteristic", {
-          characteristic: game.i18n.localize(`Genesys.Characteristics.${characteristic.capitalize()}`)
-        });
-      } else if (!actor) {
-        description = game.i18n.localize("Genesys.Rolls.Description.Simple");
-      }
-    } else if (actor) {
-      if (characteristic) {
-        description = game.i18n.format("Genesys.Rolls.Description.Skill", {
-          skill: ((_a2 = actor.items.get(skillId)) == null ? void 0 : _a2.name) ?? "UNKNOWN",
-          characteristic: game.i18n.localize(`Genesys.CharacteristicAbbr.${characteristic.capitalize()}`)
-        });
-      } else {
-        description = game.i18n.format("Genesys.Rolls.Description.SkillWithoutCharacteristic", {
-          skill: ((_b = actor.items.get(skillId)) == null ? void 0 : _b.name) ?? "UNKNOWN"
-        });
-      }
+    } else {
+        if (skillId === "-") {
+          if (characteristic) {
+            description = game.i18n.format("Genesys.Rolls.Description.Characteristic", {
+              characteristic: game.i18n.localize(`Genesys.Characteristics.${characteristic.capitalize()}`)
+            });
+          } else if (!actor) {
+            description = game.i18n.format("Genesys.Rolls.Description.Simple", {
+              superChar: usesSuperCharacteristic ? "super-char" : "hide-it"
+            });
+          }
+        } else if (actor) {
+          if (characteristic) {
+            description = game.i18n.format("Genesys.Rolls.Description.Skill", {
+              skill: ((_a3 = actor.items.get(skillId)) == null ? void 0 : _a3.name) ?? "UNKNOWN",
+              characteristic: game.i18n.localize(`Genesys.CharacteristicAbbr.${characteristic.capitalize()}`),
+              superChar: usesSuperCharacteristic ? "super-char" : "hide-it"
+            });
+          } else {
+            description = game.i18n.format("Genesys.Rolls.Description.SkillWithoutCharacteristic", {
+              skill: ((_b2 = actor.items.get(skillId)) == null ? void 0 : _b2.name) ?? "UNKNOWN"
+            });
+          }
+        }
     }
     const rollData = {
       description,
@@ -38,22 +51,22 @@ class GenesysRoller {
       user: game.user.id,
       speaker: { actor: actor == null ? void 0 : actor.id },
       content: html,
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-      roll
+      rolls: [roll]
     };
     await ChatMessage.create(chatData);
   }
   static async attackRoll({
     actor,
     characteristic,
+    usesSuperCharacteristic,
     skillId,
     formula,
     symbols,
     weapon
   }) {
-    var _a2, _b;
+    var _a3, _b2;
     const roll = new Roll(formula, { symbols });
-    await roll.evaluate({ async: true });
+    await roll.evaluate();
     const results = this.parseRollResults(roll);
     let description = void 0;
     let totalDamage = weapon.systemData.baseDamage;
@@ -77,13 +90,14 @@ class GenesysRoller {
       if (characteristic) {
         description = game.i18n.format("Genesys.Rolls.Description.AttackSkill", {
           name: weapon.name,
-          skill: ((_a2 = actor.items.get(skillId)) == null ? void 0 : _a2.name) ?? "UNKNOWN",
-          characteristic: game.i18n.localize(`Genesys.CharacteristicAbbr.${characteristic.capitalize()}`)
+          skill: ((_a3 = actor.items.get(skillId)) == null ? void 0 : _a3.name) ?? "UNKNOWN",
+          characteristic: game.i18n.localize(`Genesys.CharacteristicAbbr.${characteristic.capitalize()}`),
+          superChar: usesSuperCharacteristic ? "super-char" : "hide-it"
         });
       } else {
         description = game.i18n.format("Genesys.Rolls.Description.AttackSkillWithoutCharacteristic", {
           name: weapon.name,
-          skill: ((_b = actor.items.get(skillId)) == null ? void 0 : _b.name) ?? "UNKNOWN"
+          skill: ((_b2 = actor.items.get(skillId)) == null ? void 0 : _b2.name) ?? "UNKNOWN"
         });
       }
     }
@@ -109,8 +123,7 @@ class GenesysRoller {
       speaker: { actor: actor == null ? void 0 : actor.id },
       rollMode: game.settings.get("core", "rollMode"),
       content: html,
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-      roll
+      rolls: [roll]
     };
     await ChatMessage.create(chatData);
   }
@@ -163,17 +176,72 @@ class GenesysRoller {
   }
 }
 
+function getDiceDialogContent(short_code, title, description) {
+    const symbols = short_code.split('').map(c => simple_symbol_display[c]).join('');
+    return `
+        ${symbols}
+        <br />
+        Roll Name:
+        <input id="diceTitle" type="text" placeholder="Roll Title" value="${title || ''}" />
+        Description:
+        <textarea id="textArea" rows="5" cols="50">${description}</textarea>
+    `;
+}
+
+function makeDiceDialog(short_code, title, description, cb) {
+    return new Dialog({
+        title: "Dice Roll",
+        content: getDiceDialogContent(short_code, title, description),
+        buttons: {
+            button1: {
+                label: "Roll",
+                callback: (html) => { return diceDialogCB(html, cb); },
+                icon: `<i class="fas fa-check"></i>`
+            },
+            button2: {
+                label: "Cancel",
+                callback: () => {}
+            }
+        }
+    });
+}
+
+function diceDialogCB(html, genesysRollerCB) {
+    /*
+    const value = html.find("input#myInputID").val();
+    ui.notifications.info(`Value: ${value}`);
+    */
+
+    const title = html.find("input#diceTitle").val();
+    let description = html.find("textarea#textArea").val();
+
+    if (title && title.length > 0) {
+        description = `<label>${title}</label><br>${description}<br>`;
+    }
+
+    genesysRollerCB(description);
+}
+
 function makeSpan(symbol, color) {
     return `<span style="font-family: 'Genesys Symbols', sans-serif; color: ${color}; -webkit-text-stroke: 1px black;">${symbol}</span>`;
 }
 
+const simple_symbol_display = {
+    "P": makeSpan('P', '#fff200'),
+    "A": makeSpan('A', '#41ad49'),
+    "B": makeSpan('B', '#72cddc'),
+    "C": makeSpan('C', '#761213'),
+    "D": makeSpan('D', '#522380'),
+    "S": makeSpan('S', '#1e1e1e'),
+}
+
 const symbol_display = {
-    "{P}": makeSpan('P', '#fff200'),
-    "{A}": makeSpan('A', '#41ad49'),
-    "{B}": makeSpan('B', '#72cddc'),
-    "{C}": makeSpan('C', '#761213'),
-    "{D}": makeSpan('D', '#522380'),
-    "{S}": makeSpan('S', '#1e1e1e'),
+    "{P}": simple_symbol_display['P'],
+    "{A}": simple_symbol_display['A'],
+    "{B}": simple_symbol_display['B'],
+    "{C}": simple_symbol_display['C'],
+    "{D}": simple_symbol_display['D'],
+    "{S}": simple_symbol_display['S'],
 }
 
 function replaceSymbols(text, key) {
@@ -183,15 +251,16 @@ function replaceSymbols(text, key) {
 function main (scope) {
     let description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
     const title = scope.title?.replaceAll('|', ' ');
-    if (title) {
-        description = `<label>${title}</label><br>${description}<br>`;
-    }
-
-    description = Object.keys(symbol_display).reduce(replaceSymbols, description);
-
     const formula = scope.roll;
 
-    GenesysRoller.skillRoll({token,actor,formula,description});
+    const genesysRollerCB = (newDescription) => {
+        let description = newDescription || initDescription;
+        description = Object.keys(symbol_display).reduce(replaceSymbols, description);
+        GenesysRoller.skillRoll({token,actor,formula,description});
+    };
+
+    const dialog = makeDiceDialog(scope.short_code, title, description, genesysRollerCB);
+    dialog.render(true);
 }
 
 main(scope);

@@ -587,6 +587,7 @@ class DicePool:
             foundry_dice.append(f"{count}{foundry_code}")
 
         macro_args.append("roll=" + "+".join(foundry_dice))
+        macro_args.append(f"short_code={self.roll_str()}")
 
         if len(self.name) > 0:
             escaped_name = self.name.strip().replace(" ", "|")
@@ -596,7 +597,8 @@ class DicePool:
 
         if len(self.description) > 0:
             description_arg += (
-                self.description.strip().replace(" ", "|").replace("\n", "\\n")
+                #self.description.strip().replace(" ", "|").replace("\n", "\\n")
+                self.description.strip().replace("\n", "\\n")
             )
 
         if len(self.additional_effects) > 0:
