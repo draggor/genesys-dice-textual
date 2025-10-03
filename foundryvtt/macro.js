@@ -254,14 +254,20 @@ padding: 5px;
 font-size: 20px;
 `.replace('\n', '');
 
+const die_types_text = Object.keys(simple_symbol_display).map(symbol => {
+    return `${simple_symbol_display[symbol]}: {${symbol}}`;
+}).join(', ');
+
 function getDiceDialogContent(short_code, title, description) {
     const symbols = short_code_to_symbols(short_code);
+
     return `
         <div id="dice_symbols" style="${dice_tray_styles}">${symbols}</div>
         <br />
         Roll Name:
         <input id="diceTitle" type="text" placeholder="Roll Title" value="${title || ''}" />
         Description:
+        To include die types: <span>${die_types_text}</span>
         <textarea id="textArea" rows="5" cols="50">${description}</textarea>
         ${dice_tray_buttons}
     `;
@@ -350,13 +356,14 @@ function short_code_to_formula(short_code) {
 }
 
 function main (scope) {
-    let description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
+    const description = scope.description.replaceAll('\\n', '\n');
     const title = scope.title?.replaceAll('|', ' ');
     const original_formula = scope.roll;
 
     const genesysRollerCB = (short_code, newDescription) => {
-        let description = newDescription || initDescription;
         const formula = (short_code && short_code_to_formula(short_code)) || original_formula;
+        const next_description = newDescription || initDescription;
+        let description = next_description.replaceAll('\n', '<br>');
         description = Object.keys(symbol_display).reduce(replaceSymbols, description);
         GenesysRoller.skillRoll({token,actor,formula,description});
     };
