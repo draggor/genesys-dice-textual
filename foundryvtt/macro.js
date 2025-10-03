@@ -176,52 +176,6 @@ class GenesysRoller {
   }
 }
 
-function getDiceDialogContent(short_code, title, description) {
-    const symbols = short_code.split('').map(c => simple_symbol_display[c]).join('');
-    return `
-        ${symbols}
-        <br />
-        Roll Name:
-        <input id="diceTitle" type="text" placeholder="Roll Title" value="${title || ''}" />
-        Description:
-        <textarea id="textArea" rows="5" cols="50">${description}</textarea>
-    `;
-}
-
-function makeDiceDialog(short_code, title, description, cb) {
-    return new Dialog({
-        title: "Dice Roll",
-        content: getDiceDialogContent(short_code, title, description),
-        buttons: {
-            button1: {
-                label: "Roll",
-                callback: (html) => { return diceDialogCB(html, cb); },
-                icon: `<i class="fas fa-check"></i>`
-            },
-            button2: {
-                label: "Cancel",
-                callback: () => {}
-            }
-        }
-    });
-}
-
-function diceDialogCB(html, genesysRollerCB) {
-    /*
-    const value = html.find("input#myInputID").val();
-    ui.notifications.info(`Value: ${value}`);
-    */
-
-    const title = html.find("input#diceTitle").val();
-    let description = html.find("textarea#textArea").val();
-
-    if (title && title.length > 0) {
-        description = `<label>${title}</label><br>${description}<br>`;
-    }
-
-    genesysRollerCB(description);
-}
-
 function makeSpan(symbol, color) {
     return `<span style="font-family: 'Genesys Symbols', sans-serif; color: ${color}; -webkit-text-stroke: 1px black;">${symbol}</span>`;
 }
@@ -244,17 +198,165 @@ const symbol_display = {
     "{S}": simple_symbol_display['S'],
 }
 
+const symbol_to_forumula = {
+    'P': 'p',
+    'A': 'a',
+    'B': 'b',
+    'C': 'c',
+    'D': 'i',
+    'S': 's',
+};
+
+const mods = {
+    '+': 'A',
+    '-': 'R',
+};
+
+const dice_tray_button_styles = `
+text-align: center;
+background-color: gray;
+padding: 5px;
+font-size: 20px;
+`.replace('\n', '');
+
+const dice_tray_buttons = (() => {
+    let buttons = [];
+
+    Object.keys(simple_symbol_display).forEach(symbol => {
+        ['+','-'].forEach(mod => {
+            buttons.push(`<td><button id="tray_${mods[mod]}${symbol}" style="${dice_tray_button_styles}">${mod}${simple_symbol_display[symbol]}</button></td>`);
+        });
+    });
+
+    buttons_str = buttons.join('');
+
+    return `
+    <table>
+    <tr>
+    ${buttons_str}
+    </tr>
+    </table>
+    `;
+})();
+
+function short_code_to_symbols(short_code) {
+    return short_code.split('').map(c => simple_symbol_display[c]).join('');
+}
+
+function short_code_list_to_symbols(short_code) {
+    return short_code.map(c => simple_symbol_display[c]).join('');
+}
+
+const dice_tray_styles = `
+text-align: center;
+background-color: gray;
+padding: 5px;
+font-size: 20px;
+`.replace('\n', '');
+
+function getDiceDialogContent(short_code, title, description) {
+    const symbols = short_code_to_symbols(short_code);
+    return `
+        <div id="dice_symbols" style="${dice_tray_styles}">${symbols}</div>
+        <br />
+        Roll Name:
+        <input id="diceTitle" type="text" placeholder="Roll Title" value="${title || ''}" />
+        Description:
+        <textarea id="textArea" rows="5" cols="50">${description}</textarea>
+        ${dice_tray_buttons}
+    `;
+}
+
+function short_code_sort(short_code) {
+    const symbol_keys = Object.keys(simple_symbol_display);
+
+    return short_code.toSorted((a, b) => {
+        return symbol_keys.indexOf(a) - symbol_keys.indexOf(b);
+    });
+}
+
+function makeDiceDialog(short_code, title, description, cb) {
+    let saved_short_code = short_code;
+
+    const d = new foundry.applications.api.DialogV2({
+        title: "Dice Roll",
+        content: getDiceDialogContent(short_code, title, description),
+        form: { closeOnSubmit: false },
+        buttons: [
+            {
+                label: `<i class="fas fa-check"></i>Roll`,
+                action: "roll",
+                callback: (event, button, html) => { 
+                    d.close();
+                    return diceDialogCB($(html), saved_short_code, cb);
+                },
+            },
+            {
+                label: "Cancel",
+                action: "cancel",
+                callback: () => { d.close(); }
+            },
+        ]
+    });
+
+    d.addEventListener("render", () => {
+        const html = d.element;
+        Object.keys(simple_symbol_display).forEach(symbol => {
+            ['+','-'].forEach(mod => {
+                const id = `#tray_${mods[mod]}${symbol}`;
+                $(html).find(id).on("click", () => {
+                    let new_symbols = '';
+                    if (mod == '+') {
+                        new_symbols = short_code_sort((saved_short_code + symbol).split(''));
+                    } else {
+                        new_symbols = saved_short_code.replace(symbol, '').split('');
+                    }
+                    saved_short_code = new_symbols.join('');
+                    $(html).find("#dice_symbols").html(short_code_list_to_symbols(new_symbols));
+                });
+            });
+        });
+    });
+
+    return d;
+}
+
+function diceDialogCB(html, short_code, genesysRollerCB) {
+    const title = html.find("input#diceTitle").val();
+    let description = html.find("textarea#textArea").val();
+
+    if (title && title.length > 0) {
+        description = `<label>${title}</label><br>${description}<br>`;
+    }
+
+    genesysRollerCB(short_code, description);
+}
+
+
 function replaceSymbols(text, key) {
     return text.replaceAll(key, symbol_display[key]);
+}
+
+function short_code_to_formula(short_code) {
+    let formula_dice = [];
+    const counts = Object.groupBy(short_code, symbol => symbol);
+
+    Object.keys(simple_symbol_display).forEach(symbol => {
+        const count = (counts[symbol] && counts[symbol].length) || 0;
+        formula_dice.push(`${count}d${symbol_to_forumula[symbol]}`);
+    });
+
+    return formula_dice.join('+');
 }
 
 function main (scope) {
     let description = scope.description.replaceAll('|', ' ').replaceAll('\\n', '<br>');
     const title = scope.title?.replaceAll('|', ' ');
-    const formula = scope.roll;
+    const original_formula = scope.roll;
 
-    const genesysRollerCB = (newDescription) => {
+    const genesysRollerCB = (short_code, newDescription) => {
         let description = newDescription || initDescription;
+        const formula = (short_code && short_code_to_formula(short_code)) || original_formula;
         description = Object.keys(symbol_display).reduce(replaceSymbols, description);
         GenesysRoller.skillRoll({token,actor,formula,description});
     };

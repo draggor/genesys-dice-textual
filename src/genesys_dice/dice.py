@@ -590,20 +590,21 @@ class DicePool:
         macro_args.append(f"short_code={self.roll_str()}")
 
         if len(self.name) > 0:
-            escaped_name = self.name.strip().replace(" ", "|")
-            macro_args.append(f"title={escaped_name}")
+            # escaped_name = self.name.strip().replace(" ", "|")
+            macro_args.append(f"title={self.name}")
 
         description_arg = ""
 
         if len(self.description) > 0:
             description_arg += (
-                #self.description.strip().replace(" ", "|").replace("\n", "\\n")
+                # self.description.strip().replace(" ", "|").replace("\n", "\\n")
                 self.description.strip().replace("\n", "\\n")
             )
 
         if len(self.additional_effects) > 0:
             names = [ae.name for ae in self.additional_effects]
-            description_arg += "\\n\\nModified|with:|" + ",|".join(names)
+            # description_arg += "\\n\\nModified|with:|" + ",|".join(names)
+            description_arg += "\\n\\nModified with: " + ", ".join(names)
 
         if len(description_arg) > 0:
             macro_args.append(f"description={description_arg}")
