@@ -176,10 +176,6 @@ class GenesysRoller {
   }
 }
 
-function makeSpan(symbol, color) {
-    return `<span style="font-family: 'Genesys Symbols', sans-serif; color: ${color}; -webkit-text-stroke: 1px black;">${symbol}</span>`;
-}
-
 const simple_symbol_display = {
     "P": makeSpan('P', '#fff200'),
     "A": makeSpan('A', '#41ad49'),
@@ -212,12 +208,27 @@ const mods = {
     '-': 'R',
 };
 
+const die_types_text = Object.keys(simple_symbol_display).map(symbol => {
+    return `${simple_symbol_display[symbol]}: {${symbol}}`;
+}).join(', ');
+
 const dice_tray_button_styles = `
 text-align: center;
 background-color: gray;
 padding: 5px;
 font-size: 20px;
 `.replace('\n', '');
+
+const dice_tray_styles = `
+text-align: center;
+background-color: gray;
+padding: 5px;
+font-size: 20px;
+`.replace('\n', '');
+
+function makeSpan(symbol, color) {
+    return `<span style="font-family: 'Genesys Symbols', sans-serif; color: ${color}; -webkit-text-stroke: 1px black;">${symbol}</span>`;
+}
 
 const dice_tray_buttons = (() => {
     let buttons = [];
@@ -247,16 +258,6 @@ function short_code_list_to_symbols(short_code) {
     return short_code.map(c => simple_symbol_display[c]).join('');
 }
 
-const dice_tray_styles = `
-text-align: center;
-background-color: gray;
-padding: 5px;
-font-size: 20px;
-`.replace('\n', '');
-
-const die_types_text = Object.keys(simple_symbol_display).map(symbol => {
-    return `${simple_symbol_display[symbol]}: {${symbol}}`;
-}).join(', ');
 
 function getDiceDialogContent(short_code, title, description) {
     const symbols = short_code_to_symbols(short_code);
