@@ -579,14 +579,14 @@ class DicePool:
 
         foundry_dice = []
 
-        for die_type, count in self.dice_counts.items():
-            if die_type is Dice.PERCENTILE:
-                continue
+        #for die_type, count in self.dice_counts.items():
+        #    if die_type is Dice.PERCENTILE:
+        #        continue
 
-            foundry_code = die_type.foundry
-            foundry_dice.append(f"{count}{foundry_code}")
+        #    foundry_code = die_type.foundry
+        #    foundry_dice.append(f"{count}{foundry_code}")
 
-        macro_args.append("roll=" + "+".join(foundry_dice))
+        #macro_args.append("roll=" + "+".join(foundry_dice))
         macro_args.append(f"short_code={self.roll_str()}")
 
         if len(self.name) > 0:
